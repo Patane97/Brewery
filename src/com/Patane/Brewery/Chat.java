@@ -21,4 +21,8 @@ public enum Chat {
     public String format(String s) {
         return (s == null) ? "" : toString().replace("%", s);
     }
+
+	public static String translate(String s) {
+		return ChatColor.translateAlternateColorCodes('&', s);
+	}
 }

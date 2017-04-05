@@ -1,3 +1,7 @@
 main: com.Patane.Brewery.Brewery
 version: ALPHA-0.1
 name: Brewery
+commands:
+  br:
+    description: Primary Brewery command.
+    usage: /br
