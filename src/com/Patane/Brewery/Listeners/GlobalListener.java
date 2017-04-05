@@ -1,14 +1,12 @@
 package com.Patane.Brewery.Listeners;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.projectiles.ProjectileSource;
 
-import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.util.BrItem;
 
 public class GlobalListener implements Listener{
@@ -16,15 +14,23 @@ public class GlobalListener implements Listener{
 	//scans NBT tag
 	@EventHandler
 	public void potionSplash (PotionSplashEvent e){
-		ProjectileSource source = e.getPotion().getShooter();
-		if(source instanceof Player){
-			Player player = (Player) source;
-			Messenger.send(player, "Potion Splash!");
-			ItemStack potion = e.getPotion().getItem();
-			PotionMeta pm = (PotionMeta) potion.getItemMeta();
-			if(pm.getDisplayName() != null && BrItem.decodeItemData(pm.getDisplayName()).contains("Brewery")){
-				Messenger.send(player, "Brewery Potion");
-			}
+		ItemStack potion = e.getPotion().getItem();
+		PotionMeta pm = (PotionMeta) potion.getItemMeta();
+		if(pm.getDisplayName() != null && BrItem.decodeItemData(pm.getDisplayName()).contains("Br-")){
+			e.setCancelled(true);
 		}
+	}
+	@EventHandler
+	public void onProjectileLaunch (ProjectileLaunchEvent e){
+//		Projectile projectile = e.getEntity();
+//		String projectileName = "";
+//		if(projectile instanceof ThrownPotion){
+//			ThrownPotion tp = (ThrownPotion) projectile;
+//			projectileName = tp.getItem().getItemMeta().getDisplayName();
+//		}
+//		projectileName = BrItem.decodeItemData(projectileName);
+//		if(projectileName.contains("Br-")){
+//			e.setCancelled(true);
+//		}
 	}
 }
