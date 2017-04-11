@@ -14,14 +14,13 @@ import com.Patane.Brewery.commands.all.*;
 public class CommandHandler implements CommandExecutor{
 	
 	private Brewery plugin;
-	
 	private HashMap<String, BrCommand> commands;
 	
 	public CommandHandler(Brewery battlegrounds) {
 		this.plugin = battlegrounds;
 		registerAll();
 	}
-
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		String command = (args.length > 0 ? args[0] : "");
@@ -62,5 +61,6 @@ public class CommandHandler implements CommandExecutor{
 		}
 
 	}
+
 
 }

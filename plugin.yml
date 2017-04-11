@@ -5,3 +5,4 @@ commands:
   br:
     description: Primary Brewery command.
     usage: /br
+depend: [ProtocolLib]
