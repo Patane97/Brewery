@@ -1,6 +1,8 @@
 package com.Patane.Brewery.commands;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.StringJoiner;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,7 +48,7 @@ public class CommandHandler implements CommandExecutor{
 	}
 	private void registerAll() {
 		commands = new HashMap<String, BrCommand>();
-		register(giveCommand.class);
+		register(potionCommand.class);
 	}
 	public void register(Class< ? extends BrCommand> command){
 		CommandInfo cmdInfo = command.getAnnotation(CommandInfo.class);
@@ -62,5 +64,12 @@ public class CommandHandler implements CommandExecutor{
 
 	}
 
+	public static String argPotionNameToString(String[] args){
+		String[] temp = Arrays.copyOfRange(args, 1, args.length);
+		StringJoiner sj = new StringJoiner(" ");
+		for(String arg : temp)
+			sj.add(arg);
+		return sj.toString();
+	}
 
 }
