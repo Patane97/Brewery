@@ -1,5 +1,7 @@
 package com.Patane.Brewery.CustomPotions;
 
-public class CustomPotions {
+import com.Patane.Brewery.BrCollection;
+
+public class CustomPotions extends BrCollection<CustomPotion>{
 
 }

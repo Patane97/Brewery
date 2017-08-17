@@ -20,10 +20,10 @@ public class GlobalListener implements Listener{
 		ItemStack potion = e.getPotion().getItem();
 		PotionMeta pm = (PotionMeta) potion.getItemMeta();
 		// If it is not a BR item, return.
+		CustomPotion customPotion = 
 		if(!(pm.getDisplayName() != null && BrItem.decodeItemData(pm.getDisplayName()).contains("Br-"))) return;
 		e.setCancelled(true);
 		Location loc = e.getEntity().getLocation();
-		Location storedLoc = new Location (loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 		
 		for (LivingEntity entity : Locations.getNearbyEntities(loc, 10)){
 			LivingEntity lEntity = (LivingEntity) entity;

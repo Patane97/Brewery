@@ -1,7 +1,12 @@
 package com.Patane.Brewery.CustomEffects;
 
+import java.util.HashMap;
+
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 
 import com.Patane.Brewery.BrCollectable;
 
@@ -33,7 +38,7 @@ public class CustomEffect extends BrCollectable{
 	}
 
 	public void execute(LivingEntity entity) {
-		entity.setLastDamageCause(new EntityDamageEvent());
+		entity.setLastDamageCause(new EntityDamageByEntityEvent);
 	}
 	
 	
