@@ -1,10 +1,6 @@
 package com.Patane.Brewery.Listeners;
 
-import java.util.ArrayList;
-
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,17 +10,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 
 import com.Patane.Brewery.util.BrItem;
-import com.Patane.Brewery.util.ColouredParticle;
 import com.Patane.Brewery.util.Locations;
 
 public class GlobalListener implements Listener{
 	//listenens for potion throw/on hit
 	//scans NBT tag
-	static ArrayList<Location> storedParticleLocations = new ArrayList<Location>();
-	
-	public static ArrayList<Location> getParticleLoc(){
-		return storedParticleLocations;
-	}
 	@EventHandler
 	public void potionSplash (PotionSplashEvent e){
 		ItemStack potion = e.getPotion().getItem();
@@ -34,14 +24,8 @@ public class GlobalListener implements Listener{
 		e.setCancelled(true);
 		Location loc = e.getEntity().getLocation();
 		Location storedLoc = new Location (loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-		storedParticleLocations.add(storedLoc);
 		
-//		loc.getWorld().spawnParticle(Particle.SPELL_MOB, loc, 200, 0.4D, 0.5D, 0.4D, Color.RED);
-		ColouredParticle.RED_DUST.send(loc, 16, 23, 23, 23);
-		loc.getWorld().playSound(loc, Sound.ENTITY_SPLASH_POTION_BREAK, 1, 1);
-		
-		for (Entity entity : Locations.getNearbyEntities(loc, 10)){
-			if(!(entity instanceof LivingEntity)) return;
+		for (LivingEntity entity : Locations.getNearbyEntities(loc, 10)){
 			LivingEntity lEntity = (LivingEntity) entity;
 			lEntity.damage(lEntity.getHealth());
 		}
