@@ -3,10 +3,14 @@ package com.Patane.Brewery;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.Patane.Brewery.Messenger.ChatType;
+
 public class BrCollection<T extends BrCollectable> {
 	private HashMap<String, T> collection = new HashMap<String, T>();
 	
 	public T add(T newItem){
+		
+		Messenger.debug(ChatType.INFO, "Adding "+newItem.getID()+" to Collection");
 		return collection.put(newItem.getID(), newItem);
 	}
 	public T remove(String id){

@@ -5,8 +5,7 @@ public class BrCollectable {
 	final private String identifier;
 	protected BrCollectable(String name){
 		this.name = name;
-		// change identifier to be all caps and spaces = _
-		this.identifier = name;
+		this.identifier = name.replace(" ", "_").toUpperCase();
 	}
 	public String getName(){
 		return name;
