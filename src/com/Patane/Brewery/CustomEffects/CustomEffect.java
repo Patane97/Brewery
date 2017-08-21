@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
@@ -42,10 +43,10 @@ public abstract class CustomEffect extends BrCollectable{
 		return potionEffects;
 	}
 	
-	public abstract void execute(LivingEntity shooter, Location location);
+	public abstract void execute(LivingEntity shooter, Location location, EntityType[] hitableEntities);
 	
-	protected void executeOnEntities(LivingEntity shooter, Location location) {
-		ArrayList<LivingEntity> hitEntities = Locations.getLivingEntities(location, radius);
+	protected void executeOnEntities(LivingEntity shooter, Location location, EntityType[] hitableEntities) {
+		ArrayList<LivingEntity> hitEntities = Locations.getLivingEntities(location, radius, hitableEntities);
 		for(LivingEntity hitEntity : hitEntities){
 			hitEntity.addPotionEffects(potionEffects);
 			if(damageContainer.getDamage() > 0){

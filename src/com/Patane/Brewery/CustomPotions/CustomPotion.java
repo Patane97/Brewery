@@ -1,8 +1,9 @@
 package com.Patane.Brewery.CustomPotions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,11 +23,11 @@ public class CustomPotion extends BrCollectable{
 	Material potionMaterial;
 	String name;
 	//NBT TAG
-	HashMap<CustomEffect, LivingEntity[]> EffectPerEntity = new HashMap<CustomEffect, LivingEntity[]>();
+	Map<CustomEffect, LivingEntity[]> effectPerEntities = new HashMap<CustomEffect, LivingEntity[]>();
 	ArrayList<CustomEffect> customEffects;
 	ItemStack item;
 	
-	public CustomPotion(String name, Material potionMaterial, CustomEffect... customEffects){
+	public CustomPotion(String name, Material potionMaterial, Map<CustomEffect, LivingEntity[]> effectPerEntities){
 		super(name);
 		this.item = new ItemStack(potionMaterial, 1);
 		if(!(item.getItemMeta() instanceof PotionMeta)){
@@ -36,7 +37,8 @@ public class CustomPotion extends BrCollectable{
 		ItemMeta itemMeta = item.getItemMeta();
 		itemMeta.setDisplayName(name + BrItem.encodeItemData(" <Br-" + getID() + ">"));
 		item.setItemMeta(itemMeta);
-		this.customEffects = new ArrayList<CustomEffect>(Arrays.asList(customEffects));
+		this.effectPerEntities = effectPerEntities;
+//		this.customEffects = new ArrayList<CustomEffect>(Arrays.asList(customEffects));
 		
 		Brewery.getCustomPotions().add(this);
 	}
@@ -44,8 +46,11 @@ public class CustomPotion extends BrCollectable{
 		return item;
 	}
 	public void execute(LivingEntity shooter, Location location){
-		for(CustomEffect customEffect : customEffects){
-			customEffect.execute(shooter, location);
+		for(CustomEffect customEffect : effectPerEntities.keySet()){
+			customEffect.execute(shooter, location, effectPerEntities.get(customEffect));
 		}
+//		for(CustomEffect customEffect : customEffects){
+//			customEffect.execute(shooter, location);
+//		}
 	}
 }

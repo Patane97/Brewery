@@ -1,6 +1,7 @@
 package com.Patane.Brewery.CustomEffects;
 
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
@@ -37,7 +38,7 @@ public class LingeringEffect extends CustomEffect{
 		
 		@Override
 		public void run() {
-			executeOnEntities(shooter, location);
+			executeOnEntities(shooter, location, EntityType[] hitableEntities);
 			roughTicksLeft -= newRate;
 			if(roughTicksLeft <= 0)
 				Brewery.getInstance().getServer().getScheduler().cancelTask(scheduleID);

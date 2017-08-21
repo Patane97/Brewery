@@ -1,9 +1,11 @@
 package com.Patane.Brewery.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 public class Locations {
@@ -29,12 +31,13 @@ public class Locations {
 //	    Messenger.debug(ChatType.BROADCAST, radiusEntities.toString());
 //	    return radiusEntities;
 //	}
-	public static ArrayList<LivingEntity> getLivingEntities(Location location, double radius){
+	public static ArrayList<LivingEntity> getEntities(Location location, double radius, EntityType[] hitableEntities){
 //	    int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+		ArrayList<EntityType> entityTypes = new ArrayList<EntityType>(Arrays.asList(hitableEntities));
 	    ArrayList<LivingEntity> radiusEntities = new ArrayList<LivingEntity>();
 	    
 	    for(Entity entity : location.getWorld().getNearbyEntities(location, radius, radius, radius)){
-	    	if(entity instanceof LivingEntity)
+	    	if(entity instanceof LivingEntity && entityTypes.contains(entity.getType()))
 	    		radiusEntities.add((LivingEntity) entity);
 	    }
 //	    for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
