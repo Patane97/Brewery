@@ -30,6 +30,9 @@ public enum Chat {
     public static String translate(String s){
         return ChatColor.translateAlternateColorCodes('&', s);
     }
+    public static String deTranslate(String s){
+    	return s.replace("§", "&");
+    }
     public static boolean hasAlpha(String s){
     	return s.matches(".*[a-zA-Z]+.*");
     }
@@ -38,6 +41,12 @@ public enum Chat {
 		List<String> result = new ArrayList<String>();
 		for(String s : stringList)
 			result.add(translate(s));
+		return result;
+	}
+	public static List<String> deTranslate(List<String> stringList) {
+		List<String> result = new ArrayList<String>();
+		for(String s : stringList)
+			result.add(deTranslate(s));
 		return result;
 	}
 }

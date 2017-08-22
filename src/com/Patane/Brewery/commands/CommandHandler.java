@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.commands.all.*;
+import com.Patane.Brewery.commands.all.giveCommand;
 
 public class CommandHandler implements CommandExecutor{
 	
@@ -48,7 +48,7 @@ public class CommandHandler implements CommandExecutor{
 	}
 	private void registerAll() {
 		commands = new HashMap<String, BrCommand>();
-		register(potionCommand.class);
+		register(giveCommand.class);
 	}
 	public void register(Class< ? extends BrCommand> command){
 		CommandInfo cmdInfo = command.getAnnotation(CommandInfo.class);
@@ -64,7 +64,7 @@ public class CommandHandler implements CommandExecutor{
 
 	}
 
-	public static String argPotionNameToString(String[] args){
+	public static String argItemNameToString(String[] args){
 		String[] temp = Arrays.copyOfRange(args, 1, args.length);
 		StringJoiner sj = new StringJoiner(" ");
 		for(String arg : temp)

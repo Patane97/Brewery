@@ -1,8 +1,9 @@
-package com.Patane.Brewery;
+package com.Patane.Brewery.Collections;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.ChatType;
 
 public class BrCollection<T extends BrCollectable> {
@@ -22,7 +23,7 @@ public class BrCollection<T extends BrCollectable> {
 		return removed;
 	}
 	public T getItem(String id){
-		return collection.get(id);
+		return collection.get(id.replace(" ", "_").toUpperCase());
 	}
 	public ArrayList<T> getAllItems(){
 		return new ArrayList<T>(collection.values());

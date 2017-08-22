@@ -7,13 +7,13 @@ import org.bukkit.potion.PotionEffect;
 
 public class InstantEffect extends CustomEffect{
 	
-	public InstantEffect(String name, DamageContainer damageContainer, int radius, PotionEffect... potionEffects) {
-		super(name, damageContainer, radius, potionEffects);
+	public InstantEffect(String name, PlayerModifier modifier, int radius, PotionEffect... potionEffects) {
+		super(name, modifier, radius, potionEffects);
 	}
 
 	@Override
 	public void execute(LivingEntity shooter, Location location, EntityType[] hitableEntities) {
-		executeOnEntities(shooter, location);
+		executeOnEntities(shooter, location, hitableEntities);
 	}
 
 
