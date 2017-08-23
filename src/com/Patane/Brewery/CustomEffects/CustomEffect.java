@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffect;
 
+import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Collections.BrCollectable;
 import com.Patane.Brewery.util.LocationUtilities;
 
@@ -26,6 +27,7 @@ public abstract class CustomEffect extends BrCollectable{
 		this.radius = (radius < 0 ? 0 : radius);
 		this.potionEffects = new ArrayList<PotionEffect>(Arrays.asList(potionEffects));
 		
+		Brewery.getEffectCollection().add(this);
 	}
 	public PlayerModifier getModifier() {
 		return modifier;

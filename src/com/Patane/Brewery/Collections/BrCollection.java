@@ -10,8 +10,7 @@ public class BrCollection<T extends BrCollectable> {
 	private HashMap<String, T> collection = new HashMap<String, T>();
 	
 	public T add(T newItem){
-		
-		Messenger.debug(ChatType.INFO, "Adding "+newItem.getID()+" to Collection");
+		Messenger.debug(ChatType.INFO, "Adding "+newItem.getID()+" to "+newItem.getClass().getSimpleName()+ "Collection");
 		return collection.put(newItem.getID(), newItem);
 	}
 	public T remove(String id){

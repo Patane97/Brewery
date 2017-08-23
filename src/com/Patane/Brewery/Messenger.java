@@ -23,15 +23,15 @@ public class Messenger {
 		Bukkit.broadcastMessage(Chat.PLUGIN_PREFIX_SMALL + ChatColor.translateAlternateColorCodes('&', msg));
 	}
 	public static void info(String msg) {
-		logger.info(Chat.STRIPPED_PLUGIN_PREFIX + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
+		logger.info(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
 	}
 
 	public static void warning(String msg) {
-		logger.warning(Chat.STRIPPED_PLUGIN_PREFIX + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
+		logger.warning(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
 	}
 
 	public static void severe(String msg) {
-		logger.severe(Chat.STRIPPED_PLUGIN_PREFIX + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
+		logger.severe(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
 	}
 	public static void debug(ChatType type, String msg) {
 		if(!Brewery.debugMode())
