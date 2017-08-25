@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Collections.BrCollectable;
-import com.Patane.Brewery.CustomEffects.CustomEffect;
+import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.util.ItemUtilities;
 
 
@@ -31,9 +31,9 @@ public class BrItem extends BrCollectable{
 	 */
 	final protected ItemStack item;
 	final protected CustomType type;
-	protected Map<CustomEffect, EntityType[]> effectPerEntities = new HashMap<CustomEffect, EntityType[]>();
+	protected Map<BrEffect, EntityType[]> effectPerEntities = new HashMap<BrEffect, EntityType[]>();
 	
-	public BrItem(String name, CustomType type, ItemStack item, Map<CustomEffect, EntityType[]> effectPerEntities){
+	public BrItem(String name, CustomType type, ItemStack item, Map<BrEffect, EntityType[]> effectPerEntities){
 		super(name);
 		if(Brewery.getItemCollection().contains(getID())){
 			throw new IllegalArgumentException(getID()+" already exists!");
@@ -50,14 +50,14 @@ public class BrItem extends BrCollectable{
 	public CustomType getType(){
 		return type;
 	}
-	public Map<CustomEffect, EntityType[]> getEffectPerEntities (){
+	public Map<BrEffect, EntityType[]> getEffectPerEntities (){
 		return effectPerEntities;
 	}
 	public void execute(LivingEntity shooter, Location location){
-		for(CustomEffect customEffect : effectPerEntities.keySet()){
+		for(BrEffect customEffect : effectPerEntities.keySet()){
 			customEffect.execute(shooter, location, effectPerEntities.get(customEffect));
 		}
-//		for(CustomEffect customEffect : customEffects){
+//		for(BrEffect customEffect : customEffects){
 //			customEffect.execute(shooter, location);
 //		}
 	}

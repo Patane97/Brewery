@@ -13,7 +13,7 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Chat;
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.ChatType;
-import com.Patane.Brewery.CustomEffects.CustomEffect;
+import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.YML.BasicYML;
 import com.Patane.Brewery.util.ItemUtilities;
@@ -27,9 +27,10 @@ public class BrItemYML extends BasicYML{
 
 	@Override
 	public void save() {
+		load();
 		for(BrItem item : Brewery.getItemCollection().getAllItems()){
 			String itemName = item.getName();
-			setHeader(clearCreateSection(itemName));
+			setHeader(createSection(itemName));
 			// TYPE
 			header.set("type", item.getType().name());
 			// ITEM
@@ -42,7 +43,7 @@ public class BrItemYML extends BasicYML{
 			}
 			// EFFECTS
 			setHeader(clearCreateSection(itemName, "effect_per_entities"));
-			for(CustomEffect effect : item.getEffectPerEntities().keySet()){
+			for(BrEffect effect : item.getEffectPerEntities().keySet()){
 				Messenger.debug(ChatType.INFO, "Adding: "+effect.getID());
 				header.set(effect.getID(), YMLUtilities.getEntityTypeNames(item.getEffectPerEntities().get(effect)));
 			}
@@ -74,10 +75,10 @@ public class BrItemYML extends BasicYML{
 			ItemStack item = ItemUtilities.createItem(material, 1, (short) 0, name, lore.toArray(new String[0]));
 			// EFFECTS
 			setHeader(itemName, "effect_per_entities");
-			Map<CustomEffect, EntityType[]> effectPerEntities = new HashMap<CustomEffect, EntityType[]>();
+			Map<BrEffect, EntityType[]> effectPerEntities = new HashMap<BrEffect, EntityType[]>();
 			for(String effectName : header.getKeys(false)){
 				Messenger.debug(ChatType.INFO, "Adding Effect to item: "+effectName);
-//				CustomEffect effect = CustomEffects.getItem(effectName);
+//				BrEffect effect = BrEffects.getItem(effectName);
 //				EntityType[] entityTypes = header.getStringList(effectName).toArray(new EntityType[0]);
 //				effectPerEntities.put(effect, entityTypes);
 			}

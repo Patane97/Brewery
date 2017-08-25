@@ -3,8 +3,6 @@ package com.Patane.Brewery.YML;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.ChatType;
 import com.Patane.Brewery.util.StringUtilities;
 
 public abstract class BasicYML {
@@ -29,25 +27,27 @@ public abstract class BasicYML {
 	// DEFINE EACH OF THESE. You know what it does but will others? :)
 	
 	protected ConfigurationSection createRootSection() {
-		Messenger.debug(ChatType.BROADCAST, "Root");
 		return config.createSection(root);
 	}
-	protected ConfigurationSection createSection(String...strings) {
+	public ConfigurationSection createSection(String...strings) {
 		String path = (strings.length > 1 ? StringUtilities.stringJoiner(strings, ".") : strings[0]);
 		if(isSection(path))
 			return getSection(path);
 		return config.createSection(root + "." + path);
 	}
-	protected ConfigurationSection clearCreateSection(String...strings) {
+	public ConfigurationSection clearCreateSection(String...strings) {
 		String path = (strings.length > 1 ? StringUtilities.stringJoiner(strings, ".") : strings[0]);
 		clearSection(path);
 		return config.createSection(root + "." + path);
 	}
-	protected void setHeader(String...strings) {
+	public void setHeader(String...strings) {
 		header = createSection(strings);
 	}
-	protected void setHeader(ConfigurationSection section) {
+	public void setHeader(ConfigurationSection section) {
 		header = section;
+	}
+	public ConfigurationSection getHeader(){
+		return header;
 	}
 	public boolean isRootSection() {
 		return config.isConfigurationSection(root);
