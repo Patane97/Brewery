@@ -4,22 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.ChatType;
+import com.Patane.Brewery.Messenger.Msg;
 
 public class BrCollection<T extends BrCollectable> {
 	private HashMap<String, T> collection = new HashMap<String, T>();
 	
 	public T add(T newItem){
-		Messenger.debug(ChatType.INFO, "Adding "+newItem.getID()+" to "+newItem.getClass().getSimpleName()+ "Collection");
+		Messenger.debug(Msg.INFO, "Adding "+newItem.getID()+" to "+newItem.getClass().getSimpleName()+ "Collection");
 		return collection.put(newItem.getID(), newItem);
 	}
 	public T remove(String id){
 		T removed = collection.remove(id);
+		Messenger.debug(Msg.INFO, "Removing "+id+" to "+removed.getClass().getSimpleName()+ "Collection");
 		if(removed != null){
 			// If element was removed,
 			// Do something
 		}
 		return removed;
+	}
+	public void removeAll(){
+		collection.clear();
 	}
 	public T getItem(String id){
 		return collection.get(id.replace(" ", "_").toUpperCase());

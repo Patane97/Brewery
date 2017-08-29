@@ -8,53 +8,98 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.CustomItems.BrItem;
+import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.util.ItemUtilities;
+import com.Patane.Brewery.util.LocationUtilities;
 
 public class GlobalListener implements Listener{
-	//listenens for potion throw/on hit
-	//scans NBT tag
-	Pattern pattern = Pattern.compile(".* <Br\\-(\\w+)>");
 	
+	/**
+	 * Detects when a potion has been hit
+	 * Checks if it is from a BrItem
+	 * Checks if BrItem is of type "THROWABLE"
+	 * Executes BrItem
+	 * @param e
+	 */
 	@EventHandler
 	public void potionSplash (PotionSplashEvent e){
-		ItemStack itemStack = e.getPotion().getItem();
-		PotionMeta pm = (PotionMeta) itemStack.getItemMeta();
-
 		// If it is not a BR item, return.
-		if(pm.getDisplayName() == null)
+		BrItem brPotion = getBrItem(e.getPotion().getItem());
+		if(brPotion == null)
 			return;
-		Matcher match = pattern.matcher(ItemUtilities.decodeItemData(pm.getDisplayName()));
-		if(!match.matches())
+		// If it is not of type THROWABLE, return.
+		if(brPotion.getType() != CustomType.THROWABLE)
 			return;
-		String decodedName = match.group(1);
-		if(!Brewery.getItemCollection().contains(decodedName))
-			return;
-		BrItem customPotion = Brewery.getItemCollection().getItem(decodedName);
 		e.setCancelled(true);
 		Location location = e.getEntity().getLocation();
-		LivingEntity livingShooter = null;
-		if(e.getPotion().getShooter() instanceof LivingEntity)
-			livingShooter = (LivingEntity) e.getPotion().getShooter();
-		
-		customPotion.execute(livingShooter, location);
-		if(e.getPotion().getShooter() instanceof Player)
-			Messenger.debug((Player) e.getEntity().getShooter(), "&7"+decodedName+" &apotion detected");
+		LivingEntity shooter = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
+		brPotion.execute(shooter, location);
 	}
-//	@EventHandler
-//	public void onDamageTaken (EntityDamageEvent e){
-//		if(e instanceof EntityDamageByEntityEvent)
-//			Messenger.debug(ChatType.BROADCAST, "Damager: YOU, Cause: "+e.getCause());
-//		else
-//			Messenger.debug(ChatType.BROADCAST, "Damager: UNKNOWN, Cause: "+e.getCause());
-//	}
+	@EventHandler
+	public void onLivingEntityDeath(EntityDamageByEntityEvent e){
+		if(e.getEntity() instanceof LivingEntity && ((LivingEntity) e.getEntity()).getLastDamage() >= ((LivingEntity) e.getEntity()).getHealth())
+			Messenger.debug(e.getDamager(), "&7You &ahave killed &7"+e.getEntity().getName());
+	}
+	/**
+	 * 
+	 * @param e
+	 */
+	@EventHandler
+	public void onItemSwingBlock(PlayerInteractEvent e){
+		if(!(e.getHand().equals(EquipmentSlot.HAND) && e.getAction().equals(Action.LEFT_CLICK_BLOCK)))
+			return;
+		Player player = e.getPlayer();
+		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
+		if(brItem == null)
+			return;
+		if(brItem.getType() != CustomType.HITTABLE)
+			return;
+		Location blockLocation = LocationUtilities.getCentre(e.getClickedBlock());
+		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
+		brItem.execute(player, location);
+	}
+	@EventHandler
+	public void onItemSwingEntity(EntityDamageByEntityEvent e){
+		if(!(e.getDamager() instanceof LivingEntity))
+			return;
+		if(e.getEntity().hasMetadata("Brewery_DAMAGE")){
+			e.getEntity().removeMetadata("Brewery_DAMAGE", Brewery.getInstance());
+			return;
+		}
+		LivingEntity damager = (LivingEntity) e.getDamager();
+		BrItem brItem = getBrItem(damager.getEquipment().getItemInMainHand());
+		if(brItem == null)
+			return;
+		if(brItem.getType() != CustomType.HITTABLE)
+			return;
+		Location location = (e.getEntity() instanceof LivingEntity ? ((LivingEntity) e.getEntity()).getEyeLocation() : e.getEntity().getLocation());
+		brItem.execute(damager, location);
+	}
+	
+	private BrItem getBrItem(ItemStack item){
+		if(!item.hasItemMeta())
+			return null;
+		ItemMeta itemMeta = item.getItemMeta();
+		if(itemMeta.getDisplayName() == null)
+			return null;
+		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemUtilities.decodeItemData(itemMeta.getDisplayName()));
+		if(!match.matches())
+			return null;
+		String decodedName = match.group(1);
+		return Brewery.getItemCollection().getItem(decodedName);
+	}
 	@EventHandler
 	public void onProjectileLaunch (ProjectileLaunchEvent e){
 //		Projectile projectile = e.getEntity();

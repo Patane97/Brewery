@@ -33,10 +33,13 @@ public class Messenger {
 	public static void severe(String msg) {
 		logger.severe(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', msg)));
 	}
-	public static void debug(ChatType type, String msg) {
+	public static void debug(Msg type, String msg) {
 		if(!Brewery.debugMode())
 			return;
 		msg = ">> " + msg;
+		send(type, msg);
+	}
+	public static void send(Msg type, String msg){
 		switch(type){
 		case BROADCAST:
 			broadcast(msg);
@@ -58,7 +61,7 @@ public class Messenger {
 			send(sender, msg);
 		}
 	}
-	public static enum ChatType {
+	public static enum Msg {
 		BROADCAST(), WARNING(), SEVERE(), INFO();
 	}
 }

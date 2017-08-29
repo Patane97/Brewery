@@ -2,20 +2,29 @@ package com.Patane.Brewery.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 public class LocationUtilities {
-	public static ArrayList<LivingEntity> getEntities(Location location, double radius, EntityType[] hitableEntities){
+	/**
+	 * 
+	 * @param location
+	 * @param radius
+	 * @param hitableEntities
+	 * @return A list of all Living Entities within location/radius and which are present in the hitableEntities array (All Living Entities if hitableEntities is empty)
+	 */
+	public static List<LivingEntity> getEntities(Location location, double radius, EntityType[] hitableEntities){
 //	    int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
 		ArrayList<EntityType> entityTypes = new ArrayList<EntityType>(Arrays.asList(hitableEntities));
 	    ArrayList<LivingEntity> radiusEntities = new ArrayList<LivingEntity>();
 	    
 	    for(Entity entity : location.getWorld().getNearbyEntities(location, radius, radius, radius)){
-	    	if(entity instanceof LivingEntity && entityTypes.contains(entity.getType()))
+	    	if(entity instanceof LivingEntity && (entityTypes.isEmpty() || entityTypes.contains(entity.getType())))
 	    		radiusEntities.add((LivingEntity) entity);
 	    }
 //	    for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
@@ -29,5 +38,8 @@ public class LocationUtilities {
 //	        }
 //	    }
 	    return radiusEntities;
+	}
+	public static Location getCentre(Block block){
+		return new Location(block.getWorld(), block.getLocation().getX()+0.5, block.getLocation().getY()+0.5, block.getLocation().getZ()+0.5);
 	}
 }

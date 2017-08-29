@@ -15,6 +15,9 @@ public class StringUtilities {
 	public static String stringJoiner(String[] strings, String delimiter) {
 		return stringJoiner(strings, new StringJoiner(delimiter));
 	}
+	public static String stringJoiner(List<String> strings, String delimiter, String prefix, String suffix) {
+		return stringJoiner(strings.toArray(new String[0]), new StringJoiner(delimiter, prefix, suffix));
+	}
 	public static String stringJoiner(String[] strings, String delimiter, String prefix, String suffix) {
 		return stringJoiner(strings, new StringJoiner(delimiter, prefix, suffix));
 	}
