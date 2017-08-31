@@ -115,7 +115,7 @@ public class BrItemYML extends BasicYML{
 					//EFFECTTYPE
 					setHeader(itemName, "effects", effectName, "trigger");
 					String effectTypeName = header.getString("type");
-					EffectType effectType = getByClass(EffectTypeHandler.get(effectTypeName), "trigger", itemName+"'s "+effectName+" effect", false, itemName, "effects", effectName, "trigger");
+					EffectType effectType = getByClass(EffectTypeHandler.get(effectTypeName), "trigger", itemName+"'s "+effectName+" effect", false, header, "type");
 					//ENTITIES
 					List<EntityType> entities = new ArrayList<EntityType>();
 					if(isSection(itemName, "effects", effectName, "entities")){

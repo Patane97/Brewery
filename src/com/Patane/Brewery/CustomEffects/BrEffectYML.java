@@ -12,6 +12,7 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.Msg;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
+import com.Patane.Brewery.CustomEffects.BrEffect.BrSoundEffect;
 import com.Patane.Brewery.YML.BasicYML;
 import com.Patane.Brewery.util.ErrorHandler;
 import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
@@ -75,10 +76,13 @@ public class BrEffectYML extends BasicYML{
 			//MODIFIER
 			setHeader(effectName, "modifier");
 			String modifierName = header.getString("type");
-			Modifier modifier = getByClass(ModifierHandler.get(modifierName), "Modifier", "the "+effectName+" effect", false, effectName, "modifier");
-			Messenger.debug(Msg.INFO, "     + Modifier["+modifier.name()+"]");
+			Modifier modifier = getByClass(ModifierHandler.get(modifierName), "Modifier", "the "+effectName+" effect", false, header, "type");
 			//PARTICLES
-			BrParticleEffect particleEffect = getParticleEffect(effectName+" Effect", true, effectName, "particle");
+			setHeader(effectName, "particle");
+			BrParticleEffect particleEffect = (isSection(effectName, "particle") ? getByClass(BrParticleEffect.class, "Particle", "the "+effectName+" effect's particle", true, header, "type") : null);
+			//SOUNDS
+			setHeader(effectName, "sound");
+			BrSoundEffect soundEffect = (isSection(effectName, "sound") ? getByClass(BrSoundEffect.class, "Sound", "the "+effectName+" effect's sound", true, header, "type") : null);
 			//POTIONEFFECTS
 			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 			if(isSection(effectName, "potion_effects")){
@@ -102,7 +106,7 @@ public class BrEffectYML extends BasicYML{
 					}
 				}
 			}
-			new BrEffect(effectName, modifier, particleEffect, null, potionEffects.toArray(new PotionEffect[0]));
+			new BrEffect(effectName, modifier, particleEffect, soundEffect, potionEffects.toArray(new PotionEffect[0]));
 		} catch (BrLoadException e){
 			Messenger.warning(e.getMessage());
 		}

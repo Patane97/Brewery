@@ -12,6 +12,7 @@ public class Instant extends EffectType{
 	@Override
 	public void execute(EffectContainer container, LivingEntity shooter, Location location) {
 		particles(container, location);
+		sounds(container, location);
 		executeOnEntities(container, shooter, location);
 	}
 	

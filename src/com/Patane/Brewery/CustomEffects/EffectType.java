@@ -21,6 +21,10 @@ public abstract class EffectType extends YMLParsable{
 		if(container.getEffect().hasParticleEffect())
 			container.getEffect().getParticleEffect().spawn(location, container.getRadius());
 	}
+	protected void sounds(EffectContainer container, Location location){
+		if(container.getEffect().hasSoundEffect())
+			container.getEffect().getSoundEffect().spawn(location);
+	}
 	protected void executeOnEntities(EffectContainer container, LivingEntity shooter, Location location) {
 		List<LivingEntity> hitEntities = LocationUtilities.getEntities(location, container.getRadius(), container.getEntities());
 		for(LivingEntity hitEntity : hitEntities){

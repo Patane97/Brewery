@@ -2,13 +2,18 @@ package com.Patane.Brewery.CustomEffects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Namer;
+import com.Patane.Brewery.YMLParsable;
 import com.Patane.Brewery.Collections.BrCollectable;
+import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
 
 public class BrEffect extends BrCollectable{
 	/**
@@ -61,23 +66,46 @@ public class BrEffect extends BrCollectable{
 	public ArrayList<PotionEffect> getPotionEffects(){
 		return potionEffects;
 	}
-	
-	public static class BrParticleEffect {
-		Particle particle;
-		int intensity;
-		double velocity;
-		
-		public BrParticleEffect(Particle particle, int intensity, double velocity){
-			this.particle = particle;
+
+	@Namer(name = "Particle Effect")
+	public static class BrParticleEffect extends YMLParsable{
+		final private Particle type;
+		final private int intensity;
+		final private double velocity;
+
+		public BrParticleEffect(Map<String, String> fields) throws BrLoadException{
+			this.type = Particle.valueOf(fields.get("type"));
+			this.intensity = getInt(fields, "intensity");
+			this.velocity = getDouble(fields, "velocity");
+		}
+		public BrParticleEffect(Particle type, int intensity, double velocity){
+			this.type = type;
 			this.intensity = intensity;
 			this.velocity = velocity;
 		}
 		public void spawn(Location location, int radius){
 			double offset = radius/2;
-			location.getWorld().spawnParticle(particle, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
+			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
 		}
 	}
-	public static class BrSoundEffect {
-		
+	@Namer(name = "Sound Effect")
+	public static class BrSoundEffect extends YMLParsable{
+		final private Sound type;
+		final private float volume;
+		final private float pitch;
+
+		public BrSoundEffect(Map<String, String> fields) throws BrLoadException{
+			this.type = Sound.valueOf(fields.get("type"));
+			this.volume = (float) getDouble(fields, "volume", 100);
+			this.pitch = (float) getDouble(fields, "pitch", 1);
+		}
+		public BrSoundEffect(Sound type, float volume, float pitch){
+			this.type = type;
+			this.volume = volume;
+			this.pitch = pitch;
+		}
+		public void spawn(Location location){
+			location.getWorld().playSound(location, type, volume, pitch);
+		}
 	}
 }

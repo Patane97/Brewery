@@ -11,8 +11,9 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 
 @Namer(name="DAMAGE")
 public class Damage extends Modifier{
-	final public DamageCause cause;
-	final public double amount;
+	@SuppressWarnings("unused")
+	final private DamageCause cause;
+	final private double amount;
 	
 	public Damage(Map<String, String> fields){
 		cause = getDamageCause(fields, "cause");

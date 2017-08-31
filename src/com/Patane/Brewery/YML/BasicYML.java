@@ -7,14 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.Msg;
 import com.Patane.Brewery.YMLParsable;
-import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.util.ErrorHandler;
 import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
 import com.Patane.Brewery.util.StringUtilities;
@@ -138,25 +136,31 @@ public abstract class BasicYML {
 	 * @return A new instance of the given class or Null if there is any sort of error and optional is true.
 	 * @throws BrLoadException If there is any sort of error and optional is false
 	 */
-	public <T extends YMLParsable> T getByClass(Class<? extends T> clazz, String name, String superName, boolean optional, String...path) throws BrLoadException{
-		setHeader(path);
-		String typeName = header.getString("type");
+	public <T extends YMLParsable> T getByClass(Class<? extends T> clazz, String name, String superName, boolean optional, ConfigurationSection section, String masterField) throws BrLoadException{
+		if(header != section)
+			setHeader(section);
+		String typeName = header.getString(masterField);
 		if(typeName == null)
-			return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+": Missing 'type' field for "+name+".");
+			return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+": Missing '"+masterField+"' field for "+name+".");
 		if(clazz  == null)
 			return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+": '"+typeName+"' not recognised as a valid "+name+".");
-		Map<String, String> entries = new HashMap<String, String>();
+		
 		//Getting class Fields as Strings
-		List<String> fields = new ArrayList<String>();
-		for(Field field : clazz.getFields())
-			fields.add(field.getName());
+		List<String> fieldNames = new ArrayList<String>();
+		for(Field field : clazz.getDeclaredFields()){
+//			//Checks to see if field is private and if so, returns (YMLParsable shouldnt have any private fields)
+//			if(Modifier.isPrivate(field.getModifiers()))
+//				return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+": "+clazz.getSimpleName()+".class has one or more private fields. All fields MUST be public");
+			fieldNames.add(field.getName());
+		}
+		Map<String, String> entries = new HashMap<String, String>();
 		//Defining fields that will need to be removed from YML file (to keep clean)
 		List<String> fieldsToRemove = new ArrayList<String>();
 		//Loops through YML keys, determining if they are to be used or removed later
 		for(String key : header.getKeys(false)){
-			if(fields.contains(key))
+			if(fieldNames.contains(key)){
 				entries.put(key, header.getString(key));
-			else if(!key.equals("type"))
+			}
 				fieldsToRemove.add(key);
 		}//Building with unique field/values from 'entries'
 		T object;
@@ -181,6 +185,7 @@ public abstract class BasicYML {
 			Messenger.warning("Removed the following invalid fields for "+superName+"'s "+object.name()+" "+name+": "+StringUtilities.stringJoiner(fieldsToRemove, ", "));
 			config.save();
 		}
+		Messenger.debug(Msg.INFO, "     + "+name+"["+StringUtilities.stringJoiner(entries.values(), ", ")+"]");
 		return object;
 	}
 	public <T extends Enum<T>> T getEnumFromString(Class<T> clazz, String string, String name, String superName, boolean optional) throws BrLoadException{
@@ -193,23 +198,5 @@ public abstract class BasicYML {
 			return ErrorHandler.optionalLoadError(Msg.WARNING, false, "Failed to load "+superName+": '"+string+"' not recognised as a valid "+name+".");
 		}
 		return object;
-	}
-	public BrParticleEffect getParticleEffect(String superName, boolean optional, String... path) throws BrLoadException{
-		if(optional && !isSection(path))
-			return null;
-		setHeader(path);
-		String typeName = header.getString("type");
-		try{
-			Particle particle = Particle.valueOf(typeName);
-			int intensity = header.getInt("intensity");
-			double velocity = header.getDouble("velocity");
-
-			Messenger.debug(Msg.INFO, "     + Particle Effect["+particle+", "+intensity+", "+velocity+"]");
-			return new BrParticleEffect(particle, intensity, velocity);
-		} catch(IllegalArgumentException e){
-			return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+" particles: "+e.getCause().getMessage());
-		} catch(NullPointerException e){
-			return ErrorHandler.optionalLoadError(Msg.WARNING, optional, "Failed to load "+superName+" particles: "+e.getCause().getMessage());
-		}
 	}
 }

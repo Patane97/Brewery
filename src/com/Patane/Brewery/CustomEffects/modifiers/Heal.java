@@ -10,7 +10,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 
 @Namer(name="HEAL")
 public class Heal extends Modifier{
-	final public double amount;
+	final private double amount;
 	
 	public Heal(Map<String, String> fields){
 		amount = getDouble(fields, "amount");
