@@ -2,8 +2,6 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Namer;
@@ -21,9 +19,9 @@ public class Feed extends Modifier{
 		this.amount = amount;
 	}
 	@Override
-	public void modify(LivingEntity feedee, Entity feeder) {
-		if(feedee instanceof Player){
-			Player player = (Player) feedee;
+	public void modify(ModifierInfo info) {
+		if(info.getTarget() instanceof Player){
+			Player player = (Player) info.getTarget();
 			player.setFoodLevel((int) Math.min(20, (player.getFoodLevel() + amount)));
 		}
 	}

@@ -160,7 +160,7 @@ public abstract class BasicYML {
 		for(String key : header.getKeys(false)){
 			if(fieldNames.contains(key)){
 				entries.put(key, header.getString(key));
-			}
+			} else if(!key.equals(masterField))
 				fieldsToRemove.add(key);
 		}//Building with unique field/values from 'entries'
 		T object;
@@ -185,7 +185,7 @@ public abstract class BasicYML {
 			Messenger.warning("Removed the following invalid fields for "+superName+"'s "+object.name()+" "+name+": "+StringUtilities.stringJoiner(fieldsToRemove, ", "));
 			config.save();
 		}
-		Messenger.debug(Msg.INFO, "     + "+name+"["+StringUtilities.stringJoiner(entries.values(), ", ")+"]");
+		Messenger.debug(Msg.INFO, "     + "+name+"[("+typeName+") "+StringUtilities.stringJoiner(entries.values(), ", ")+"]");
 		return object;
 	}
 	public <T extends Enum<T>> T getEnumFromString(Class<T> clazz, String string, String name, String superName, boolean optional) throws BrLoadException{

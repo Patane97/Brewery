@@ -2,9 +2,6 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
 
@@ -20,8 +17,8 @@ public class Heal extends Modifier{
 		this.amount = amount;
 	}
 	@Override
-	public void modify(LivingEntity healee, Entity healer) {
+	public void modify(ModifierInfo info) {
 		if(amount > 0)
-			healee.setHealth(Math.min(20, healee.getHealth() + amount));
+			info.getTarget().setHealth(Math.min(20, info.getTarget().getHealth() + amount));
 	}
 }

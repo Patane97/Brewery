@@ -9,6 +9,7 @@ import com.Patane.Brewery.Messenger.Msg;
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.types.Instant;
 import com.Patane.Brewery.CustomEffects.types.Lingering;
+import com.Patane.Brewery.util.StringUtilities;
 
 public class EffectTypeHandler {
 	private static HashMap<String, Class< ? extends EffectType>> effectTypes;
@@ -31,14 +32,15 @@ public class EffectTypeHandler {
 //		}
 		register(Instant.class);
 		register(Lingering.class);
+		Messenger.debug(Msg.INFO, "Registered Types: "+StringUtilities.stringJoiner(effectTypes.keySet(), ", "));
 	}
 	private static void register(Class< ? extends EffectType> effectType){
 		Namer info = effectType.getAnnotation(Namer.class);
-		if(info == null) {
+		if(info == null){
+			Messenger.warning("Failed to register EffectType '"+effectType.getSimpleName()+".class': Missing annotation!");
 			return;
 		}
 		effectTypes.put(info.name(), effectType);
-		Messenger.debug(Msg.INFO, "Registered "+info.name());
 	}
 	public static List<String> getKeys() {
 		return new ArrayList<String>(effectTypes.keySet());

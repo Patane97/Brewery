@@ -2,9 +2,6 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
 
@@ -20,8 +17,7 @@ public class Ignite extends Modifier{
 		this.duration = duration;
 	}
 	@Override
-	public void modify(LivingEntity ignitee, Entity igniter) {
-		ignitee.setFireTicks(duration);
-//		ignitee.getWorld().spawnParticle(Particle.FLAME, ignitee.getEyeLocation(), 50, 0.25,0.25,0.25,0);
+	public void modify(ModifierInfo info) {
+		info.getTarget().setFireTicks(duration);
 	}
 }

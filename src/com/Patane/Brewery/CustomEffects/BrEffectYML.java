@@ -78,11 +78,9 @@ public class BrEffectYML extends BasicYML{
 			String modifierName = header.getString("type");
 			Modifier modifier = getByClass(ModifierHandler.get(modifierName), "Modifier", "the "+effectName+" effect", false, header, "type");
 			//PARTICLES
-			setHeader(effectName, "particle");
-			BrParticleEffect particleEffect = (isSection(effectName, "particle") ? getByClass(BrParticleEffect.class, "Particle", "the "+effectName+" effect's particle", true, header, "type") : null);
+			BrParticleEffect particleEffect = (isSection(effectName, "particle") ? getByClass(BrParticleEffect.class, "Particle", "the "+effectName+" effect's particle", true, getSection(effectName, "particle"), "type") : null);
 			//SOUNDS
-			setHeader(effectName, "sound");
-			BrSoundEffect soundEffect = (isSection(effectName, "sound") ? getByClass(BrSoundEffect.class, "Sound", "the "+effectName+" effect's sound", true, header, "type") : null);
+			BrSoundEffect soundEffect = (isSection(effectName, "sound") ? getByClass(BrSoundEffect.class, "Sound", "the "+effectName+" effect's sound", true, getSection(effectName, "sound"), "type") : null);
 			//POTIONEFFECTS
 			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 			if(isSection(effectName, "potion_effects")){

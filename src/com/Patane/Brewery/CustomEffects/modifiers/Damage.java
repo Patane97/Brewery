@@ -2,8 +2,6 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.Patane.Brewery.Namer;
@@ -16,7 +14,7 @@ public class Damage extends Modifier{
 	final private double amount;
 	
 	public Damage(Map<String, String> fields){
-		cause = getDamageCause(fields, "cause");
+		cause = getEnumValue(DamageCause.class, fields, "cause");
 		amount = getDouble(fields, "amount");
 	}
 	
@@ -25,12 +23,12 @@ public class Damage extends Modifier{
 		this.amount = amount;
 	}
 	@Override
-	public void modify(LivingEntity damagee, Entity damager) {
+	public void modify(ModifierInfo info) {
 		if(amount > 0){
-			if(damager != null){
-				damage(damagee, damager, amount);
+			if(info.getTargeter() != null){
+				damage(info.getTarget(), info.getTargeter(), amount);
 			}
-			damagee.damage(amount);
+			info.getTarget().damage(amount);
 		}
 	}
 }

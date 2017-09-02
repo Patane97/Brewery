@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.YMLParsable;
+import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.Brewery.CustomItems.BrItem.EffectContainer;
 import com.Patane.Brewery.util.LocationUtilities;
 
@@ -30,7 +31,7 @@ public abstract class EffectType extends YMLParsable{
 		for(LivingEntity hitEntity : hitEntities){
 			hitEntity.addPotionEffects(container.getEffect().getPotionEffects());
 			if(container.getEffect().hasModifier())
-				container.getEffect().getModifier().modify(hitEntity, shooter);
+				container.getEffect().getModifier().modify(new ModifierInfo(hitEntity, shooter, location));
 			Messenger.debug(hitEntity, "&cAffected by &7"+container.getEffect().getName()+"&c effect.");
 		}
 	}

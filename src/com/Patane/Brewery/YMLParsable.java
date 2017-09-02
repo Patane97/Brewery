@@ -2,8 +2,6 @@ package com.Patane.Brewery;
 
 import java.util.Map;
 
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-
 import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
 
 public abstract class YMLParsable extends Nameable{
@@ -49,21 +47,21 @@ public abstract class YMLParsable extends Nameable{
 		}
 		return result;
 	}
-	protected DamageCause getDamageCause(Map<String, String> fields, String name, DamageCause defaultValue){
+	protected <T extends Enum<T>> T getDamageCause(Class<T> clazz, Map<String, String> fields, String name, T defaultValue){
 		try{
-			return getDamageCause(fields, name);
+			return getEnumValue(clazz, fields, name);
 		} catch(IllegalArgumentException e){
 			return defaultValue;
 		}
 	}
-	protected DamageCause getDamageCause(Map<String, String> fields, String name){
+	protected <T extends Enum<T>> T getEnumValue(Class<T> clazz, Map<String, String> fields, String name){
 		String value = fields.get(name);
-		DamageCause result;
+		T result;
 		if(value == null)
 			throw new IllegalArgumentException("'"+name()+"' is missing the '"+name+"' field");
-		result = DamageCause.valueOf(value);
+		result = T.valueOf(clazz, value);
 		if(result == null)
-			throw new IllegalArgumentException("'"+name()+"' has invalid value in '"+name+"' field (Value must be a DamageCause type)");
+			throw new IllegalArgumentException("'"+name()+"' has invalid value in '"+name+"' field (Value must be a "+clazz.getSimpleName()+" type)");
 		return result;
 	}
 }
