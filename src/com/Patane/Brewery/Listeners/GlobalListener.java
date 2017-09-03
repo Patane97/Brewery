@@ -43,7 +43,8 @@ public class GlobalListener implements Listener{
 		if(brPotion.getType() != CustomType.THROWABLE)
 			return;
 		e.setCancelled(true);
-		Location location = e.getEntity().getLocation();
+//		Location location = e.getEntity().getLocation();
+		Location location = e.getHitEntity().getLocation();
 		LivingEntity shooter = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
 		brPotion.execute(shooter, location);
 	}

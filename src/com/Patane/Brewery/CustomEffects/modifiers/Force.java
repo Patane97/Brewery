@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
+import com.Patane.Brewery.Messenger;
+import com.Patane.Brewery.Messenger.Msg;
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
 
@@ -24,17 +26,24 @@ public class Force extends Modifier{
 	}
 	@Override
 	public void modify(ModifierInfo info) {
-		moveToward(info.getTarget(), info.getImpact(), intensity);
+		double speed = Math.min(intensity/8, info.getTarget().getLocation().distance(info.getImpact()));
+        Messenger.debug(Msg.BROADCAST, "Speed: " +speed);
+		moveToward(info.getTarget(), info.getImpact().getDirection(), speed);
 	}
+	@SuppressWarnings("unused")
 	private void moveToward(Entity entity, Location to, double speed){
         Location loc = entity.getLocation();
         double x = loc.getX() - to.getX();
         double y = loc.getY() - to.getY();
         double z = loc.getZ() - to.getZ();
         Vector velocity = new Vector(x, y, z).normalize().multiply(-speed);
-        entity.setVelocity(velocity);   
+        entity.setVelocity(velocity);
+    }
+	private void moveToward(Entity entity, Vector direction, double speed){
+        Vector velocity = direction.normalize().multiply(-speed);
+        entity.setVelocity(velocity);
     }
 	private enum Direction {
-		IN(), OUT(), RANDOM();
+		IN(), OUT(), UP(), DOWN(), DIRECTIONAL(), RANDOM();
 	}
 }
