@@ -5,10 +5,10 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
-import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.EffectType;
 import com.Patane.Brewery.CustomItems.BrItem.EffectContainer;
+import com.Patane.Brewery.util.BrRunnable;
 
 @Namer(name="LINGERING")
 public class Lingering extends EffectType{
@@ -28,8 +28,7 @@ public class Lingering extends EffectType{
 	public void execute(EffectContainer container, LivingEntity shooter, Location location) {
 		new LingeringTask(container, shooter, location);
 	}
-	protected class LingeringTask implements Runnable{
-		private final int scheduleID;
+	protected class LingeringTask extends BrRunnable{
 		private long newRate = ((long) (rate*20));
 		private float roughTicksLeft = duration*20;
 		private final EffectContainer container;
@@ -37,7 +36,7 @@ public class Lingering extends EffectType{
 		private final Location location;
 		
 		public LingeringTask(EffectContainer container, LivingEntity shooter, Location location){
-			scheduleID = Brewery.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(Brewery.getInstance(), this, 0, newRate);
+			super(0, (long) (rate*20));
 			this.container = container;
 			this.shooter = shooter;
 			this.location = location;
@@ -45,12 +44,12 @@ public class Lingering extends EffectType{
 		
 		@Override
 		public void run() {
-			particles(container, location);
+			applyParticles(container, location);
+			applySounds(container, location);
 			executeOnEntities(container, shooter, location);
 			roughTicksLeft -= newRate;
 			if(roughTicksLeft <= 0)
-				Brewery.getInstance().getServer().getScheduler().cancelTask(scheduleID);
+				this.cancel();
 		}
-		
 	}
 }

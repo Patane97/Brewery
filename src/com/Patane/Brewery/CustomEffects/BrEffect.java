@@ -7,12 +7,14 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.YMLParsable;
 import com.Patane.Brewery.Collections.BrCollectable;
+import com.Patane.Brewery.CustomEffects.types.Instant;
 import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
 
 public class BrEffect extends BrCollectable{
@@ -35,36 +37,45 @@ public class BrEffect extends BrCollectable{
 	private final ArrayList<PotionEffect> potionEffects;
 	private final BrParticleEffect particleEffect;
 	private final BrSoundEffect soundEffect;
+	private final DefaultContainer defaultContainer;
 	
-	public BrEffect(String name, Modifier modifier, BrParticleEffect particleEffect, BrSoundEffect soundEffect, PotionEffect... potionEffects) {
+	public BrEffect(String name, Modifier modifier, BrParticleEffect particleEffect, BrSoundEffect soundEffect, DefaultContainer defaultContainer, PotionEffect... potionEffects) {
 		super(name);
 		this.modifier = modifier;
 		this.particleEffect = particleEffect;
 		this.soundEffect = soundEffect;
+		this.defaultContainer = (defaultContainer == null ? new DefaultContainer() : defaultContainer);
 		this.potionEffects = new ArrayList<PotionEffect>(Arrays.asList(potionEffects));
 		Brewery.getEffectCollection().add(this);
 	}
+	
 	public boolean hasModifier() {
 		return (modifier == null ? false : true);
 	}
 	public Modifier getModifier() {
 		return modifier;
 	}
+	
+	public boolean hasParticleEffect() {
+		return (particleEffect == null ? false : true);
+	}
 	public BrParticleEffect getParticleEffect() {
 		return particleEffect;
 	}
-	public boolean hasParticleEffect() {
-		return (particleEffect == null ? false : true);
+	
+	public boolean hasSoundEffect() {
+		return (soundEffect == null ? false : true);
 	}
 	public BrSoundEffect getSoundEffect() {
 		return soundEffect;
 	}
-
-	public boolean hasSoundEffect() {
-		return (soundEffect == null ? false : true);
-	}
+	
 	public ArrayList<PotionEffect> getPotionEffects(){
 		return potionEffects;
+	}
+
+	public DefaultContainer getDefaultInfo() {
+		return defaultContainer;
 	}
 
 	@Namer(name = "Particle Effect")
@@ -106,6 +117,29 @@ public class BrEffect extends BrCollectable{
 		}
 		public void spawn(Location location){
 			location.getWorld().playSound(location, type, volume, pitch);
+		}
+	}
+	public static class DefaultContainer {
+		final private EffectType type;
+		final private int radius;
+		final private EntityType[] entities;
+		
+		public DefaultContainer(EffectType type, Integer radius, EntityType... entities){
+			this.type 		= (type == null ? new Instant() : type);
+			this.radius 	= (radius == null ? 1 : (radius < 0 ? 0 : radius));
+			this.entities 	= (entities == null ? new EntityType[0] : entities);
+		}
+		public DefaultContainer(){
+			this(null,null);
+		}
+		public EffectType getType() {
+			return type;
+		}
+		public int getRadius() {
+			return radius;
+		}
+		public EntityType[] getEntities() {
+			return entities;
 		}
 	}
 }

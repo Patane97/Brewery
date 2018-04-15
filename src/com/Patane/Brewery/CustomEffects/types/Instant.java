@@ -11,8 +11,8 @@ import com.Patane.Brewery.CustomItems.BrItem.EffectContainer;
 public class Instant extends EffectType{
 	@Override
 	public void execute(EffectContainer container, LivingEntity shooter, Location location) {
-		particles(container, location);
-		sounds(container, location);
+		applyParticles(container, location);
+		applySounds(container, location);
 		executeOnEntities(container, shooter, location);
 	}
 	

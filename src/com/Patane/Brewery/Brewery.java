@@ -12,6 +12,8 @@ import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItemYML;
 import com.Patane.Brewery.Listeners.GlobalListener;
 import com.Patane.Brewery.Listeners.ParticlePacketAdapter;
+import com.Patane.Brewery.Sequencer.Sequencer;
+import com.Patane.Brewery.Sequencer.SequencesYML;
 import com.Patane.Brewery.commands.CommandHandler;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -74,6 +76,8 @@ public class Brewery extends JavaPlugin{
 		BrEffect.YML().load();
 		BrItem.setYML(new BrItemYML(this));
 		BrItem.YML().load();
+		Sequencer.setYML(new SequencesYML(this));
+		Sequencer.YML().load();
 	}
 	public static boolean debugMode() {
 		return debugMode;

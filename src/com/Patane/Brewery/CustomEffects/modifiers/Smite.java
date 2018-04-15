@@ -7,7 +7,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 
 @Namer(name="SMITE")
 public class Smite extends Modifier{
-	public double amount;
+	final public double amount;
 
 	public Smite(Map<String, String> fields){
 		amount = getDouble(fields, "amount");

@@ -73,7 +73,12 @@ public class BrItem extends BrCollectable{
 		}
 		Messenger.debug(executor, "&7You &ahave activated &7"+getName());
 		for(EffectContainer effectContainer : effects){
-			effectContainer.getType().execute(effectContainer, executor, location);
+			try{
+				effectContainer.execute(executor, location);
+			} catch(Exception e){
+				Messenger.warning("Failed to execute "+effectContainer.getEffect().getID()+" effect: "+e.getMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 	public static enum CustomType {
@@ -102,6 +107,9 @@ public class BrItem extends BrCollectable{
 		}
 		public EntityType[] getEntities() {
 			return entities;
+		}
+		public void execute(LivingEntity executor, Location location){
+			type.execute(this, executor, location);
 		}
 	}
 

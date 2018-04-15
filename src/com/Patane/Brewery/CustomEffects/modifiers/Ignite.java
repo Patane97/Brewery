@@ -7,7 +7,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 
 @Namer(name="IGNITE")
 public class Ignite extends Modifier{
-	final private int duration;
+	final public int duration;
 	
 	public Ignite(Map<String, String> fields){
 		duration = Math.round((float) getDouble(fields, "duration")*20);

@@ -9,7 +9,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 
 @Namer(name="FEED")
 public class Feed extends Modifier{
-	final private double amount;
+	final public double amount;
 
 	public Feed(Map<String, String> fields){
 		amount = getDouble(fields, "amount");

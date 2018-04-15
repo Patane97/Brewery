@@ -6,9 +6,16 @@ import java.util.List;
 
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.Msg;
-import com.Patane.Brewery.util.StringUtilities;
 import com.Patane.Brewery.Namer;
-import com.Patane.Brewery.CustomEffects.modifiers.*;
+import com.Patane.Brewery.CustomEffects.modifiers.Damage;
+import com.Patane.Brewery.CustomEffects.modifiers.Feed;
+import com.Patane.Brewery.CustomEffects.modifiers.Force;
+import com.Patane.Brewery.CustomEffects.modifiers.Heal;
+import com.Patane.Brewery.CustomEffects.modifiers.Ignite;
+import com.Patane.Brewery.CustomEffects.modifiers.Kill;
+import com.Patane.Brewery.CustomEffects.modifiers.Polymorph;
+import com.Patane.Brewery.CustomEffects.modifiers.Smite;
+import com.Patane.Brewery.util.StringUtilities;
 
 public class ModifierHandler{
 private static HashMap<String, Class< ? extends Modifier>> modifiers;
@@ -30,6 +37,8 @@ private static HashMap<String, Class< ? extends Modifier>> modifiers;
 		register(Ignite.class);
 		register(Smite.class);
 		register(Force.class);
+		register(Polymorph.class);
+		register(Kill.class);
 		Messenger.debug(Msg.INFO, "Registered Modifiers: "+StringUtilities.stringJoiner(modifiers.keySet(), ", "));
 	}
 	private static void register(Class< ? extends Modifier> modifierClass){

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -13,14 +12,12 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Chat;
 import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.Messenger.Msg;
-import com.Patane.Brewery.CustomEffects.BrEffect;
-import com.Patane.Brewery.CustomEffects.EffectType;
-import com.Patane.Brewery.CustomEffects.EffectTypeHandler;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.CustomItems.BrItem.EffectContainer;
 import com.Patane.Brewery.YML.BasicYML;
 import com.Patane.Brewery.util.ErrorHandler;
 import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
+import com.Patane.Brewery.util.ErrorHandler.Importance;
 import com.Patane.Brewery.util.ItemUtilities;
 import com.Patane.Brewery.util.StringUtilities;
 import com.Patane.Brewery.util.YMLUtilities;
@@ -86,13 +83,13 @@ public class BrItemYML extends BasicYML{
 			setHeader(itemName);
 			Messenger.debug(Msg.INFO, "Attempting to load "+itemName+" item...");
 			if(!itemName.equals(itemName.replace(" ", "_").toUpperCase()))
-				ErrorHandler.optionalLoadError(Msg.WARNING, false, "Failed to load "+itemName+": Name must be in upper case with no spacing, eg. '"+itemName.replace(" ", "_").toUpperCase()+"'");
+				ErrorHandler.optionalLoadError(Msg.WARNING, Importance.REQUIRED, "Failed to load "+itemName+": Name must be in upper case with no spacing, eg. '"+itemName.replace(" ", "_").toUpperCase()+"'");
 			// TYPE
-			CustomType type = getEnumFromString(CustomType.class, header.getString("type"), "type", itemName, false);
+			CustomType type = getEnumFromString(Importance.REQUIRED, CustomType.class, header.getString("type"), "type", itemName);
 			Messenger.debug(Msg.INFO, "     + Type["+type.name()+"]");
 			// ITEM
 			setHeader(itemName, "item");
-			Material material = getEnumFromString(Material.class, header.getString("material"), "material", itemName+"'s item", false);
+			Material material = getEnumFromString(Importance.REQUIRED, Material.class, header.getString("material"), "material", itemName+"'s item");
 			String name = header.getString("name");
 			List<String> lore = header.getStringList("lore");
 			ItemStack item = ItemUtilities.hideFlags(ItemUtilities.createItem(material, 1, (short) 0, name, lore.toArray(new String[0])));
@@ -102,36 +99,9 @@ public class BrItemYML extends BasicYML{
 			List<EffectContainer> effects = new ArrayList<EffectContainer>();
 			for(String effectName : header.getKeys(false)){
 				try{
-					if(!effectName.equals(effectName.replace(" ", "_").toUpperCase()))
-						ErrorHandler.optionalLoadError(Msg.WARNING, false, "Failed to load "+itemName+"'s "+effectName+" effect: Name must be in upper case with no spacing, eg. '"+effectName.replace(" ", "_").toUpperCase()+"'");
-					
-					//BREFFECT
-					BrEffect effect = Brewery.getEffectCollection().getItem(effectName);
-					if(effect == null)
-						ErrorHandler.optionalLoadError(Msg.WARNING, false, "Failed to load "+itemName+"'s "+effectName+" effect: Effect does not exist (Did it fail to load?)");
-					setHeader(itemName, "effects", effectName);
-					//RADIUS
-					int radius = getIntFromString(false, header.getString("radius"), "radius", itemName+"'s "+effectName+" effect");
-					//EFFECTTYPE
-					setHeader(itemName, "effects", effectName, "trigger");
-					String effectTypeName = header.getString("type");
-					EffectType effectType = getByClass(EffectTypeHandler.get(effectTypeName), "trigger", itemName+"'s "+effectName+" effect", false, header, "type");
-					//ENTITIES
-					List<EntityType> entities = new ArrayList<EntityType>();
-					if(isSection(itemName, "effects", effectName, "entities")){
-						setHeader(itemName, "effects", effectName);
-						for(String entityName : header.getStringList("entities")){
-							try{
-								EntityType entityType = getEnumFromString(EntityType.class, entityName, "entity type", "a "+effectName+" effect entity for "+itemName, false);
-								entities.add(entityType);
-							} catch (BrLoadException e){
-								Messenger.warning(e.getMessage());
-							}
-						}
-					}
-					EffectContainer container = new EffectContainer(effect, radius, effectType, entities.toArray(new EntityType[0]));
+					EffectContainer container = grabEffectContainer(Importance.REQUIRED, header, effectName);
 					effects.add(container);
-					Messenger.debug(Msg.INFO, "     + Effect["+effect.getID()+", "+radius+", "+effectTypeName+", "+entities.toString()+"]");
+					Messenger.debug(Msg.INFO, "     + Effect["+container.getEffect().getID()+", "+container.getRadius()+", "+container.getType().name()+", "+container.getEntities().toString()+"]");
 				} catch (BrLoadException e){
 					Messenger.warning(e.getMessage());
 				}
@@ -141,4 +111,5 @@ public class BrItemYML extends BasicYML{
 			Messenger.warning(e.getMessage());
 		}
 	}
+	
 }
