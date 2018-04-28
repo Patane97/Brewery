@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 
 @Namer(name="DAMAGE")
 public class Damage extends Modifier{
@@ -29,5 +29,11 @@ public class Damage extends Modifier{
 			}
 			info.getTarget().damage(amount);
 		}
+	}
+
+	@Override
+	public String[] stringValues() {
+		String[] values = {cause.name(), Double.toString(amount)};
+		return values;
 	}
 }

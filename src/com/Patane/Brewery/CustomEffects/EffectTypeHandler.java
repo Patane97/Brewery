@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.Msg;
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.types.Instant;
 import com.Patane.Brewery.CustomEffects.types.Lingering;
-import com.Patane.Brewery.util.StringUtilities;
+import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
+import com.Patane.util.general.StringsUtil;
 
 public class EffectTypeHandler {
 	private static HashMap<String, Class< ? extends EffectType>> effectTypes;
@@ -32,7 +32,7 @@ public class EffectTypeHandler {
 //		}
 		register(Instant.class);
 		register(Lingering.class);
-		Messenger.debug(Msg.INFO, "Registered Types: "+StringUtilities.stringJoiner(effectTypes.keySet(), ", "));
+		Messenger.debug(Msg.INFO, "Registered Types: "+StringsUtil.stringJoiner(effectTypes.keySet(), ", "));
 	}
 	private static void register(Class< ? extends EffectType> effectType){
 		Namer info = effectType.getAnnotation(Namer.class);

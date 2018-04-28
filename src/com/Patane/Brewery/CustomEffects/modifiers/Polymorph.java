@@ -15,8 +15,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 /**
  * Extremely experimental, needs work
  * Maybe using NMS somehow? (without ever removing the original entity to ensure compatibility eg. Battlegrounds)
@@ -91,5 +91,11 @@ public class Polymorph extends Modifier{
 				morphed.remove();
 			}
 		}, (long) (duration*20)-5);
+	}
+	
+	@Override
+	public String[] stringValues() {
+		String[] values = {morph.name(), Double.toString(duration)};
+		return values;
 	}
 }

@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 
 @Namer(name="FEED")
 public class Feed extends Modifier{
@@ -24,5 +24,11 @@ public class Feed extends Modifier{
 			Player player = (Player) info.getTarget();
 			player.setFoodLevel((int) Math.min(20, (player.getFoodLevel() + amount)));
 		}
+	}
+	
+	@Override
+	public String[] stringValues() {
+		String[] values = {Double.toString(amount)};
+		return values;
 	}
 }

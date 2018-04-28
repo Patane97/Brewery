@@ -2,8 +2,8 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 
 @Namer(name="HEAL")
 public class Heal extends Modifier{
@@ -20,5 +20,11 @@ public class Heal extends Modifier{
 	public void modify(ModifierInfo info) {
 		if(amount > 0)
 			info.getTarget().setHealth(Math.min(20, info.getTarget().getHealth() + amount));
+	}
+	
+	@Override
+	public String[] stringValues() {
+		String[] values = {Double.toString(amount)};
+		return values;
 	}
 }

@@ -2,6 +2,9 @@ package com.Patane.Brewery;
 
 import java.util.HashMap;
 
+import com.Patane.util.YML.Nameable;
+import com.Patane.util.YML.Namer;
+
 public class ClassesCollection <T extends Nameable>{
 	private HashMap<String, T> items;
 	public T get(String name){

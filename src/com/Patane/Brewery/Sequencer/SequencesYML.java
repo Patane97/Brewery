@@ -2,9 +2,9 @@ package com.Patane.Brewery.Sequencer;
 
 import org.bukkit.plugin.Plugin;
 
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.Msg;
-import com.Patane.Brewery.YML.BasicYML;
+import com.Patane.util.YML.BasicYML;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
 
 public class SequencesYML extends BasicYML{
 

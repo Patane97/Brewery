@@ -23,9 +23,9 @@ import org.bukkit.util.Vector;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Brewery.util.BrRunnable;
-import com.Patane.Brewery.util.ItemUtilities;
-import com.Patane.Brewery.util.LocationUtilities;
+import com.Patane.util.general.PatRunnable;
+import com.Patane.util.ingame.ItemsUtil;
+import com.Patane.util.ingame.LocationsUtil;
 
 public class GlobalListener implements Listener{
 	
@@ -65,7 +65,7 @@ public class GlobalListener implements Listener{
 		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
-		Location blockLocation = LocationUtilities.getCentre(e.getClickedBlock());
+		Location blockLocation = LocationsUtil.getCentre(e.getClickedBlock());
 		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
 		brItem.execute(player, location);
 	}
@@ -110,13 +110,13 @@ public class GlobalListener implements Listener{
 		item.setVelocity(new Vector(x,z,y).multiply(0.5));
 		new ItemDetection(player, brItem, item);
 	}
-	private class ItemDetection extends BrRunnable {
+	private class ItemDetection extends PatRunnable {
 		private final Item item;
 		private final BrItem brItem;
 		private final LivingEntity shooter;
 		
 		public ItemDetection(LivingEntity shooter, BrItem brItem, Item item) {
-			super(2, 1);
+			super(Brewery.getInstance(), 2, 1);
 			this.item = item;
 			this.brItem = brItem;
 			this.shooter = shooter;
@@ -143,7 +143,7 @@ public class GlobalListener implements Listener{
 		ItemMeta itemMeta = item.getItemMeta();
 		if(itemMeta.getDisplayName() == null)
 			return null;
-		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemUtilities.decodeItemData(itemMeta.getDisplayName()));
+		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemsUtil.decodeItemData(itemMeta.getDisplayName()));
 		if(!match.matches())
 			return null;
 		String decodedName = match.group(1);

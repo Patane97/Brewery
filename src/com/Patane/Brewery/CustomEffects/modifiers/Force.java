@@ -5,8 +5,8 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 
 @Namer(name="FORCE")
 public class Force extends Modifier{
@@ -27,6 +27,13 @@ public class Force extends Modifier{
         Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
         info.getTarget().setVelocity(velocity);
 	}
+
+	@Override
+	public String[] stringValues(){
+		String[] values = {direction.name(), Double.toString(intensity)};
+		return values;
+	}
+	
 	public enum Direction {
 		TOWARDS(new ForceAction(){
 			public Vector getVector(Location from, Location to){

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.Msg;
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.modifiers.Damage;
 import com.Patane.Brewery.CustomEffects.modifiers.Feed;
 import com.Patane.Brewery.CustomEffects.modifiers.Force;
@@ -15,7 +12,10 @@ import com.Patane.Brewery.CustomEffects.modifiers.Ignite;
 import com.Patane.Brewery.CustomEffects.modifiers.Kill;
 import com.Patane.Brewery.CustomEffects.modifiers.Polymorph;
 import com.Patane.Brewery.CustomEffects.modifiers.Smite;
-import com.Patane.Brewery.util.StringUtilities;
+import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
+import com.Patane.util.general.StringsUtil;
 
 public class ModifierHandler{
 private static HashMap<String, Class< ? extends Modifier>> modifiers;
@@ -39,7 +39,7 @@ private static HashMap<String, Class< ? extends Modifier>> modifiers;
 		register(Force.class);
 		register(Polymorph.class);
 		register(Kill.class);
-		Messenger.debug(Msg.INFO, "Registered Modifiers: "+StringUtilities.stringJoiner(modifiers.keySet(), ", "));
+		Messenger.debug(Msg.INFO, "Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
 	}
 	private static void register(Class< ? extends Modifier> modifierClass){
 		Namer info = modifierClass.getAnnotation(Namer.class);

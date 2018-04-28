@@ -3,8 +3,8 @@ package com.Patane.Brewery.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.Msg;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
 
 public class BrCollection<T extends BrCollectable> {
 	private HashMap<String, T> collection = new HashMap<String, T>();
@@ -15,7 +15,7 @@ public class BrCollection<T extends BrCollectable> {
 	}
 	public T remove(String id){
 		T removed = collection.remove(id);
-		Messenger.debug(Msg.INFO, "Removing "+id+" to "+removed.getClass().getSimpleName()+ "Collection");
+		Messenger.debug(Msg.INFO, "Removing "+id+" from "+removed.getClass().getSimpleName()+ "Collection");
 		if(removed != null){
 			// If element was removed,
 			// Do something

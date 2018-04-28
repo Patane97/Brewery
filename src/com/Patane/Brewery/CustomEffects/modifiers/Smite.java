@@ -2,8 +2,8 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 
 import java.util.Map;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
 
 @Namer(name="SMITE")
 public class Smite extends Modifier{
@@ -21,4 +21,9 @@ public class Smite extends Modifier{
 		damage(info.getTarget(), info.getTargeter(), amount);
 	}
 
+	@Override
+	public String[] stringValues(){
+		String[] values = {Double.toString(amount)};
+		return values;
+	}
 }

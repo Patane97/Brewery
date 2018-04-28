@@ -15,6 +15,8 @@ import com.Patane.Brewery.Listeners.ParticlePacketAdapter;
 import com.Patane.Brewery.Sequencer.Sequencer;
 import com.Patane.Brewery.Sequencer.SequencesYML;
 import com.Patane.Brewery.commands.CommandHandler;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.main.PataneUtil;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -25,7 +27,6 @@ import com.comphenix.protocol.events.PacketAdapter;
  */
 
 public class Brewery extends JavaPlugin{
-	private static boolean debugMode = true;
 	
 	private static Brewery brewery;
 	private static BrItemCollection itemCollection;
@@ -35,6 +36,7 @@ public class Brewery extends JavaPlugin{
 	
 	public void onEnable() {
 		brewery = this;
+		PataneUtil.setup(brewery, true);
 		itemCollection = new BrItemCollection();
 		effectCollection = new BrEffectCollection();
 		getServer().getPluginManager().registerEvents(new GlobalListener(), this);
@@ -56,7 +58,7 @@ public class Brewery extends JavaPlugin{
 //						new PotionEffect(PotionEffectType.GLOWING, 20, 1)), 
 //				new Lingering(5f, 0.5f), 
 //				EntityType.PLAYER));
-//		new BrItem("Vampiric Scepter", CustomType.THROWABLE, ItemUtilities.createItem(Material.SPLASH_POTION, 1, (short) 0, "&6Vampiric Scepter", "&7Damages Undead", "&7heals players"), effects);
+//		new BrItem("Vampiric Scepter", CustomType.THROWABLE, ItemsUtil.createItem(Material.SPLASH_POTION, 1, (short) 0, "&6Vampiric Scepter", "&7Damages Undead", "&7heals players"), effects);
 		/////////////////////////
 
 //		BrItem.YML().save();
@@ -78,9 +80,6 @@ public class Brewery extends JavaPlugin{
 		BrItem.YML().load();
 		Sequencer.setYML(new SequencesYML(this));
 		Sequencer.YML().load();
-	}
-	public static boolean debugMode() {
-		return debugMode;
 	}
 	public static Brewery getInstance(){
 		return brewery;

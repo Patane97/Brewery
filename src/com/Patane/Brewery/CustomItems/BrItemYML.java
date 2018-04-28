@@ -5,24 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Chat;
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Messenger.Msg;
+import com.Patane.Brewery.CustomEffects.BrEffect;
+import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Brewery.CustomItems.BrItem.EffectContainer;
-import com.Patane.Brewery.YML.BasicYML;
-import com.Patane.Brewery.util.ErrorHandler;
-import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
-import com.Patane.Brewery.util.ErrorHandler.Importance;
-import com.Patane.Brewery.util.ItemUtilities;
-import com.Patane.Brewery.util.StringUtilities;
-import com.Patane.Brewery.util.YMLUtilities;
+import com.Patane.Brewery.util.YML.BreweryYML;
+import com.Patane.util.YML.YMLUtil;
+import com.Patane.util.general.Chat;
+import com.Patane.util.general.Check;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
+import com.Patane.util.general.StringsUtil;
+import com.Patane.util.ingame.ItemsUtil;
 
-public class BrItemYML extends BasicYML{
+public class BrItemYML extends BreweryYML{
 
 	public BrItemYML(Plugin plugin) {
 		super(plugin, "items.yml", "items");
@@ -45,25 +45,25 @@ public class BrItemYML extends BasicYML{
 			setHeader(clearCreateSection(itemName, "item"));
 			header.set("material", item.getItem().getType().name());
 			if(item.getItem().hasItemMeta()){
-				String hiddenID = ItemUtilities.encodeItemData(ItemUtilities.getTag(item.getID()));
+				String hiddenID = ItemsUtil.encodeItemData(ItemsUtil.getTag(item.getID()));
 				header.set("name", Chat.deTranslate(item.getItem().getItemMeta().getDisplayName().replace(hiddenID, "")));
 				header.set("lore", Chat.deTranslate(item.getItem().getItemMeta().getLore())); // make method to convert back and forth
 			}
 			// EFFECTS
 			setHeader(clearCreateSection(itemName, "effects"));
-			for(EffectContainer effectContainer : item.getEffectContainers()){
-				setHeader(clearCreateSection(itemName, "effects", effectContainer.getEffect().getID(), "trigger"));
-				header.set("type", effectContainer.getType().name());
-				for(Field field : effectContainer.getType().getClass().getFields()){
+			for(BrEffect effect : item.getEffects()){
+				setHeader(clearCreateSection(itemName, "effects", effect.getID(), "trigger"));
+				header.set("type", effect.getTrigger().name());
+				for(Field field : effect.getTrigger().getClass().getFields()){
 					try {
-						header.set(field.getName(), field.get(effectContainer.getType()));
+						header.set(field.getName(), field.get(effect.getTrigger()));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
 					}
 				}
-				setHeader(itemName, "effects", effectContainer.getEffect().getID());
-				header.set("entities", YMLUtilities.getEntityTypeNames(effectContainer.getEntities()));
-				Messenger.debug(Msg.INFO, "Added "+effectContainer.getEffect().getID()+" to "+item.getID()+" in YML");
+				setHeader(itemName, "effects", effect.getID());
+				header.set("entities", YMLUtil.getEntityTypeNames(effect.getEntitiesArray()));
+				Messenger.debug(Msg.INFO, "Added "+effect.getID()+" to "+item.getID()+" in YML");
 			}
 			Messenger.debug(Msg.INFO, "Successfully saved Item: " + itemName);
 		}
@@ -72,44 +72,91 @@ public class BrItemYML extends BasicYML{
 
 	@Override
 	public void load() {
-		setHeader(getRootSection());
 		for(String itemName : header.getKeys(false)){
-			load(itemName);
+			setHeader(getRootSection());
+			load(getSection(header, itemName));
 		}
-		Messenger.info("Successfully loaded Items: "+StringUtilities.stringJoiner(Brewery.getItemCollection().getAllIDs(), ", "));
+		Messenger.info("Successfully loaded Items: "+StringsUtil.stringJoiner(Brewery.getItemCollection().getAllIDs(), ", "));
 	}
-	public void load(String itemName){
+	public BrItem load(ConfigurationSection section){
 		try{
+			String itemName = extractLast(section);
+			
 			setHeader(itemName);
+			
 			Messenger.debug(Msg.INFO, "Attempting to load "+itemName+" item...");
-			if(!itemName.equals(itemName.replace(" ", "_").toUpperCase()))
-				ErrorHandler.optionalLoadError(Msg.WARNING, Importance.REQUIRED, "Failed to load "+itemName+": Name must be in upper case with no spacing, eg. '"+itemName.replace(" ", "_").toUpperCase()+"'");
-			// TYPE
-			CustomType type = getEnumFromString(Importance.REQUIRED, CustomType.class, header.getString("type"), "type", itemName);
-			Messenger.debug(Msg.INFO, "     + Type["+type.name()+"]");
-			// ITEM
+			
+			// Ensures itemName is of valid format.
+			safeFormatCheck(itemName);
+
+			Messenger.debug(Msg.INFO, "=+ "+itemName);
+			/*
+			 * TYPE
+			 */
+			CustomType type = getEnumFromString(header.getString("type"), CustomType.class);
+			Messenger.debug(Msg.INFO, " + Type["+type.name()+"]");
+			
+			/*
+			 * ITEM
+			 */
 			setHeader(itemName, "item");
-			Material material = getEnumFromString(Importance.REQUIRED, Material.class, header.getString("material"), "material", itemName+"'s item");
+			
+			// Find material from Minecraft Material enum.
+			Material material = getEnumFromString(header.getString("material"), Material.class);
+			
+			// Setting the item name.
 			String name = header.getString("name");
+			
+			// Setting the item lore.
 			List<String> lore = header.getStringList("lore");
-			ItemStack item = ItemUtilities.hideFlags(ItemUtilities.createItem(material, 1, (short) 0, name, lore.toArray(new String[0])));
-			Messenger.debug(Msg.INFO, "     + Item["+material.name()+", "+name+", "+lore+"]");
-			// EFFECTS
-			setHeader(itemName, "effects");
-			List<EffectContainer> effects = new ArrayList<EffectContainer>();
+			
+			// Creating the item with all flags hidden.
+			ItemStack itemStack = ItemsUtil.hideFlags(ItemsUtil.createItem(material, 1, (short) 0, name, lore.toArray(new String[0])));
+			
+			// Printing for debug.
+			Messenger.debug(Msg.INFO, " + Item["+material.name()+"]");
+			Messenger.debug(Msg.INFO, " +--[name: "+name+"]");
+			Messenger.debug(Msg.INFO, " +--[lore: "+lore+"]");
+
+			/*
+			 * EFFECTS
+			 */
+			setHeader(itemName, "effect");
+			
+			// Creating effects ArrayList
+			List<BrEffect> effects = new ArrayList<BrEffect>();
+			
+			// Loops through each key in effect section
 			for(String effectName : header.getKeys(false)){
+				// Surrounded in try/catch to ensure that one failed effect
+				// doesnt stop other effects from being retrieved.
 				try{
-					EffectContainer container = grabEffectContainer(Importance.REQUIRED, header, effectName);
-					effects.add(container);
-					Messenger.debug(Msg.INFO, "     + Effect["+container.getEffect().getID()+", "+container.getRadius()+", "+container.getType().name()+", "+container.getEntities().toString()+"]");
-				} catch (BrLoadException e){
-					Messenger.warning(e.getMessage());
+					// Retrieves the effect using the yml given, the default BrEffectYML and the retrieve() function.
+					BrEffect effect = BrEffectYML.retrieve(getSection(header, effectName), BrEffect.YML().getSection(effectName), false);
+					
+					// Checks if the effect is null or not.
+					Check.nulled(effect);
+					
+					// Adds the effect to the effects list.
+					effects.add(effect);
+				}
+				// Generally NullPointerExceptions, however some other can come from retieve if handled incorrectly.
+				catch(Exception e){
+					Messenger.warning("'"+effectName+" Effect for '"+itemName+" Item failed to be retireved:");
+					e.printStackTrace();
 				}
 			}
-			new BrItem(itemName, type, item, effects);
-		} catch (BrLoadException e){
+			// Creates the item with all given values.
+			BrItem item = new BrItem(itemName, type, itemStack, effects);
+
+			// If item isnt already in the collection, it adds it.
+			if(!Brewery.getItemCollection().contains(item.getID()))
+				Brewery.getItemCollection().add(item);
+			return item;
+		} catch (IllegalArgumentException | ClassNotFoundException e){
 			Messenger.warning(e.getMessage());
 		}
+		return null;
 	}
 	
 }
