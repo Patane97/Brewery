@@ -114,6 +114,9 @@ public class BrEffect extends BrCollectable{
 		trigger.execute(this, executor, location);
 	}
 	
+/*
+ *  PARTICLE EFFECTS
+ */
 	@Namer(name = "Particle Effect")
 	public static class BrParticleEffect extends YMLParsable{
 		final public Particle type;
@@ -144,6 +147,11 @@ public class BrEffect extends BrCollectable{
 			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
 		}
 	}
+	
+
+/*
+ *  SOUND EFFECTS
+ */
 	@Namer(name = "Sound Effect")
 	public static class BrSoundEffect extends YMLParsable{
 		final public Sound type;

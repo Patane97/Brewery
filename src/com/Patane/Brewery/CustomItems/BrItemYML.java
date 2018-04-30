@@ -121,7 +121,7 @@ public class BrItemYML extends BreweryYML{
 			/*
 			 * EFFECTS
 			 */
-			setHeader(itemName, "effect");
+			setHeader(itemName, "effects");
 			
 			// Creating effects ArrayList
 			List<BrEffect> effects = new ArrayList<BrEffect>();
