@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Stephen/workspace/Spigot/spigot-1.12.2.jar"/>
-	<classpathentry kind="lib" path="External Jars/ProtocolLib.jar"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/PataneUtil"/>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>
