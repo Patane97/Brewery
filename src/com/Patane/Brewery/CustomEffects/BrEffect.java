@@ -49,7 +49,10 @@ public class BrEffect extends BrCollectable{
 		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
 		this.modifier = (incompleteAllowed ? modifier : Check.nulled(modifier, "BrEffect '"+name+"' has no modifiers set anywhere. Please check YML files."));
 		this.trigger = (incompleteAllowed ? trigger : Check.nulled(trigger, "BrEffect '"+name+"' has no triggers set anywhere. Please check YML files."));
-		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		// PROBLEM!
+		// Maybe make radius non-essential?
+		// If radius isnt set, then it only applies to any entities hit?
+		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect '"+name+"' has no radius set anywhere. Please check YML files."));
 		
 		// NON-ESSENTIAL VALUES.
 		// These values can be null. However if the arrays are null, they are converted to empty arrays.
