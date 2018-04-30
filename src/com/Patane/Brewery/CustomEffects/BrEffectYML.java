@@ -78,17 +78,9 @@ public class BrEffectYML extends BreweryYML{
 	 * @param incompleteAllowed Whether essential values (such as Trigger) can be missing. Generally true if this is retireving a default effect.
 	 */
 	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader, boolean incompleteAllowed){
-		try{
-			// PROBLEM! 
-			// Still needs to deal with a scenario where the effect can be in the baseHeader, 
-			// but NOT the defaultHeader.
-			// (eg. THUNDER from AXE_OF_THOR in items.yml).
-			
+		try{			
 			// Making sure the baseHeader is not null.
 			Check.nulled(baseHeader);
-			
-			// If the defaultHeader is null, it should equal the baseHeader (attempting to fix problem above).
-//			defaultHeader = (getSection(defaultHeader) == null ? baseHeader : defaultHeader);
 			
 			// Creating currentHeader to be used throughout this method.
 			ConfigurationSection currentHeader = baseHeader;
@@ -289,11 +281,11 @@ public class BrEffectYML extends BreweryYML{
 				Brewery.getEffectCollection().add(effect);
 			
 			return effect;
-		} catch (ClassNotFoundException e) {
-			Messenger.debug(Msg.WARNING, "Effect could not be retrieved: Class error.");
+		} catch(YMLException e){
+			Messenger.warning("An effect failed to be found and load:");
 			e.printStackTrace();
-		} catch (YMLException e) {
-			Messenger.debug(Msg.WARNING, "Effect could not be retrieved: YML error.");
+		} catch (Exception e) {
+			Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
 			e.printStackTrace();
 		}
 		return null;

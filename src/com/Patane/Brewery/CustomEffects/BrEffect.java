@@ -49,7 +49,10 @@ public class BrEffect extends BrCollectable{
 		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
 		this.modifier = (incompleteAllowed ? modifier : Check.nulled(modifier, "BrEffect '"+name+"' has no modifiers set anywhere. Please check YML files."));
 		this.trigger = (incompleteAllowed ? trigger : Check.nulled(trigger, "BrEffect '"+name+"' has no triggers set anywhere. Please check YML files."));
-		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		// PROBLEM!
+		// Maybe make radius non-essential?
+		// If radius isnt set, then it only applies to any entities hit?
+		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect '"+name+"' has no radius set anywhere. Please check YML files."));
 		
 		// NON-ESSENTIAL VALUES.
 		// These values can be null. However if the arrays are null, they are converted to empty arrays.
@@ -114,6 +117,9 @@ public class BrEffect extends BrCollectable{
 		trigger.execute(this, executor, location);
 	}
 	
+/*
+ *  PARTICLE EFFECTS
+ */
 	@Namer(name = "Particle Effect")
 	public static class BrParticleEffect extends YMLParsable{
 		final public Particle type;
@@ -144,6 +150,11 @@ public class BrEffect extends BrCollectable{
 			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
 		}
 	}
+	
+
+/*
+ *  SOUND EFFECTS
+ */
 	@Namer(name = "Sound Effect")
 	public static class BrSoundEffect extends YMLParsable{
 		final public Sound type;

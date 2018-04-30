@@ -20,6 +20,7 @@ import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.general.ErrorHandler.YMLException;
 import com.Patane.util.ingame.ItemsUtil;
 
 public class BrItemYML extends BreweryYML{
@@ -73,6 +74,7 @@ public class BrItemYML extends BreweryYML{
 	@Override
 	public void load() {
 		for(String itemName : header.getKeys(false)){
+			Messenger.debug(Msg.INFO, "Attempting to load Item: '"+itemName+" ...");
 			setHeader(getRootSection());
 			load(getSection(header, itemName));
 		}
@@ -80,35 +82,47 @@ public class BrItemYML extends BreweryYML{
 	}
 	public BrItem load(ConfigurationSection section){
 		try{
+			// Making sure the section is not null.
+			Check.nulled(section);
+			
+			// Getting the item name from the last portion of the section.
 			String itemName = extractLast(section);
-			
-			setHeader(itemName);
-			
-			Messenger.debug(Msg.INFO, "Attempting to load "+itemName+" item...");
-			
+
 			// Ensures itemName is of valid format.
 			safeFormatCheck(itemName);
 
 			Messenger.debug(Msg.INFO, "=+ "+itemName);
 			/*
-			 * TYPE
+			 * ==================> TYPE <==================
 			 */
-			CustomType type = getEnumFromString(header.getString("type"), CustomType.class);
-			Messenger.debug(Msg.INFO, " + Type["+type.name()+"]");
+			setHeader(itemName);
+			
+			CustomType type = null;
+			try{
+				type = getEnumFromString(header.getString("type"), CustomType.class);
+				Messenger.debug(Msg.INFO, " + Type["+type.name()+"]");
+			} catch (NullPointerException e){}
 			
 			/*
-			 * ITEM
+			 * ==================> ITEM <==================
 			 */
 			setHeader(itemName, "item");
 			
 			// Find material from Minecraft Material enum.
-			Material material = getEnumFromString(header.getString("material"), Material.class);
+			Material material = null;
+			try{
+				material = getEnumFromString(header.getString("material"), Material.class);
+			} catch (NullPointerException e){}
 			
 			// Setting the item name.
 			String name = header.getString("name");
 			
 			// Setting the item lore.
-			List<String> lore = header.getStringList("lore");
+			List<String> lore = new ArrayList<String>();
+			try{
+				lore.addAll(header.getStringList("lore"));
+			} catch (NullPointerException e) {}
+			
 			
 			// Creating the item with all flags hidden.
 			ItemStack itemStack = ItemsUtil.hideFlags(ItemsUtil.createItem(material, 1, (short) 0, name, lore.toArray(new String[0])));
@@ -119,9 +133,9 @@ public class BrItemYML extends BreweryYML{
 			Messenger.debug(Msg.INFO, " +--[lore: "+lore+"]");
 
 			/*
-			 * EFFECTS
+			 * ==================> EFFECTS <==================
 			 */
-			setHeader(itemName, "effect");
+			setHeader(itemName, "effects");
 			
 			// Creating effects ArrayList
 			List<BrEffect> effects = new ArrayList<BrEffect>();
@@ -140,9 +154,12 @@ public class BrItemYML extends BreweryYML{
 					// Adds the effect to the effects list.
 					effects.add(effect);
 				}
+				catch(NullPointerException e){
+					Messenger.warning("'"+effectName+"' Effect could not been added to '"+itemName+"'. Did the effect fail to load?");
+				}
 				// Generally NullPointerExceptions, however some other can come from retieve if handled incorrectly.
 				catch(Exception e){
-					Messenger.warning("'"+effectName+" Effect for '"+itemName+" Item failed to be retireved:");
+					Messenger.warning("'"+effectName+"' Effect for '"+itemName+" Item failed to be retireved:");
 					e.printStackTrace();
 				}
 			}
@@ -153,8 +170,12 @@ public class BrItemYML extends BreweryYML{
 			if(!Brewery.getItemCollection().contains(item.getID()))
 				Brewery.getItemCollection().add(item);
 			return item;
-		} catch (IllegalArgumentException | ClassNotFoundException e){
-			Messenger.warning(e.getMessage());
+		} catch(YMLException e){
+			Messenger.warning("An item failed to be found and load:");
+			e.printStackTrace();
+		} catch (Exception e){
+			Messenger.warning("'"+extractLast(section)+"' Item failed to load:");
+			e.printStackTrace();
 		}
 		return null;
 	}
