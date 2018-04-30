@@ -1,0 +1,20 @@
+#### EXAMPLE ITEM ####
+effects:
+  # FLAME_BURST:
+    # modifier:
+      # type: DAMAGE
+      # cause: FIRE
+      # amount: 2
+    # trigger:
+      # type: INSTANT
+    # radius: 5
+    # entities:
+    # - ZOMBIE
+    # particle:
+      # type: FLAME
+      # intensity: 20
+      # velocity: 0.05
+      # formation: RADIUS
+    # sound:
+      # type: BLOCK_FURNACE_FIRE_CRACKLE
+      # volume: 5

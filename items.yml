@@ -1,0 +1,26 @@
+#### EXAMPLE ITEM ####
+#items:
+#  SWORD_OF_FLAMES:
+#    type: HITTABLE
+#    item:
+#      material: IRON_SWORD
+#     name: '&6Sword of Flames'
+#     lore:
+#      - '&7Burst of flame on impact'
+#      - '&7Sets each target hit alight'
+#    effects:
+#      FLAME:
+#        radius: 4
+#        trigger:
+#          type: INSTANT
+#        modifier:
+#          type: DAMAGE
+#          cause: FIRE
+#          amount: 5
+#      IGNITE:
+#        radius: 2
+#        trigger:
+#          type: INSTANT
+#        modifier:
+#          type: IGNITE
+#          duration: 3

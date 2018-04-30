@@ -20,10 +20,4 @@ public class Ignite extends Modifier{
 	public void modify(ModifierInfo info) {
 		info.getTarget().setFireTicks(duration);
 	}
-	
-	@Override
-	public String[] stringValues() {
-		String[] values = {Double.toString(duration)};
-		return values;
-	}
 }

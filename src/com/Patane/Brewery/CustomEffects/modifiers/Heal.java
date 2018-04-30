@@ -21,10 +21,4 @@ public class Heal extends Modifier{
 		if(amount > 0)
 			info.getTarget().setHealth(Math.min(20, info.getTarget().getHealth() + amount));
 	}
-	
-	@Override
-	public String[] stringValues() {
-		String[] values = {Double.toString(amount)};
-		return values;
-	}
 }

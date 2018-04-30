@@ -69,6 +69,11 @@ public class BrEffectYML extends BreweryYML{
 		}
 		Messenger.info("Successfully loaded Effects: "+StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), ", "));
 	}
+	
+	public void load(ConfigurationSection section){
+		retrieve(section, null, true);
+	}
+
 	/**
 	 * This function will extract a BrEffect from a YML file.
 	 * If the BrEffect is not complete, a default effect can be applied to fill in any null values.
@@ -92,6 +97,7 @@ public class BrEffectYML extends BreweryYML{
 			safeFormatCheck(effectName);
 
 			Messenger.debug(Msg.INFO, " + Effect["+effectName+"]");
+			
 			/*
 			 * ==================> MODIFIER <==================
 			 */
@@ -109,6 +115,7 @@ public class BrEffectYML extends BreweryYML{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				modifier = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
 			} catch (YMLException e){}
+			
 			/*
 			 * ==================> RADIUS <==================
 			 */
@@ -145,6 +152,7 @@ public class BrEffectYML extends BreweryYML{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), EffectTypeHandler.get(triggerName), "type");
 			} catch (YMLException e){}
+			
 			/*
 			 * ==================> ENTITIES <==================
 			 */
@@ -182,6 +190,7 @@ public class BrEffectYML extends BreweryYML{
 			/*
 			 * ==================> PARTICLES <==================
 			 */
+			
 			// Setting currentHeader to the baseHeader's particles.
 			// If this is unavailable, then currentHeader is set to the defaultSection's particles.
 			currentHeader = getAvailable(getSection(baseHeader, "particle"), getSection(defaultHeader, "particle"));
@@ -290,83 +299,5 @@ public class BrEffectYML extends BreweryYML{
 		}
 		return null;
 		
-	}
-	public void load(ConfigurationSection section){
-		retrieve(section, null, true);
-//		try{
-//			setHeader(effectName);
-//			Messenger.debug(Msg.INFO, "Attempting to load "+effectName+" effect...");
-//			if(!effectName.equals(effectName.replace(" ", "_").toUpperCase()))
-//				ErrorHandler.optionalLoadError(Msg.WARNING, Importance.REQUIRED, "Failed to load "+effectName+": Name must be in upper case with no spacing, eg. '"+effectName.replace(" ", "_").toUpperCase()+"'");
-//			//MODIFIER
-//			setHeader(effectName, "modifier");
-//			String modifierName = header.getString("type");
-//			Modifier modifier = getByClass(Importance.REQUIRED, ModifierHandler.get(modifierName), "Modifier", "the "+effectName+" effect", header, "type");
-//			
-//			//			Messenger.debug(Msg.INFO, "     + Modifier[#" + modifierName + "#, " + StringsUtil.stringJoiner(modifier.stringValues(), ", ")+"]");
-//			//RADIUS
-//			Integer radius = null;
-//			setHeader(effectName);
-//			if(header.getString("radius") != null){
-//				radius = getIntFromString(header.getString("radius"));
-//				if(radius != null)
-//					Messenger.debug(Msg.INFO, "     + radius["+radius+"]");
-//			}
-//			//TRIGGER
-//			EffectType effectType = null;
-//			if(isSection(effectName, "trigger")){
-//				setHeader(effectName, "trigger");
-//				String effectTypeName = header.getString("type");
-//				effectType = getByClass(Importance.MINOR, EffectTypeHandler.get(effectTypeName), "trigger", "the "+effectName+" effect's trigger", header, "type");
-//			}
-//			//ENTITIES
-//			List<EntityType> entities = null;
-//			if(isSection(effectName, "entities")){
-//				entities = new ArrayList<EntityType>();
-//				setHeader(effectName);
-////				for(String entityName : header.getStringList("entities")){
-////					try{
-////						EntityType entityType = getEnumFromString(Importance.REQUIRED, EntityType.class, entityName, "entity type", "an entity for "+effectName+" effect");
-////						entities.add(entityType);
-////					} catch (LoadException e){
-////						Messenger.warning(e.getMessage());
-////					}
-////				}
-//			}
-//			//PARTICLES
-//			BrParticleEffect particleEffect = null;
-//			if(isSection(effectName, "Particle"))
-//				particleEffect = getByClass(Importance.MINOR, BrParticleEffect.class, "Particle", "the "+effectName+" effect's particle", getSection(effectName, "particle"));
-//			//SOUNDS
-//			BrSoundEffect soundEffect = null;
-//			if(isSection(effectName, "Sound"))
-//				soundEffect = getByClass(Importance.MINOR, BrSoundEffect.class, "Sound", "the "+effectName+" effect's sound", getSection(effectName, "sound"), "type");
-//			//POTIONEFFECTS
-//			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
-//			if(isSection(effectName, "potion_effects")){
-//				setHeader(effectName, "potion_effects");
-//				for(String potionName : header.getKeys(false)){
-//					try{
-//						setHeader(effectName, "potion_effects", potionName);
-//						String preName = "the "+effectName+"'s "+potionName+" Effect";
-//						// Type
-//						PotionEffectType type = PotionEffectType.getByName(potionName);
-//						if(type == null)
-//							ErrorHandler.optionalLoadError(Msg.WARNING, Importance.MINOR, "Failed to load "+preName+": '"+potionName+"' not recognised as a valid PotionEffect.");
-//						// Duration
-//						int duration = Math.round(getFloatFromString(header.getString("duration"))*20);
-//						// Strength
-//						int strength = getIntFromString(header.getString("strength"));
-//						Messenger.debug(Msg.INFO, "     + Potion Effect["+potionName+", "+duration+", "+strength+"]");
-//						potionEffects.add(new PotionEffect(type, duration, strength));
-//					} catch (LoadException e){
-//						Messenger.warning(e.getMessage());
-//					}
-//				}
-//			}
-//			new BrEffect(effectName, modifier, particleEffect, soundEffect, new DefaultContainer(effectType, radius, (entities == null ? null : entities.toArray(new EntityType[0]))), potionEffects.toArray(new PotionEffect[0]));
-//		} catch (LoadException e){
-//			Messenger.warning(e.getMessage());
-//		}
 	}
 }

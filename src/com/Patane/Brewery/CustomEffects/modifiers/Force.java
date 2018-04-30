@@ -27,12 +27,6 @@ public class Force extends Modifier{
         Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
         info.getTarget().setVelocity(velocity);
 	}
-
-	@Override
-	public String[] stringValues(){
-		String[] values = {direction.name(), Double.toString(intensity)};
-		return values;
-	}
 	
 	public enum Direction {
 		TOWARDS(new ForceAction(){

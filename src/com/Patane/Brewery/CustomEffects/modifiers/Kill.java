@@ -10,10 +10,4 @@ public class Kill extends Modifier{
 	public void modify(ModifierInfo info) {
 		damage(info.getTarget(), info.getTargeter(), info.getTarget().getHealth());
 	}
-
-	@Override
-	public String[] stringValues() {
-		String[] values = {"N/A"};
-		return values;
-	}
 }

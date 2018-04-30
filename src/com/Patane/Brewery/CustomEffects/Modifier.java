@@ -16,7 +16,7 @@ public abstract class Modifier extends YMLParsable{
 	public Modifier(Map<String, String> fields){}
 	
 	public abstract void modify(ModifierInfo info);
-	public abstract String[] stringValues();
+	
 	public void damage(LivingEntity damagee, Entity damager, double amount){
 		damagee.setMetadata("Brewery_DAMAGE", new FixedMetadataValue(Brewery.getInstance(), null));
 		damagee.damage(amount, damager);

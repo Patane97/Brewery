@@ -20,10 +20,4 @@ public class Smite extends Modifier{
 		info.getTarget().getWorld().strikeLightningEffect(info.getTarget().getLocation());
 		damage(info.getTarget(), info.getTargeter(), amount);
 	}
-
-	@Override
-	public String[] stringValues(){
-		String[] values = {Double.toString(amount)};
-		return values;
-	}
 }

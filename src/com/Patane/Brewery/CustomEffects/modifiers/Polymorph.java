@@ -92,10 +92,4 @@ public class Polymorph extends Modifier{
 			}
 		}, (long) (duration*20)-5);
 	}
-	
-	@Override
-	public String[] stringValues() {
-		String[] values = {morph.name(), Double.toString(duration)};
-		return values;
-	}
 }

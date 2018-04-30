@@ -30,10 +30,4 @@ public class Damage extends Modifier{
 			info.getTarget().damage(amount);
 		}
 	}
-
-	@Override
-	public String[] stringValues() {
-		String[] values = {cause.name(), Double.toString(amount)};
-		return values;
-	}
 }

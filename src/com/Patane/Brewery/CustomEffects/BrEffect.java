@@ -15,6 +15,7 @@ import com.Patane.Brewery.Collections.BrCollectable;
 import com.Patane.util.YML.Namer;
 import com.Patane.util.YML.YMLParsable;
 import com.Patane.util.general.Check;
+import com.Patane.util.general.Messenger;
 import com.Patane.util.general.ErrorHandler.LoadException;
 
 public class BrEffect extends BrCollectable{
@@ -128,10 +129,19 @@ public class BrEffect extends BrCollectable{
 		final public double velocity;
 
 		public BrParticleEffect(Map<String, String> fields) throws LoadException{
-			this.type = Particle.valueOf(fields.get("type"));
-			this.formation = Formation.valueOf(fields.get("formation"));
-			this.intensity = getInt(fields, "intensity");
-			this.velocity = getDouble(fields, "velocity");
+			this.type = getEnumValue(Particle.class, fields, "type");
+			this.formation = getEnumValue(Formation.class, fields, "formation");
+			try{ this.intensity = getInt(fields, "intensity");
+			} catch (IllegalArgumentException e){
+				Messenger.warning("Particle Effect failed to load:");
+				throw e;
+			}
+			try{
+				this.velocity = getDouble(fields, "velocity");
+			} catch (IllegalArgumentException e){
+				Messenger.warning("Particle Effect failed to load:");
+				throw e;
+			}
 		}
 		public BrParticleEffect(Particle type, Formation formation, int intensity, double velocity){
 			this.type = type;
@@ -158,19 +168,19 @@ public class BrEffect extends BrCollectable{
 	@Namer(name = "Sound Effect")
 	public static class BrSoundEffect extends YMLParsable{
 		final public Sound type;
-		final public Formation formation;
+//		final public Formation formation;
 		final public float volume;
 		final public float pitch;
 
 		public BrSoundEffect(Map<String, String> fields) throws LoadException{
-			this.type = Sound.valueOf(fields.get("type"));
-			this.formation = Formation.valueOf(fields.get("formation"));
+			this.type = getEnumValue(Sound.class, fields, "type");
+//			this.formation = getEnumValue(Formation.class, fields, "formation");
 			this.volume = (float) getDouble(fields, "volume", 100);
 			this.pitch = (float) getDouble(fields, "pitch", 1);
 		}
-		public BrSoundEffect(Sound type, Formation formation, float volume, float pitch){
+		public BrSoundEffect(Sound type, float volume, float pitch){
 			this.type = type;
-			this.formation = formation;
+//			this.formation = formation;
 			this.volume = volume;
 			this.pitch = pitch;
 		}

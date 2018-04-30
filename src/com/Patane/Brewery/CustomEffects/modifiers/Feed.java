@@ -25,10 +25,4 @@ public class Feed extends Modifier{
 			player.setFoodLevel((int) Math.min(20, (player.getFoodLevel() + amount)));
 		}
 	}
-	
-	@Override
-	public String[] stringValues() {
-		String[] values = {Double.toString(amount)};
-		return values;
-	}
 }
