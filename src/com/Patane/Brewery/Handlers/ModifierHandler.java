@@ -12,6 +12,7 @@ import com.Patane.Brewery.CustomEffects.modifiers.Force;
 import com.Patane.Brewery.CustomEffects.modifiers.Heal;
 import com.Patane.Brewery.CustomEffects.modifiers.Ignite;
 import com.Patane.Brewery.CustomEffects.modifiers.Kill;
+import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.modifiers.Polymorph;
 import com.Patane.Brewery.CustomEffects.modifiers.Smite;
 import com.Patane.handlers.PatHandler;
@@ -34,6 +35,7 @@ public class ModifierHandler implements PatHandler{
 	}
 	public static void registerAll() {
 		modifiers = new HashMap<String, Class< ? extends Modifier>>();
+		register(None.class);
 		register(Damage.class);
 		register(Heal.class);
 		register(Feed.class);

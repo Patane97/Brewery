@@ -10,7 +10,6 @@ import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YML.YMLParsable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Focusable.Focus;
-import com.Patane.util.ingame.LocationsUtil;
 
 public abstract class Trigger extends YMLParsable{
 
@@ -27,8 +26,8 @@ public abstract class Trigger extends YMLParsable{
 	 * @return A List of the LivingEntities in which the effects were executed on.
 	 */
 	protected List<LivingEntity> executeOnEntities(BrEffect effect, Location impact, LivingEntity executor) {		
-		// Grabs all the entities that are hit within the effects given radius.
-		List<LivingEntity> hitEntities = LocationsUtil.getEntities(impact, effect.getRadius(), effect.getEntitiesArray(), false);
+		// Grabs all entites within the radius and filters them appropriately.
+		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
 		for(LivingEntity hitEntity : hitEntities){
 			// Executes the effect on each entity hit.
 			executeOnEntity(effect, impact, executor, hitEntity);

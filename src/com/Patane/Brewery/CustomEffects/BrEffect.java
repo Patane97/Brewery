@@ -1,14 +1,12 @@
 package com.Patane.Brewery.CustomEffects;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
@@ -41,8 +39,8 @@ public class BrEffect extends PatCollectable{
 	private final Trigger trigger;
 	private final Integer radius;
 	// NEED TO ADD: if radius is 0, projectile must HIT an entity to damage/affect it and only it.
-	private final ArrayList<EntityType> entities;
-	private final ArrayList<PotionEffect> potionEffects;
+	private final Filter filter;
+	private final List<PotionEffect> potionEffects;
 	private final BrParticleEffect particleEffect;
 	private final BrSoundEffect soundEffect;
 	private final BrTag tag;
@@ -50,7 +48,7 @@ public class BrEffect extends PatCollectable{
 	private List<String> incomplete = new ArrayList<String>();
 	
 	public BrEffect(boolean incompleteAllowed, String name, Modifier modifier, Trigger trigger, Integer radius, 
-			EntityType[] entities, BrParticleEffect particleEffect, BrSoundEffect soundEffect, PotionEffect[] potionEffects, 
+			Filter filter, BrParticleEffect particleEffect, BrSoundEffect soundEffect, List<PotionEffect> potionEffects, 
 			BrTag tag) {
 		// Setting the name
 		super(name);
@@ -69,11 +67,11 @@ public class BrEffect extends PatCollectable{
 		if(radius == null) incomplete.add("radius");
 		
 		// NON-ESSENTIAL VALUES.
-		// These values can be null. However if the arrays are null, they are converted to empty arrays.
-		this.entities = (entities == null ? new ArrayList<EntityType>() : new ArrayList<EntityType>(Arrays.asList(entities)));
+		// These values can be null. However if some objects are null, they are converted to empty objects.
+		this.filter = (filter == null ? new Filter() : filter);
 		this.particleEffect = particleEffect;
 		this.soundEffect = soundEffect;
-		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : new ArrayList<PotionEffect>(Arrays.asList(potionEffects)));
+		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
 		this.tag = tag;
 	}
 	
@@ -90,15 +88,12 @@ public class BrEffect extends PatCollectable{
 	
 	// Has & Getters for non-essential values.
 	
-	// Entities
-	public boolean hasEntities() {
-		return (entities.isEmpty() ? false : true);
+	// Filter
+	public boolean hasFilter() {
+		return (filter == null ? false : true);
 	}
-	public ArrayList<EntityType> getEntities() {
-		return entities;
-	}
-	public EntityType[] getEntitiesArray(){
-		return entities.toArray(new EntityType[entities.size()]);
+	public Filter getFilter() {
+		return filter;
 	}
 	
 	// Particle
@@ -121,7 +116,7 @@ public class BrEffect extends PatCollectable{
 	public boolean hasPotions() {
 		return (potionEffects.isEmpty() ? false : true);
 	}
-	public ArrayList<PotionEffect> getPotions(){
+	public List<PotionEffect> getPotions(){
 		return potionEffects;
 	}
 	public PotionEffect[] getPotionsArray(){
@@ -163,12 +158,8 @@ public class BrEffect extends PatCollectable{
 		public BrParticleEffect(Map<String, String> fields){
 			this.type = getEnumValue(Particle.class, fields, "type");
 			this.formation = Check.nulled(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
-			try{ this.intensity = getInt(fields, "intensity");
-			} catch (IllegalArgumentException e){
-				Messenger.warning("Particle Effect failed to load:");
-				throw e;
-			}
-			try{
+			try{ 
+				this.intensity = getInt(fields, "intensity");
 				this.velocity = getDouble(fields, "velocity");
 			} catch (IllegalArgumentException e){
 				Messenger.warning("Particle Effect failed to load:");

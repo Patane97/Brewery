@@ -7,13 +7,13 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.util.YML.BreweryYML;
-import com.Patane.handlers.ErrorHandler.YMLException;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
@@ -127,7 +127,7 @@ public class BrItemYML extends BreweryYML{
 			if(!Brewery.getItemCollection().contains(item.getID()))
 				Brewery.getItemCollection().add(item);
 			return item;
-		} catch(YMLException e){
+		} catch(YAMLException e){
 			Messenger.warning("An item failed to be found and load:");
 			e.printStackTrace();
 		} catch (Exception e){

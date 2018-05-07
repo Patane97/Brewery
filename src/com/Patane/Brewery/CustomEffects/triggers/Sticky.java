@@ -14,7 +14,6 @@ import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.YML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focusable.Focus;
-import com.Patane.util.ingame.LocationsUtil;
 
 @Namer(name="STICKY")
 public class Sticky extends Trigger{
@@ -31,8 +30,7 @@ public class Sticky extends Trigger{
 	}
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
-		boolean ignore = ((!effect.getEntities().isEmpty() && effect.getEntities().get(0) == null) ? true : false);
-		List<LivingEntity> hitEntities = LocationsUtil.getEntities(impact, effect.getRadius(), effect.getEntitiesArray(), ignore);
+		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
 		new StickyTask(effect, impact, executor, hitEntities);
 	}
 

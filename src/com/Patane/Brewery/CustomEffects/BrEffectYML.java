@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrSoundEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
+import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.util.YML.BreweryYML;
-import com.Patane.handlers.ErrorHandler.YMLException;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
@@ -87,7 +87,7 @@ public class BrEffectYML extends BreweryYML{
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				modifier = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
-			} catch (YMLException e){
+			} catch (YAMLException e){
 			} catch (ClassNotFoundException e){
 				throw new ClassNotFoundException("Type required for 'modifier' is missing.");
 			}
@@ -127,43 +127,39 @@ public class BrEffectYML extends BreweryYML{
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
-			} catch (YMLException e){
+			} catch (YAMLException e){
 			} catch (ClassNotFoundException e){
 				throw new ClassNotFoundException("Type required for 'trigger' is missing.");
 			}
 			
 			/*
-			 * ==================> ENTITIES <==================
-			 */			
-			// Setting currentHeader to the baseHeader.
-			// If this doesnt have entities, then currentHeader is set to the defaultSection.
-			// If defaultSection doesnt have entities, then currentHeader is null.
-			currentHeader = getAvailableWithSet("entities", getSection(baseHeader), getSection(defaultHeader));
+			 * ==================> FILTER <==================
+			 */
+
+			// Setting currentHeader to the baseHeader's filter.
+			// If this is unavailable, then currentHeader is set to the defaultSection's filter.
+			currentHeader = getAvailable(getSection(baseHeader, "filter"), getSection(defaultHeader, "filter"));
+
+			// Filter is null if there are no filters in the base or default headers.
+			Filter filter = null;
 			
-			// Creates a new ArrayList for the entities
-			List<EntityType> entities = new ArrayList<EntityType>();
-			
-			// If either the base or the default headers have entities, then they are added (base taking priority).
-			if(currentHeader != null){
-				Messenger.debug(Msg.INFO, "    + Entities: ");
-				
-				// Loops through each entitiy on the list.
-				for(String entityName : currentHeader.getStringList("entities")){
+			// If either the base or the default headers have a filter, then its added (base taking priority).
+				if(currentHeader != null){
+					Messenger.debug(Msg.INFO, "    + Filter: ");
 					// This is within a try/catch because it is optional.
 					// If it failed, we dont want to halt the entire retrieval process.
 					try{
+						FilterGroup target = getFilterGroup(getSection(currentHeader, "target"), true);
+						FilterGroup ignore = getFilterGroup(getSection(currentHeader, "ignore"), false);
 						
-						// Finds and matches the given entityName with an EntityType Enum.
-						EntityType entityType = getEnumFromString(entityName, EntityType.class);
-						Messenger.debug(Msg.INFO, "    +---"+entityType.name());
-						
-						// If entityType isnt null, adds it to the entities ArrayList.
-						if(entityType != null) entities.add(entityType);
-						
-					// Throws a NullPointerException if the entityname is null or object is null.
-					} catch(NullPointerException e){}
+						filter = new Filter(target, ignore);
+					} 
+					// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
+					catch(Exception e){
+						Messenger.warning("Failed to retrieve "+effectName+" filter:");
+						e.printStackTrace();
+					}
 				}
-			}
 			/*
 			 * ==================> TAGS <==================
 			 */
@@ -172,20 +168,20 @@ public class BrEffectYML extends BreweryYML{
 			// If this is unavailable, then currentHeader is set to the defaultSection's tags.
 			currentHeader = getAvailable(getSection(baseHeader, "tag"), getSection(defaultHeader, "tag"));
 			
-			// BrTag is null if there are no particles in the base or default headers.
+			// BrTag is null if there are no tags in the base or default headers.
 			BrTag tag = null;
 
-			// If either the base or the default headers have a particle, then its added (base taking priority).
+			// If either the base or the default headers have a tag, then its added (base taking priority).
 			if(currentHeader != null){
 				// This is within a try/catch because it is optional.
 				// If it failed, we dont want to halt the entire retrieval process.
 				try{
 
-					// Setting the particle effect using the currentHeader, defaultHeader and getSimpleClassDefault method.
+					// Setting the tag using the currentHeader, defaultHeader and getSimpleClassDefault method.
 					tag = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "tag"), BrTag.class);
 				} 
 				
-				// Generally ClassNotFoundException (class is null) or YMLException (currentHeader is null).
+				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 				catch(Exception e){
 					Messenger.warning("Failed to retrieve "+effectName+" tag:");
 					e.printStackTrace();
@@ -213,7 +209,7 @@ public class BrEffectYML extends BreweryYML{
 					particleEffect = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "particle"), BrParticleEffect.class);
 				} 
 				
-				// Generally ClassNotFoundException (class is null) or YMLException (currentHeader is null).
+				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 				catch(Exception e){
 					Messenger.warning("Failed to retrieve "+effectName+" particle effect:");
 					e.printStackTrace();
@@ -240,7 +236,7 @@ public class BrEffectYML extends BreweryYML{
 					soundEffect = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "sound"), BrSoundEffect.class);
 				} 
 				
-				// Generally ClassNotFoundException (class is null) or YMLException (currentHeader is null).
+				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 				catch(Exception e){
 					Messenger.warning("Failed to retrieve "+effectName+" sound effect:");
 					e.printStackTrace();
@@ -289,8 +285,7 @@ public class BrEffectYML extends BreweryYML{
 				}
 			}
 			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, 
-					entities.toArray(new EntityType[0]), particleEffect, soundEffect, potionEffects.toArray(new PotionEffect[0]), 
-					tag);
+					filter, particleEffect, soundEffect, potionEffects, tag);
 
 			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
 			BrEffectCollection.delProcessing(effectName);
@@ -300,10 +295,12 @@ public class BrEffectYML extends BreweryYML{
 				Brewery.getEffectCollection().add(effect);
 			
 			return effect;
-		} catch(YMLException e){
+		} catch(YAMLException e){
 			Messenger.warning("An effect failed to be found and loaded:");
 			e.printStackTrace();
 		} catch (Exception e) {
+			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
+			BrEffectCollection.delProcessing(extractLast(baseHeader));
 			Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
 			e.printStackTrace();
 		}

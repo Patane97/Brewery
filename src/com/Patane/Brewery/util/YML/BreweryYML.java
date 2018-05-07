@@ -1,12 +1,19 @@
 package com.Patane.Brewery.util.YML;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
 import com.Patane.util.YML.BasicYML;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
+import com.Patane.util.general.StringsUtil;
 
 public abstract class BreweryYML extends BasicYML{
 
@@ -52,5 +59,27 @@ public abstract class BreweryYML extends BasicYML{
 		if(!string.equals(string.replace(" ", "_").toUpperCase()))
 			throw new IllegalArgumentException("String must be in upper case with no spacing, eg. '"+string.replace(" ", "_").toUpperCase()+"'");
 		return string;
+	}
+	
+	public static FilterGroup getFilterGroup(ConfigurationSection section, boolean defaultReturn) throws ClassNotFoundException, NullPointerException{
+		if(section != null){
+			Messenger.debug(Msg.INFO, "    +--- "+extractLast(section)+": ");
+			List<EntityType> entities = new ArrayList<EntityType>();
+			for(String entityName : section.getStringList("entities")){
+				EntityType entityType = getEnumFromString(entityName, EntityType.class);
+				if(entityType != null){
+					entities.add(entityType);
+				}
+			}
+			if(!entities.isEmpty())Messenger.debug(Msg.INFO, "    +------ entities: "+StringsUtil.stringJoiner(section.getStringList("entities"), ", "));
+			List<String> player = section.getStringList("players");
+			if(!player.isEmpty())Messenger.debug(Msg.INFO, "    +------ players: "+StringsUtil.stringJoiner(player, ", "));
+			List<String> permissions = section.getStringList("permissions");
+			if(!permissions.isEmpty())Messenger.debug(Msg.INFO, "    +------ permissions: "+StringsUtil.stringJoiner(permissions, ", "));
+			List<String> tags = section.getStringList("tags");
+			if(!tags.isEmpty())Messenger.debug(Msg.INFO, "    +------ tags: "+StringsUtil.stringJoiner(tags, ", "));
+			return new FilterGroup(entities, player, permissions, tags, defaultReturn);
+		}
+		return new FilterGroup(null, null, null, null, defaultReturn);
 	}
 }

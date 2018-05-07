@@ -34,19 +34,19 @@ public class BrMetaDataHandler extends MetaDataHandler{
 //	}
 
 	public static boolean add(PatRunnable task, LivingEntity entity, String metaName, Object value){
-		return add(entity, packMetaName(task, metaName), value);
+		return MetaDataHandler.add(entity, packMetaName(task, metaName), value);
 	}
 	public static boolean add(PatRunnable task, List<LivingEntity> entities, String metaName, Object value){
-		return add(entities, packMetaName(task, metaName), value);
+		return MetaDataHandler.add(entities, packMetaName(task, metaName), value);
 	}
 	public static boolean remove(PatRunnable task, LivingEntity entity, String metaName){
-		return remove(entity, packMetaName(task, metaName));
+		return MetaDataHandler.remove(entity, packMetaName(task, metaName));
 	}
 	public static boolean remove(PatRunnable task, String metaName){
-		return remove(packMetaName(task, metaName));
+		return MetaDataHandler.remove(packMetaName(task, metaName));
 	}
 	public static boolean check(LivingEntity entity, String regex){
-		return check(entity, "\\[\\d+\\]"+regex);
+		return MetaDataHandler.check(entity, "\\[\\d+\\]"+regex);
 	}
 	
 	private static String packMetaName(PatRunnable task, String metaName){
