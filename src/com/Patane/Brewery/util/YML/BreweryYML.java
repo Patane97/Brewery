@@ -10,8 +10,8 @@ import com.Patane.util.general.Messenger;
 
 public abstract class BreweryYML extends BasicYML{
 
-	public BreweryYML(Plugin plugin, String config, String root) {
-		super(plugin, config, root);
+	public BreweryYML(Plugin plugin, String config, String root, String header) {
+		super(plugin, config, root, header);
 	}
 	/**
 	 * Retireves a potion effect from a YML and creates it based on the values given.

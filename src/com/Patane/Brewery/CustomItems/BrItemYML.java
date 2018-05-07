@@ -1,6 +1,5 @@
 package com.Patane.Brewery.CustomItems;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,67 +13,25 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.util.YML.BreweryYML;
-import com.Patane.util.YML.YMLUtil;
-import com.Patane.util.general.Chat;
+import com.Patane.handlers.ErrorHandler.YMLException;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.general.ErrorHandler.YMLException;
 import com.Patane.util.ingame.ItemsUtil;
 
 public class BrItemYML extends BreweryYML{
 
 	public BrItemYML(Plugin plugin) {
-		super(plugin, "items.yml", "items");
+		super(plugin, "items.yml", "items", "YML File for each item\nExample:");
 	}
-	/**
-	 * NOT CURRENTLY USED (NOT SURE IF IT WILL BE)
-	 */
 	@Override
-	public void save() {
-		for(BrItem item : Brewery.getItemCollection().getAllItems()){
-			String itemName = item.getName();
-//			if(isSection(itemName)){
-//				Messenger.debug(Msg.INFO, itemName+" ALREADY EXISTS IN YML!");
-//				load(itemName);
-//			}
-			setHeader(clearCreateSection(itemName));
-			// TYPE
-			header.set("type", item.getType().name());
-			// ITEM
-			setHeader(clearCreateSection(itemName, "item"));
-			header.set("material", item.getItem().getType().name());
-			if(item.getItem().hasItemMeta()){
-				String hiddenID = ItemsUtil.encodeItemData(ItemsUtil.getTag(item.getID()));
-				header.set("name", Chat.deTranslate(item.getItem().getItemMeta().getDisplayName().replace(hiddenID, "")));
-				header.set("lore", Chat.deTranslate(item.getItem().getItemMeta().getLore())); // make method to convert back and forth
-			}
-			// EFFECTS
-			setHeader(clearCreateSection(itemName, "effects"));
-			for(BrEffect effect : item.getEffects()){
-				setHeader(clearCreateSection(itemName, "effects", effect.getID(), "trigger"));
-				header.set("type", effect.getTrigger().name());
-				for(Field field : effect.getTrigger().getClass().getFields()){
-					try {
-						header.set(field.getName(), field.get(effect.getTrigger()));
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-				}
-				setHeader(itemName, "effects", effect.getID());
-				header.set("entities", YMLUtil.getEntityTypeNames(effect.getEntitiesArray()));
-				Messenger.debug(Msg.INFO, "Added "+effect.getID()+" to "+item.getID()+" in YML");
-			}
-			Messenger.debug(Msg.INFO, "Successfully saved Item: " + itemName);
-		}
-		config.save();
-	}
+	public void save() {}
 
 	@Override
 	public void load() {
 		for(String itemName : header.getKeys(false)){
-			Messenger.debug(Msg.INFO, "Attempting to load Item: '"+itemName+" ...");
+			Messenger.debug(Msg.INFO, "Attempting to load Item '"+itemName+"' ...");
 			setHeader(getRootSection());
 			load(getSection(header, itemName));
 		}
@@ -146,7 +103,7 @@ public class BrItemYML extends BreweryYML{
 				// doesnt stop other effects from being retrieved.
 				try{
 					// Retrieves the effect using the yml given, the default BrEffectYML and the retrieve() function.
-					BrEffect effect = BrEffectYML.retrieve(getSection(header, effectName), BrEffect.YML().getSection(effectName), false);
+					BrEffect effect = BrEffectYML.retrieve(getSectionAndWarn(header, effectName), BrEffect.YML().getSection(effectName), false);
 					
 					// Checks if the effect is null or not.
 					Check.nulled(effect);

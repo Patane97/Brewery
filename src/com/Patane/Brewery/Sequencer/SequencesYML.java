@@ -9,7 +9,7 @@ import com.Patane.util.general.Messenger.Msg;
 public class SequencesYML extends BasicYML{
 
 	public SequencesYML(Plugin plugin) {
-		super(plugin, "sequences.yml", "sequences");
+		super(plugin, "sequences.yml", "sequences", "YML File for each sequence\nExample:");
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class SequencesYML extends BasicYML{
 				Messenger.debug(Msg.WARNING, keyName);
 //				switch(keyName){
 //				case "Effect":
-//					// Need to work in EffectType somehow
+//					// Need to work in Trigger somehow
 //					break;
 //				case "Particle":
 //					break;

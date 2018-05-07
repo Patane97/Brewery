@@ -9,14 +9,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Collections.BrCollectable;
 import com.Patane.Brewery.CustomEffects.BrEffect;
+import com.Patane.util.collections.PatCollectable;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.ItemsUtil;
 
 
-public class BrItem extends BrCollectable{
+public class BrItem extends PatCollectable{
 	/**
 	 * ******************* STATIC YML SECTION *******************
 	 */
@@ -74,7 +74,7 @@ public class BrItem extends BrCollectable{
 			try{
 				effect.execute(executor, location);
 			} catch(Exception e){
-				Messenger.warning("Failed to execute "+effect.getID()+" effect: "+e.getMessage());
+				Messenger.warning("Failed to execute "+effect.getID()+" effect: ");
 				e.printStackTrace();
 			}
 		}

@@ -4,13 +4,14 @@ import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Check;
 
 @Namer(name="SMITE")
 public class Smite extends Modifier{
 	final public double amount;
 
 	public Smite(Map<String, String> fields){
-		amount = getDouble(fields, "amount");
+		amount = Check.greaterThanEqual(getDouble(fields, "amount"), 0, "Amount must be greater than or equal to 0.");
 	}
 	public Smite(double amount){
 		this.amount = amount;

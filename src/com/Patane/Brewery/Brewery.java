@@ -6,10 +6,11 @@ import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.Collections.BrItemCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
-import com.Patane.Brewery.CustomEffects.EffectTypeHandler;
-import com.Patane.Brewery.CustomEffects.ModifierHandler;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItemYML;
+import com.Patane.Brewery.Handlers.FormationHandler;
+import com.Patane.Brewery.Handlers.ModifierHandler;
+import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.Listeners.GlobalListener;
 import com.Patane.Brewery.Listeners.ParticlePacketAdapter;
 import com.Patane.Brewery.Sequencer.Sequencer;
@@ -43,8 +44,9 @@ public class Brewery extends JavaPlugin{
         CommandHandler commandHandler = new CommandHandler(this);
 		this.getCommand("br").setExecutor(commandHandler);
 		
-		EffectTypeHandler.registerAll();
+		TriggerHandler.registerAll();
 		ModifierHandler.registerAll();
+		FormationHandler.registerAll();
 		
 		protocolManager = ProtocolLibrary.getProtocolManager();
 		protocolManager.addPacketListener(new ParticlePacketAdapter(PacketAdapter.params(this, new PacketType[] {PacketType.Play.Server.WORLD_EVENT})));
@@ -55,7 +57,7 @@ public class Brewery extends JavaPlugin{
 //				new Instant(), 
 //				EntityType.SKELETON, EntityType.ZOMBIE));
 //		effects.add(new EffectContainer(new BrEffect("Mark of Light", new Modifier.Heal(2), 3, 
-//						new PotionEffect(PotionEffectType.GLOWING, 20, 1)), 
+//						new PotionEffect(PotionTrigger.GLOWING, 20, 1)), 
 //				new Lingering(5f, 0.5f), 
 //				EntityType.PLAYER));
 //		new BrItem("Vampiric Scepter", CustomType.THROWABLE, ItemsUtil.createItem(Material.SPLASH_POTION, 1, (short) 0, "&6Vampiric Scepter", "&7Damages Undead", "&7heals players"), effects);

@@ -23,7 +23,7 @@ import org.bukkit.util.Vector;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.util.general.PatRunnable;
+import com.Patane.runnables.PatRunnable;
 import com.Patane.util.ingame.ItemsUtil;
 import com.Patane.util.ingame.LocationsUtil;
 
@@ -45,8 +45,8 @@ public class GlobalListener implements Listener{
 //		e.setCancelled(true);
 ////		Location location = e.getEntity().getLocation();
 //		Location location = e.getHitEntity().getLocation();
-//		LivingEntity shooter = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
-//		brItem.execute(shooter, location);
+//		LivingEntity executor = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
+//		brItem.execute(executor, location);
 //	}
 //	@EventHandler
 //	public void onLivingEntityDeath(EntityDamageByEntityEvent e){
@@ -113,24 +113,24 @@ public class GlobalListener implements Listener{
 	private class ItemDetection extends PatRunnable {
 		private final Item item;
 		private final BrItem brItem;
-		private final LivingEntity shooter;
+		private final LivingEntity executor;
 		
-		public ItemDetection(LivingEntity shooter, BrItem brItem, Item item) {
-			super(Brewery.getInstance(), 2, 1);
+		public ItemDetection(LivingEntity executor, BrItem brItem, Item item) {
+			super(2, 1);
 			this.item = item;
 			this.brItem = brItem;
-			this.shooter = shooter;
+			this.executor = executor;
 		}
 
 		@Override
 		public void run() {
 			Location loc = item.getLocation();
 			Collection<Entity> entities = item.getNearbyEntities(item.getWidth(), item.getHeight(), item.getWidth());
-			entities.remove(shooter);
+			entities.remove(executor);
 			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR || !entities.isEmpty()){
 				item.setPickupDelay(0);
 				item.remove();
-				brItem.execute(shooter, item.getLocation());
+				brItem.execute(executor, item.getLocation());
 				this.cancel();
 				return;
 			}

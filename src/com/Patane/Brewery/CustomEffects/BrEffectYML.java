@@ -1,6 +1,5 @@
 package com.Patane.Brewery.CustomEffects;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +9,15 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrSoundEffect;
+import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
+import com.Patane.Brewery.Handlers.ModifierHandler;
+import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.util.YML.BreweryYML;
+import com.Patane.handlers.ErrorHandler.YMLException;
 import com.Patane.util.general.Check;
-import com.Patane.util.general.ErrorHandler.YMLException;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
@@ -22,50 +25,17 @@ import com.Patane.util.general.StringsUtil;
 public class BrEffectYML extends BreweryYML{
 
 	public BrEffectYML(Plugin plugin) {
-		super(plugin, "effects.yml", "effects");
+		super(plugin, "effects.yml", "effects", "YML File for each effect\nExample:");
 	}
 
 	@Override
-	public void save() {
-		// Unfinished?
-		for(BrEffect effect : Brewery.getEffectCollection().getAllItems()){
-			String effectID = effect.getID();
-			setHeader(createSection(effectID));
-			//MODIFIER
-			setHeader(clearCreateSection(effectID, "modifier"));
-			header.set("type", effect.getModifier().name());
-			for(Field field : effect.getModifier().getClass().getFields()){
-				try {
-					header.set(field.getName(), field.get(effect.getModifier()));
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-//			setHeader(itemName, "effects", effectContainer.getEffect().getID());
-//			header.set("entities", YMLUtilities.getEntityTypeNames(effectContainer.getEntities()));
-			
-		}
-		config.save();
-//		for(BrEffect effect : Brewery.getEffectCollection().getAllItems()){
-//			String effectName = effect.getName();
-//			setHeader(createSection(effectName));
-//			// TYPE
-//			header.set("type", effect.getType().getClass().getAnnotation(EffectTypeInfo.class).name());
-//			for(Field field : effect.getType().getClass().getFields()){
-//				try {
-//					header.set(field.getName(), field.get(effect.getType()));
-//				} catch (IllegalArgumentException | IllegalAccessException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-	}
+	public void save() {}
 
 	@Override
 	public void load() {
 		setHeader(getRootSection());
 		for(String effectName : header.getKeys(false)){
-			load(getSection(header, effectName));
+			load(getSectionAndWarn(header, effectName));
 		}
 		Messenger.info("Successfully loaded Effects: "+StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), ", "));
 	}
@@ -95,8 +65,11 @@ public class BrEffectYML extends BreweryYML{
 			
 			// Checks if the effect's name is valid. Must be in upper case and with no spaces (Underscores replace spaces).
 			safeFormatCheck(effectName);
-
+			
 			Messenger.debug(Msg.INFO, " + Effect["+effectName+"]");
+			
+			// Adding effect to the processing list. This avoids any infinite loops of processing effects.
+			BrEffectCollection.addProcessing(effectName);
 			
 			/*
 			 * ==================> MODIFIER <==================
@@ -114,7 +87,10 @@ public class BrEffectYML extends BreweryYML{
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				modifier = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
-			} catch (YMLException e){}
+			} catch (YMLException e){
+			} catch (ClassNotFoundException e){
+				throw new ClassNotFoundException("Type required for 'modifier' is missing.");
+			}
 			
 			/*
 			 * ==================> RADIUS <==================
@@ -146,17 +122,19 @@ public class BrEffectYML extends BreweryYML{
 			// Getting triggerName value from either base or default headers, depending on whats available.
 			String triggerName = getStringDefault("type", currentHeader, getSection(defaultHeader, "trigger"));
 			
-			EffectType trigger = null;
+			Trigger trigger = null;
 			// If this effect is allowed to be incomplete then this can be null.
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
-				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), EffectTypeHandler.get(triggerName), "type");
-			} catch (YMLException e){}
+				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
+			} catch (YMLException e){
+			} catch (ClassNotFoundException e){
+				throw new ClassNotFoundException("Type required for 'trigger' is missing.");
+			}
 			
 			/*
 			 * ==================> ENTITIES <==================
-			 */
-
+			 */			
 			// Setting currentHeader to the baseHeader.
 			// If this doesnt have entities, then currentHeader is set to the defaultSection.
 			// If defaultSection doesnt have entities, then currentHeader is null.
@@ -184,6 +162,33 @@ public class BrEffectYML extends BreweryYML{
 						
 					// Throws a NullPointerException if the entityname is null or object is null.
 					} catch(NullPointerException e){}
+				}
+			}
+			/*
+			 * ==================> TAGS <==================
+			 */
+			
+			// Setting currentHeader to the baseHeader's tags.
+			// If this is unavailable, then currentHeader is set to the defaultSection's tags.
+			currentHeader = getAvailable(getSection(baseHeader, "tag"), getSection(defaultHeader, "tag"));
+			
+			// BrTag is null if there are no particles in the base or default headers.
+			BrTag tag = null;
+
+			// If either the base or the default headers have a particle, then its added (base taking priority).
+			if(currentHeader != null){
+				// This is within a try/catch because it is optional.
+				// If it failed, we dont want to halt the entire retrieval process.
+				try{
+
+					// Setting the particle effect using the currentHeader, defaultHeader and getSimpleClassDefault method.
+					tag = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "tag"), BrTag.class);
+				} 
+				
+				// Generally ClassNotFoundException (class is null) or YMLException (currentHeader is null).
+				catch(Exception e){
+					Messenger.warning("Failed to retrieve "+effectName+" tag:");
+					e.printStackTrace();
 				}
 			}
 			
@@ -283,7 +288,12 @@ public class BrEffectYML extends BreweryYML{
 					}
 				}
 			}
-			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, entities.toArray(new EntityType[0]), particleEffect, soundEffect, potionEffects.toArray(new PotionEffect[0]));
+			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, 
+					entities.toArray(new EntityType[0]), particleEffect, soundEffect, potionEffects.toArray(new PotionEffect[0]), 
+					tag);
+
+			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
+			BrEffectCollection.delProcessing(effectName);
 			
 			// If effect isnt already in the collection, it adds it.
 			if(!Brewery.getEffectCollection().contains(effect.getID()))
@@ -291,7 +301,7 @@ public class BrEffectYML extends BreweryYML{
 			
 			return effect;
 		} catch(YMLException e){
-			Messenger.warning("An effect failed to be found and load:");
+			Messenger.warning("An effect failed to be found and loaded:");
 			e.printStackTrace();
 		} catch (Exception e) {
 			Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");

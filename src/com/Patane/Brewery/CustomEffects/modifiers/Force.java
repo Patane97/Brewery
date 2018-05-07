@@ -7,6 +7,7 @@ import org.bukkit.util.Vector;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Check;
 
 @Namer(name="FORCE")
 public class Force extends Modifier{
@@ -15,7 +16,7 @@ public class Force extends Modifier{
 
 	public Force(Map<String, String> fields){
 		direction = getEnumValue(Direction.class, fields, "direction");
-		intensity = getDouble(fields, "intensity");
+		intensity = Check.greaterThan(getDouble(fields, "intensity"), 0, "Intensity must be greater than 0.");
 	}
 	public Force(Direction direction, double intensity){
 		this.direction = direction;
