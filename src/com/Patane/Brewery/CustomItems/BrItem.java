@@ -1,22 +1,22 @@
 package com.Patane.Brewery.CustomItems;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Messenger;
-import com.Patane.Brewery.Collections.BrCollectable;
 import com.Patane.Brewery.CustomEffects.BrEffect;
-import com.Patane.Brewery.CustomEffects.EffectType;
-import com.Patane.Brewery.util.ItemUtilities;
+import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.general.Check;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.ingame.ItemsUtil;
 
 
-public class BrItem extends BrCollectable{
+public class BrItem extends PatCollectable{
 	/**
 	 * ******************* STATIC YML SECTION *******************
 	 */
@@ -33,20 +33,18 @@ public class BrItem extends BrCollectable{
 	 */
 	final protected ItemStack item;
 	final protected CustomType type;
-	final protected List<EffectContainer> effects;
+	final protected List<BrEffect> effects;
 	// Contains list of UUID's currently executing this items effect. (Used to avoid DamageEntityEvent loops)
 	protected List <UUID> executing;
 	
-	public BrItem(String name, CustomType type, ItemStack item, List<EffectContainer> effects){
+	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects){
 		super(name);
 		if(Brewery.getItemCollection().contains(getID())){
 			throw new IllegalArgumentException(getID()+" already exists!");
 		}
-		this.type = type;
-		this.item = ItemUtilities.addBrTag(item, getID());
-		this.effects = effects;
-		
-		Brewery.getItemCollection().add(this);
+		this.type = Check.nulled(type, "BrItem '"+name+"' has no set type. Please check YML files.");
+		this.item = Check.nulled(ItemsUtil.addBrTag(item, getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
+		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
 	}
 	public ItemStack getItem(){
 		return item;
@@ -54,7 +52,7 @@ public class BrItem extends BrCollectable{
 	public CustomType getType(){
 		return type;
 	}
-	public List<EffectContainer> getEffectContainers (){
+	public List<BrEffect> getEffects (){
 		return effects;
 	}
 	public boolean addExecuting(UUID uuid){
@@ -72,45 +70,17 @@ public class BrItem extends BrCollectable{
 			return;
 		}
 		Messenger.debug(executor, "&7You &ahave activated &7"+getName());
-		for(EffectContainer effectContainer : effects){
+		for(BrEffect effect : effects){
 			try{
-				effectContainer.execute(executor, location);
+				effect.execute(executor, location);
 			} catch(Exception e){
-				Messenger.warning("Failed to execute "+effectContainer.getEffect().getID()+" effect: "+e.getMessage());
+				Messenger.warning("Failed to execute "+effect.getID()+" effect: ");
 				e.printStackTrace();
 			}
 		}
 	}
 	public static enum CustomType {
 		THROWABLE(), HITTABLE(), PASSIVE();
-	}
-	public static class EffectContainer {
-		final private BrEffect effect;
-		final private int radius;
-		final private EffectType type;
-		final private EntityType[] entities;
-		
-		public EffectContainer(BrEffect effect, int radius, EffectType type, EntityType... entities){
-			this.effect = effect;
-			this.type = type;
-			this.radius = (radius < 0 ? 0 : radius);
-			this.entities = entities;
-		}
-		public BrEffect getEffect() {
-			return effect;
-		}
-		public int getRadius() {
-			return radius;
-		}
-		public EffectType getType() {
-			return type;
-		}
-		public EntityType[] getEntities() {
-			return entities;
-		}
-		public void execute(LivingEntity executor, Location location){
-			type.execute(this, executor, location);
-		}
 	}
 
 }

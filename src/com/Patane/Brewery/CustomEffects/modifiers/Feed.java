@@ -4,15 +4,16 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Check;
 
 @Namer(name="FEED")
 public class Feed extends Modifier{
 	final public double amount;
 
 	public Feed(Map<String, String> fields){
-		amount = getDouble(fields, "amount");
+		amount = Check.greaterThan(getDouble(fields, "amount"), 0, "Amount must be greater than 0.");
 	}
 	
 	public Feed(double amount){

@@ -1,23 +1,26 @@
 package com.Patane.Brewery.CustomEffects;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 
-import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Namer;
-import com.Patane.Brewery.YMLParsable;
-import com.Patane.Brewery.Collections.BrCollectable;
-import com.Patane.Brewery.CustomEffects.types.Instant;
-import com.Patane.Brewery.util.ErrorHandler.BrLoadException;
+import com.Patane.Brewery.Handlers.BrMetaDataHandler;
+import com.Patane.Brewery.Handlers.FormationHandler;
+import com.Patane.handlers.MetaDataHandler;
+import com.Patane.runnables.PatRunnable;
+import com.Patane.util.YML.Namer;
+import com.Patane.util.YML.YMLParsable;
+import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.general.Check;
+import com.Patane.util.general.Messenger;
 
-public class BrEffect extends BrCollectable{
+public class BrEffect extends PatCollectable{
 	/**
 	 * ******************* STATIC YML SECTION *******************
 	 */
@@ -33,85 +36,176 @@ public class BrEffect extends BrCollectable{
 	 * **********************************************************
 	 */
 	private final Modifier modifier;
-	// if radius is 0, projectile must HIT an entity to damage/affect it and only it.
-	private final ArrayList<PotionEffect> potionEffects;
+	private final Trigger trigger;
+	private final Integer radius;
+	// NEED TO ADD: if radius is 0, projectile must HIT an entity to damage/affect it and only it.
+	private final Filter filter;
+	private final List<PotionEffect> potionEffects;
 	private final BrParticleEffect particleEffect;
 	private final BrSoundEffect soundEffect;
-	private final DefaultContainer defaultContainer;
+	private final BrTag tag;
+
+	private List<String> incomplete = new ArrayList<String>();
 	
-	public BrEffect(String name, Modifier modifier, BrParticleEffect particleEffect, BrSoundEffect soundEffect, DefaultContainer defaultContainer, PotionEffect... potionEffects) {
+	public BrEffect(boolean incompleteAllowed, String name, Modifier modifier, Trigger trigger, Integer radius, 
+			Filter filter, BrParticleEffect particleEffect, BrSoundEffect soundEffect, List<PotionEffect> potionEffects, 
+			BrTag tag) {
+		// Setting the name
 		super(name);
-		this.modifier = modifier;
+		
+		// ESSENTIAL VALUES.
+		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
+		this.modifier = (incompleteAllowed ? modifier : Check.nulled(modifier, "BrEffect needs more data: '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		if(modifier == null) incomplete.add("modifier");
+		
+		this.trigger = (incompleteAllowed ? trigger : Check.nulled(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
+		if(trigger == null)	incomplete.add("trigger");
+		// PROBLEM!
+		// Maybe make radius non-essential?
+		// If radius isnt set, then it only applies to any entities hit?
+		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect needs more data: '"+name+"' has no radius set anywhere. Please check YML files."));
+		if(radius == null) incomplete.add("radius");
+		
+		// NON-ESSENTIAL VALUES.
+		// These values can be null. However if some objects are null, they are converted to empty objects.
+		this.filter = (filter == null ? new Filter() : filter);
 		this.particleEffect = particleEffect;
 		this.soundEffect = soundEffect;
-		this.defaultContainer = (defaultContainer == null ? new DefaultContainer() : defaultContainer);
-		this.potionEffects = new ArrayList<PotionEffect>(Arrays.asList(potionEffects));
-		Brewery.getEffectCollection().add(this);
+		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
+		this.tag = tag;
 	}
 	
-	public boolean hasModifier() {
-		return (modifier == null ? false : true);
-	}
+	// Getters for essential values.
 	public Modifier getModifier() {
 		return modifier;
 	}
+	public Trigger getTrigger() {
+		return trigger;
+	}
+	public Integer getRadius() {
+		return radius;
+	}
 	
-	public boolean hasParticleEffect() {
+	// Has & Getters for non-essential values.
+	
+	// Filter
+	public boolean hasFilter() {
+		return (filter == null ? false : true);
+	}
+	public Filter getFilter() {
+		return filter;
+	}
+	
+	// Particle
+	public boolean hasParticle() {
 		return (particleEffect == null ? false : true);
 	}
 	public BrParticleEffect getParticleEffect() {
 		return particleEffect;
 	}
-	
-	public boolean hasSoundEffect() {
+
+	// Sound
+	public boolean hasSound() {
 		return (soundEffect == null ? false : true);
 	}
 	public BrSoundEffect getSoundEffect() {
 		return soundEffect;
 	}
-	
-	public ArrayList<PotionEffect> getPotionEffects(){
+
+	// Potion Effects
+	public boolean hasPotions() {
+		return (potionEffects.isEmpty() ? false : true);
+	}
+	public List<PotionEffect> getPotions(){
 		return potionEffects;
 	}
-
-	public DefaultContainer getDefaultInfo() {
-		return defaultContainer;
+	public PotionEffect[] getPotionsArray(){
+		return potionEffects.toArray(new PotionEffect[potionEffects.size()]);
+	}
+	
+	public void execute(LivingEntity executor, Location impact){
+		trigger.execute(this, impact, executor);
+	}
+	
+	// Tags
+	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
+		if(tag != null)
+			tag.apply(run, entities);
+	}
+	public void clearTag(PatRunnable run) {
+		if(tag != null)
+			tag.clear(run);
+	}
+	// Completed
+	public boolean isComplete() {
+		return incomplete.isEmpty();
+	}
+	// Get incompleted essential values
+	public List<String> getIncomplete(){
+		return incomplete;
 	}
 
+/*
+ *  PARTICLE EFFECTS
+ */
 	@Namer(name = "Particle Effect")
 	public static class BrParticleEffect extends YMLParsable{
-		final private Particle type;
-		final private int intensity;
-		final private double velocity;
+		final public Particle type;
+		final public Formation formation;
+		final public int intensity;
+		final public double velocity;
 
-		public BrParticleEffect(Map<String, String> fields) throws BrLoadException{
-			this.type = Particle.valueOf(fields.get("type"));
-			this.intensity = getInt(fields, "intensity");
-			this.velocity = getDouble(fields, "velocity");
+		public BrParticleEffect(Map<String, String> fields){
+			this.type = getEnumValue(Particle.class, fields, "type");
+			this.formation = Check.nulled(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
+			try{ 
+				this.intensity = getInt(fields, "intensity");
+				this.velocity = getDouble(fields, "velocity");
+			} catch (IllegalArgumentException e){
+				Messenger.warning("Particle Effect failed to load:");
+				throw e;
+			}
 		}
-		public BrParticleEffect(Particle type, int intensity, double velocity){
+		public BrParticleEffect(Particle type, Formation formation, int intensity, double velocity){
 			this.type = type;
+			this.formation = formation;
 			this.intensity = intensity;
 			this.velocity = velocity;
 		}
 		public void spawn(Location location, int radius){
+			spawn(location, radius, intensity, velocity);
+		}
+		public void spawn(Location location, int radius, int intensity){
+			spawn(location, radius, intensity, velocity);
+		}
+		public void spawn(Location location, int radius, int intensity, double velocity){
 			double offset = radius/2;
 			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
 		}
+		public Formation getFormation(){
+			return formation;
+		}
 	}
+
+/*
+ *  SOUND EFFECTS
+ */
 	@Namer(name = "Sound Effect")
 	public static class BrSoundEffect extends YMLParsable{
-		final private Sound type;
-		final private float volume;
-		final private float pitch;
+		final public Sound type;
+//		final public Formation formation;
+		final public float volume;
+		final public float pitch;
 
-		public BrSoundEffect(Map<String, String> fields) throws BrLoadException{
-			this.type = Sound.valueOf(fields.get("type"));
+		public BrSoundEffect(Map<String, String> fields){
+			this.type = getEnumValue(Sound.class, fields, "type");
+//			this.formation = getEnumValue(Formation.class, fields, "formation");
 			this.volume = (float) getDouble(fields, "volume", 100);
 			this.pitch = (float) getDouble(fields, "pitch", 1);
 		}
 		public BrSoundEffect(Sound type, float volume, float pitch){
 			this.type = type;
+//			this.formation = formation;
 			this.volume = volume;
 			this.pitch = pitch;
 		}
@@ -119,27 +213,28 @@ public class BrEffect extends BrCollectable{
 			location.getWorld().playSound(location, type, volume, pitch);
 		}
 	}
-	public static class DefaultContainer {
-		final private EffectType type;
-		final private int radius;
-		final private EntityType[] entities;
+
+/*
+ *  TAGS
+ */
+	@Namer(name = "Tag")
+	public static class BrTag extends YMLParsable{
+		final public String name;
+
+		public BrTag(Map<String, String> fields){
+			this.name = getString(fields, "name");
+		}
+		public BrTag(Particle type, String name, float duration){
+			this.name = name;
+		}
 		
-		public DefaultContainer(EffectType type, Integer radius, EntityType... entities){
-			this.type 		= (type == null ? new Instant() : type);
-			this.radius 	= (radius == null ? 1 : (radius < 0 ? 0 : radius));
-			this.entities 	= (entities == null ? new EntityType[0] : entities);
+
+		public void apply(PatRunnable task, List<LivingEntity> entities){
+			BrMetaDataHandler.addClean(task, entities, MetaDataHandler.id("tag", name), null);
 		}
-		public DefaultContainer(){
-			this(null,null);
-		}
-		public EffectType getType() {
-			return type;
-		}
-		public int getRadius() {
-			return radius;
-		}
-		public EntityType[] getEntities() {
-			return entities;
+		
+		public void clear(PatRunnable task){
+			BrMetaDataHandler.remove(task, MetaDataHandler.id("tag", name));
 		}
 	}
 }

@@ -10,8 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Messenger;
 import com.Patane.Brewery.commands.all.giveCommand;
+import com.Patane.util.general.Messenger;
 
 public class CommandHandler implements CommandExecutor{
 	

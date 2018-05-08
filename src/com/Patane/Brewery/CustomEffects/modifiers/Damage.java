@@ -4,8 +4,9 @@ import java.util.Map;
 
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.Patane.Brewery.Namer;
 import com.Patane.Brewery.CustomEffects.Modifier;
+import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Check;
 
 @Namer(name="DAMAGE")
 public class Damage extends Modifier{
@@ -14,7 +15,7 @@ public class Damage extends Modifier{
 	
 	public Damage(Map<String, String> fields){
 		cause = getEnumValue(DamageCause.class, fields, "cause");
-		amount = getDouble(fields, "amount");
+		amount = Check.greaterThan(getDouble(fields, "amount"), 0, "Amount must be greater than 0.");
 	}
 	
 	public Damage(DamageCause cause, double amount){

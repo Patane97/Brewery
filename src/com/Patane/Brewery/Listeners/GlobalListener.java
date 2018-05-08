@@ -23,9 +23,9 @@ import org.bukkit.util.Vector;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Brewery.util.BrRunnable;
-import com.Patane.Brewery.util.ItemUtilities;
-import com.Patane.Brewery.util.LocationUtilities;
+import com.Patane.runnables.PatRunnable;
+import com.Patane.util.ingame.ItemsUtil;
+import com.Patane.util.ingame.LocationsUtil;
 
 public class GlobalListener implements Listener{
 	
@@ -45,8 +45,8 @@ public class GlobalListener implements Listener{
 //		e.setCancelled(true);
 ////		Location location = e.getEntity().getLocation();
 //		Location location = e.getHitEntity().getLocation();
-//		LivingEntity shooter = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
-//		brItem.execute(shooter, location);
+//		LivingEntity executor = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
+//		brItem.execute(executor, location);
 //	}
 //	@EventHandler
 //	public void onLivingEntityDeath(EntityDamageByEntityEvent e){
@@ -59,13 +59,13 @@ public class GlobalListener implements Listener{
 	 */
 	@EventHandler
 	public void onItemSwingBlock(PlayerInteractEvent e){
-		if(!(e.getHand().equals(EquipmentSlot.HAND) && e.getAction().equals(Action.LEFT_CLICK_BLOCK)))
+		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
 			return;
 		Player player = e.getPlayer();
 		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
-		Location blockLocation = LocationUtilities.getCentre(e.getClickedBlock());
+		Location blockLocation = LocationsUtil.getCentre(e.getClickedBlock());
 		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
 		brItem.execute(player, location);
 	}
@@ -91,7 +91,7 @@ public class GlobalListener implements Listener{
 	 */
 	@EventHandler
 	public void onItemRightClick(PlayerInteractEvent e){
-		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK))))
+		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
 			return;
 		Player player = e.getPlayer();
 		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
@@ -110,27 +110,27 @@ public class GlobalListener implements Listener{
 		item.setVelocity(new Vector(x,z,y).multiply(0.5));
 		new ItemDetection(player, brItem, item);
 	}
-	private class ItemDetection extends BrRunnable {
+	private class ItemDetection extends PatRunnable {
 		private final Item item;
 		private final BrItem brItem;
-		private final LivingEntity shooter;
+		private final LivingEntity executor;
 		
-		public ItemDetection(LivingEntity shooter, BrItem brItem, Item item) {
+		public ItemDetection(LivingEntity executor, BrItem brItem, Item item) {
 			super(2, 1);
 			this.item = item;
 			this.brItem = brItem;
-			this.shooter = shooter;
+			this.executor = executor;
 		}
 
 		@Override
 		public void run() {
 			Location loc = item.getLocation();
 			Collection<Entity> entities = item.getNearbyEntities(item.getWidth(), item.getHeight(), item.getWidth());
-			entities.remove(shooter);
+			entities.remove(executor);
 			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR || !entities.isEmpty()){
 				item.setPickupDelay(0);
 				item.remove();
-				brItem.execute(shooter, item.getLocation());
+				brItem.execute(executor, item.getLocation());
 				this.cancel();
 				return;
 			}
@@ -143,7 +143,7 @@ public class GlobalListener implements Listener{
 		ItemMeta itemMeta = item.getItemMeta();
 		if(itemMeta.getDisplayName() == null)
 			return null;
-		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemUtilities.decodeItemData(itemMeta.getDisplayName()));
+		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemsUtil.decodeItemData(itemMeta.getDisplayName()));
 		if(!match.matches())
 			return null;
 		String decodedName = match.group(1);

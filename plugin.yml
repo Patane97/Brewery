@@ -1,5 +1,5 @@
 main: com.Patane.Brewery.Brewery
-version: ALPHA-0.1
+version: ALPHA-4.0
 name: Brewery
 commands:
   br:
