@@ -121,7 +121,7 @@ public class BrItemYML extends BreweryYML{
 				}
 			}
 			// Creates the item with all given values.
-			BrItem item = new BrItem(itemName, type, itemStack, effects);
+			BrItem item = new BrItem(itemName, type, itemStack, effects, 3f);
 
 			// If item isnt already in the collection, it adds it.
 			if(!Brewery.getItemCollection().contains(item.getID()))

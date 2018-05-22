@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Formation;
 import com.Patane.util.YML.Namer;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
 
 @Namer(name="RADIUS")
 public class Radius extends Formation{
@@ -15,6 +17,10 @@ public class Radius extends Formation{
 
 	@Override
 	public void form(BrEffect effect, Location location) {
+		if(!effect.hasRadius()) {
+			Messenger.send(Msg.WARNING, "'"+name()+"' Formation needs a radius to be formed.");
+			return;
+		}
 		effect.getParticleEffect().spawn(location, effect.getRadius());
 	}
 

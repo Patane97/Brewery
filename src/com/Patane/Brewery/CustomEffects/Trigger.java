@@ -1,5 +1,6 @@
 package com.Patane.Brewery.CustomEffects;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -7,56 +8,87 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
-import com.Patane.util.YML.YMLParsable;
+import com.Patane.util.YML.MapParsable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Focusable.Focus;
 
-public abstract class Trigger extends YMLParsable{
+public abstract class Trigger extends MapParsable{
 
 	protected Trigger(){};
 	public Trigger(Map<String, String> fields){}
 	
+	/**
+	 * Executes the effect on a specific location.
+	 * @param effect Effect to execute.
+	 * @param impact Location to execute at.
+	 * @param executor LivingEntity who executed the effect.
+	 */
 	public abstract void execute(BrEffect effect, Location impact, LivingEntity executor);
-
+	
+	/**
+	 * Executes the effect on a specific target.
+	 * @param effect Effect to execute.
+	 * @param executor LivingEntity who executed the effect.
+	 * @param target LivingEntity to target with the effect.
+	 */
+	public abstract void execute(BrEffect effect, LivingEntity executor, LivingEntity target);
+	/**
+	 * Executes an effect on either each entity around a target entity or if the radius is null, just the target entity.
+	 * @param effect Effect to execute.
+	 * @param executor LivingEntity who cast the effect.
+	 * @param target LivingEntity who was originally hit by the effect.
+	 * @return A list of the LivingEntities in which the effects were executed on.
+	 */
+	protected List<LivingEntity> executeMany(BrEffect effect, LivingEntity executor, LivingEntity target) {
+		if(effect.hasRadius())
+			return executeMany(effect, target.getLocation(), executor);
+		else
+			return executeMany(effect, target.getLocation(), executor, effect.getFilter().filter(target));
+	}
 	/**
 	 * Executes an effect on each entity within the effects given radius.
 	 * @param effect Effect to execute.
 	 * @param impact Location of the effects impact.
-	 * @param executor The LivingEntity who cast the effect.
+	 * @param executor LivingEntity who cast the effect.
 	 * @return A List of the LivingEntities in which the effects were executed on.
 	 */
-	protected List<LivingEntity> executeOnEntities(BrEffect effect, Location impact, LivingEntity executor) {		
+	protected List<LivingEntity> executeMany(BrEffect effect, Location impact, LivingEntity executor) {	
 		// Grabs all entites within the radius and filters them appropriately.
 		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
-		for(LivingEntity hitEntity : hitEntities){
-			// Executes the effect on each entity hit.
-			executeOnEntity(effect, impact, executor, hitEntity);
-		}
-		return hitEntities;
+		return executeMany(effect, impact, executor, hitEntities);
 	}
 	/**
+	 * 
 	 * Executes an effect on a list of entities.
 	 * @param effect Effect to execute.
 	 * @param impact Location of the effects impact.
-	 * @param executor The LivingEntity who cast the effect.
-	 * @param hitEntity The LivingEntities to execute the effect on.
+	 * @param executor LivingEntity who cast the effect.
+	 * @param hitEntity LivingEntities to execute the effect on.
 	 * @return A List of the LivingEntities in which the effects were executed on.
 	 */
-	protected List<LivingEntity> executeOnEntities(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> hitEntities) {
-		for(LivingEntity hitEntity : hitEntities)
-			// Executes the effect on each entity given.
-			executeOnEntity(effect, impact, executor, hitEntity);
-		return hitEntities;
+	protected List<LivingEntity> executeMany(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> hitEntities) {
+		// Creates a returned list. This can be different to 'hitEntities' as the execution on a certain entity could fail.
+		List<LivingEntity> returned = new ArrayList<LivingEntity>();
+		for(LivingEntity hitEntity : hitEntities) {
+			// Executes the effect on each entity hit.
+			hitEntity = executeOne(effect, impact, executor, hitEntity);
+			if(hitEntity != null)
+				returned.add(hitEntity);
+		}
+		return returned;
 	}
 	/**
 	 * Executes an effect on a specific LivingEntity, with relevant needed information.
 	 * @param effect Effect to execute.
-	 * @param impact Location of the effects impact.
-	 * @param executor The LivingEntity who cast the effect.
-	 * @param hitEntity The LivingEntity to execute the effect on.
+	 * @param impact Location of the effects original impact. Relevant for certain modifiers such as 'FORCE'.
+	 * @param executor LivingEntity who cast the effect.
+	 * @param hitEntity LivingEntity to execute the effect on.
 	 * @return The LivingEntity in which the effects were executed on, or null if they are dead.
 	 */
-	protected LivingEntity executeOnEntity(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity){
+	protected LivingEntity executeOne(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity){
+		// If ignore_user is true and the hit entity is the user, then return null.
+		if(effect.ignoreUser() && executor.equals(hitEntity))
+			return null;
 		// If the entity is dead, do not perform any actions onto them. Let them rest in peace dangit!
 		if(!hitEntity.isDead()){
 			// Applies visual/auditory effects if they focus on Entities.

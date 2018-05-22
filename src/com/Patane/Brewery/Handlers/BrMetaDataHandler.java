@@ -92,7 +92,7 @@ public class BrMetaDataHandler extends MetaDataHandler{
 		for(LivingEntity entity : new ArrayList<LivingEntity>(entities)){
 			
 			// If the entity is in within metadata collection found from using the given regex.
-			if(BrMetaDataHandler.check(entity, "\\[\\d+\\]"+metaName)){
+			if(BrMetaDataHandler.check(entity, metaName)){
 				try{
 					// Grab the first metadata value (in this case, a PatTimedRunnable) stored within the entity from using the given regex.
 					PatTimedRunnable storedTask = (PatTimedRunnable) BrMetaDataHandler.grabFirst(entity, "\\[\\d+\\]"+metaName);

@@ -13,7 +13,12 @@ public class Instant extends Trigger{
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		applyByFocus(effect, impact, Focus.BLOCK);
-		executeOnEntities(effect, impact, executor);
+		executeMany(effect, impact, executor);
+	}
+	@Override
+	public void execute(BrEffect effect, LivingEntity executor, LivingEntity target) {
+		applyByFocus(effect, target.getLocation(), Focus.BLOCK);
+		executeMany(effect, executor, target);
 	}
 	
 }

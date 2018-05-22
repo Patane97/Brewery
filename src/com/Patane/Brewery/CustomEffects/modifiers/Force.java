@@ -24,6 +24,9 @@ public class Force extends Modifier{
 	}
 	@Override
 	public void modify(ModifierInfo info) {
+		// If the target IS the location, do nothing.
+		if(info.getTarget().getLocation().equals(info.getImpact()))
+			return;
 		double speed = direction.getIntensity(info.getTarget().getLocation(), info.getImpact())*(1+intensity/10);
         Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
         info.getTarget().setVelocity(velocity);

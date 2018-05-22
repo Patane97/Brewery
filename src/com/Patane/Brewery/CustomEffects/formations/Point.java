@@ -15,7 +15,7 @@ public class Point extends Formation{
 
 	@Override
 	public void form(BrEffect effect, Location location) {
-		effect.getParticleEffect().spawn(location, 0);
+		effect.getParticleEffect().spawn(location, 0f);
 	}
 
 }

@@ -44,8 +44,18 @@ public class Filter {
 		return filtered;
 	}
 	
-	public List<LivingEntity> filter(Location impact, int radius){
-		return filter(LocationsUtil.getEntities(impact, radius));
+	public List<LivingEntity> filter(LivingEntity entity){
+		List<LivingEntity> filtered = new ArrayList<LivingEntity>();
+		// Checks if the entity must be ignored (Ignore takes priority over Target)
+		// If 'ignore' doesnt match and 'target' DOES match.
+		if(!ignore.match(entity) && target.match(entity))
+			filtered.add(entity);
+		return filtered;
+	}
+	
+	public List<LivingEntity> filter(Location impact, float radius){
+//		return filter(LocationsUtil.getEntities(impact, radius));
+		return filter(LocationsUtil.getRadius(impact, radius));
 	}
 	
 	

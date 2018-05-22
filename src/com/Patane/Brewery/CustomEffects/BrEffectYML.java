@@ -53,12 +53,15 @@ public class BrEffectYML extends BreweryYML{
 	 * @param incompleteAllowed Whether essential values (such as Trigger) can be missing. Generally true if this is retireving a default effect.
 	 */
 	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader, boolean incompleteAllowed){
+		// Setting the name of the current essential task. Used to give a little bit of info when errors occur.
+		String essentialTask = null;
 		try{			
 			// Making sure the baseHeader is not null.
 			Check.nulled(baseHeader);
 			
 			// Creating currentHeader to be used throughout this method.
 			ConfigurationSection currentHeader = baseHeader;
+			
 			
 			// Getting the effect name from the last portion of the baseHeader.
 			String effectName = extractLast(baseHeader);
@@ -74,13 +77,14 @@ public class BrEffectYML extends BreweryYML{
 			/*
 			 * ==================> MODIFIER <==================
 			 */
+			essentialTask = "Modifier";
 			
 			// Setting currentHeader to the baseHeader's modifier.
 			// If this is unavailable, then currentHeader is set to the defaultSection's modifier.
 			currentHeader = getAvailable(getSection(baseHeader, "modifier"), getSection(defaultHeader, "modifier"));
 			
 			// Getting modifierName value from either base or default headers, depending on whats available.
-			String modifierName = getStringDefault("type", currentHeader, getSection(defaultHeader, "modifier"));
+			String modifierName = getString("type", currentHeader, getSection(defaultHeader, "modifier"));
 			
 			Modifier modifier = null;
 			// If this effect is allowed to be incomplete then this can be null.
@@ -91,36 +95,18 @@ public class BrEffectYML extends BreweryYML{
 			} catch (ClassNotFoundException e){
 				throw new ClassNotFoundException("Type required for 'modifier' is missing.");
 			}
-			
-			/*
-			 * ==================> RADIUS <==================
-			 */
 
-			// Setting currentHeader to the baseHeader.
-			// If this doesnt have a radius, then currentHeader is set to the defaultSection.
-			// If defaultSection doesnt have a radius, then currentHeader is null.
-			currentHeader = getAvailableWithSet("radius", getSection(baseHeader), getSection(defaultHeader));
-			
-			// Setting radiusStr to current or default header's radius.
-			String radiusStr = getStringDefault("radius", currentHeader, defaultHeader);
-			
-			// If the radiusStr given (isnt null), then attempt to turn the Str into an Integer.
-			Integer radius = null;
-			if(radiusStr != null){
-				radius = getIntFromString(radiusStr);
-				if(radius != null) Messenger.debug(Msg.INFO, "    + Radius: "+radius);
-			}
-			
 			/*
 			 * ==================> TRIGGER <==================
 			 */
+			essentialTask = "Trigger";
 			
 			// Setting currentHeader to the baseHeader's trigger.
 			// If this is unavailable, then currentHeader is set to the defaultSection's trigger.
 			currentHeader = getAvailable(getSection(baseHeader, "trigger"), getSection(defaultHeader, "trigger"));
 			
 			// Getting triggerName value from either base or default headers, depending on whats available.
-			String triggerName = getStringDefault("type", currentHeader, getSection(defaultHeader, "trigger"));
+			String triggerName = getString("type", currentHeader, getSection(defaultHeader, "trigger"));
 			
 			Trigger trigger = null;
 			// If this effect is allowed to be incomplete then this can be null.
@@ -129,7 +115,56 @@ public class BrEffectYML extends BreweryYML{
 				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
 			} catch (YAMLException e){
 			} catch (ClassNotFoundException e){
-				throw new ClassNotFoundException("Type required for 'trigger' is missing.");
+				throw new ClassNotFoundException("'type' field is required but missing.");
+			}
+			
+			/*
+			 * =========================================================
+			 * 					NON-ESSENTIAL FIELDS
+			 * =========================================================
+			 */
+			essentialTask = null;
+			
+			/*
+			 * ==================> RADIUS <==================
+			 */
+			
+			// Setting currentHeader to the baseHeader.
+			// If this doesnt have a radius, then currentHeader is set to the defaultSection.
+			// If defaultSection doesnt have a radius, then currentHeader is null.
+			currentHeader = getAvailableWithSet("radius", getSection(baseHeader), getSection(defaultHeader));
+
+			// Extracting the nullable Float from the radius, currentHeader and defaultHeader.
+			Float radius = null;
+			if(currentHeader != null) {
+				try {
+					radius = getFloat("radius", currentHeader, defaultHeader);
+					if(radius != null) Messenger.debug(Msg.INFO, "    + Radius: "+radius);
+				} catch(Exception e) {
+					Messenger.warning("Failed to retrieve "+effectName+" radius:");
+					e.printStackTrace();
+				}
+			}
+
+			/*
+			 * ==================> IGNORE_USER <==================
+			 */
+
+			// Setting currentHeader to the baseHeader.
+			// If this doesnt have an ignore_user, then currentHeader is set to the defaultSection.
+			// If defaultSection doesnt have a ignore_user, then currentHeader is null.
+			currentHeader = getAvailableWithSet("ignore_user", getSection(baseHeader), getSection(defaultHeader));
+
+			// Extracting the nullable Boolean from the radius, currentHeader and defaultHeader.
+			Boolean ignore_user = null;
+			if(currentHeader != null) {
+				try{
+					ignore_user = getBoolean("ignore_user", currentHeader, defaultHeader);
+					if(ignore_user != null) Messenger.debug(Msg.INFO, "    + Ignore_User: "+ignore_user);
+				} catch(Exception e) {
+					Messenger.warning("Failed to retrieve "+effectName+" ignore_user:");
+					e.printStackTrace();
+				}
 			}
 			
 			/*
@@ -285,7 +320,7 @@ public class BrEffectYML extends BreweryYML{
 				}
 			}
 			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, 
-					filter, particleEffect, soundEffect, potionEffects, tag);
+					filter, particleEffect, soundEffect, potionEffects, tag, ignore_user);
 
 			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
 			BrEffectCollection.delProcessing(effectName);
@@ -298,10 +333,13 @@ public class BrEffectYML extends BreweryYML{
 		} catch(YAMLException e){
 			Messenger.warning("An effect failed to be found and loaded:");
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch(Exception e) {
 			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
 			BrEffectCollection.delProcessing(extractLast(baseHeader));
-			Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
+			if(essentialTask != null)
+				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load due to an error with the "+essentialTask+":");
+			else
+				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load :");
 			e.printStackTrace();
 		}
 		return null;

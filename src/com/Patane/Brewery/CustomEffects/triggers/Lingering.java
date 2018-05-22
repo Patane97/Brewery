@@ -33,26 +33,42 @@ public class Lingering extends Trigger{
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		new LingeringTask(effect, impact, executor);
 	}
+	@Override
+	public void execute(BrEffect effect, LivingEntity executor, LivingEntity target) {
+		new LingeringTask(effect, executor, target);
+	}
 
 	protected class LingeringTask extends PatTimedRunnable{
 		private final BrEffect effect;
 		private final Location impact;
 		private final LivingEntity executor;
+		private final LivingEntity target;
 		
 		public LingeringTask(BrEffect effect, Location impact, LivingEntity executor){
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = impact;
 			this.executor = executor;
+			this.target = null;
+		}
+		public LingeringTask(BrEffect effect, LivingEntity executor, LivingEntity target){
+			super(0, rate, duration);
+			this.effect = effect;
+			this.impact = null;
+			this.executor = executor;
+			this.target = target;
 		}
 
 		@Override
 		public void task() {
+			// A dynamicImpact location is used to simulate the effect either 
+			// hitting and sticking to a spot on the ground OR sticking to an entity and moving the effect along to wherever they are.
+			Location dynamicImpact = (impact == null ? target.getLocation() : impact);
 			// Applies Visual/Auditory effects via a focus point.
-			applyByFocus(effect, impact, Focus.BLOCK);
+			applyByFocus(effect, dynamicImpact, Focus.BLOCK);
 
 			// Executes tasks on hit LivingEntities and adds the appropriate metadata to each.
-			List<LivingEntity> hit = executeOnEntities(effect, impact, executor);
+			List<LivingEntity> hit = (impact == null ? executeMany(effect, executor, target) : executeMany(effect, impact, executor));
 			BrMetaDataHandler.addClean(this, hit, MetaDataHandler.id(effect.getName(), "lingering"), null);
 			effect.applyTag(this, hit);
 		}

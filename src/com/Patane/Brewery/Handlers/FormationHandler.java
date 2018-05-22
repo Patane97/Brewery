@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.Patane.Brewery.CustomEffects.Formation;
 import com.Patane.Brewery.CustomEffects.formations.Entity;
-import com.Patane.Brewery.CustomEffects.formations.Floor;
+import com.Patane.Brewery.CustomEffects.formations.Face;
 import com.Patane.Brewery.CustomEffects.formations.Point;
 import com.Patane.Brewery.CustomEffects.formations.Radius;
 import com.Patane.handlers.PatHandler;
@@ -30,7 +30,7 @@ private static HashMap<String, Formation> formations;
 	public static void registerAll() {
 		formations = new HashMap<String, Formation>();
 		register(new Radius());
-		register(new Floor());
+		register(new Face());
 		register(new Point());
 		register(new Entity());
 		Messenger.debug(Msg.INFO, "Registered Formations: "+StringsUtil.stringJoiner(formations.keySet(), ", "));

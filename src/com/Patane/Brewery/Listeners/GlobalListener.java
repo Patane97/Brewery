@@ -1,8 +1,6 @@
 package com.Patane.Brewery.Listeners;
 
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,20 +9,24 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.runnables.PatRunnable;
-import com.Patane.util.ingame.ItemsUtil;
+import com.Patane.util.general.GeneralUtil;
+import com.Patane.util.general.Messenger;
+import com.Patane.util.general.Messenger.Msg;
+import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.LocationsUtil;
 
 public class GlobalListener implements Listener{
@@ -53,10 +55,6 @@ public class GlobalListener implements Listener{
 //		if(e.getEntity() instanceof LivingEntity && ((LivingEntity) e.getEntity()).getLastDamage() >= ((LivingEntity) e.getEntity()).getHealth())
 //			Messenger.debug(e.getDamager(), "&7You &ahave killed &7"+e.getEntity().getName());
 //	}
-	/**
-	 * 
-	 * @param e
-	 */
 	@EventHandler
 	public void onItemSwingBlock(PlayerInteractEvent e){
 		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
@@ -65,9 +63,15 @@ public class GlobalListener implements Listener{
 		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
+		
+		
 		Location blockLocation = LocationsUtil.getCentre(e.getClickedBlock());
 		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
-		brItem.execute(player, location);
+
+		// Starts the cooldown (if any)
+		brItem.getCD().start(player);
+		
+		hitGround(brItem, location, player);
 	}
 	@EventHandler
 	public void onItemSwingEntity(EntityDamageByEntityEvent e){
@@ -79,74 +83,160 @@ public class GlobalListener implements Listener{
 		}
 		LivingEntity damager = (LivingEntity) e.getDamager();
 		BrItem brItem = getBrItem(damager.getEquipment().getItemInMainHand());
+		
+		
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
-		Location location = (e.getEntity() instanceof LivingEntity ? ((LivingEntity) e.getEntity()).getEyeLocation() : e.getEntity().getLocation());
-		brItem.execute(damager, location);
+		
+		// Starts the cooldown (if any)
+		brItem.getCD().start(damager);
+		
+		if(!(e.getEntity() instanceof LivingEntity)) {
+			Location location = e.getEntity().getLocation();
+			hitGround(brItem, location, damager);
+			return;
+		}
+		LivingEntity damaged = (LivingEntity) e.getEntity();
+		hitEntity(brItem, damager, damaged);
 	}
-
-	/**
-	 * 
-	 * @param e
-	 */
 	@EventHandler
 	public void onItemRightClick(PlayerInteractEvent e){
 		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
 			return;
 		Player player = e.getPlayer();
 		BrItem brItem = getBrItem(player.getInventory().getItemInMainHand());
-		if(brItem == null || brItem.getType() != CustomType.THROWABLE)
+		if(brItem == null)
 			return;
 		// Cancels if its something like SplashPotion
 		e.setCancelled(true);
-		Location throwingLoc = new Location(player.getWorld(), player.getEyeLocation().getX(), player.getEyeLocation().getY()-0.5, player.getEyeLocation().getZ());
-		Item item = player.getWorld().dropItem(throwingLoc, brItem.getItem());
+		
+		// Starts the cooldown (if any)
+		brItem.getCD().start(player);
+		
+		if(brItem.getType() == CustomType.THROWABLE) {
+			throwBrItem(player, brItem);
+		}
+		if(brItem.getType() == CustomType.CLICKABLE) {
+			hitEntity(brItem, player, player);
+		}
+	}
+	@SuppressWarnings("deprecation")
+	@EventHandler
+	public void onItemSwitch(PlayerItemHeldEvent e) {
+		Player player = e.getPlayer();
+		BrItem brItem = getBrItem(player.getInventory().getItem(e.getNewSlot()));
+		int slot = e.getNewSlot();
+		if(brItem == null || brItem.getType() != CustomType.MAIN_HAND)
+			return;
+		Brewery.getInstance().getServer().getPluginManager().registerEvents(new PassiveItem(brItem, player, slot), Brewery.getInstance());
+	}
+	private class PassiveItem extends PatRunnable implements Listener{
+		private final BrItem brItem;
+		private final Player player ;
+		private final int slot;
+		
+		public PassiveItem(BrItem brItem, Player player, int slot) {
+			super(0, 20);
+			this.brItem = brItem;
+			this.player = player;
+			this.slot = slot;
+		}
+
+		@Override
+		public void run() {
+			hitEntity(brItem, player, player);
+		}
+		@EventHandler
+		public void onItemSwitch(PlayerItemHeldEvent e) {
+			if(!e.getPlayer().equals(player))
+				return;
+			if(e.getPreviousSlot() == slot && e.getNewSlot() != slot)
+				HandlerList.unregisterAll(this);
+				this.cancel();
+		}
+	}
+	/*================================================================================================
+	 * 										Useful Methods
+	 * 
+	 *================================================================================================
+	 */
+	private void hitGround(BrItem item, Location location, LivingEntity executor) {
+		Messenger.debug(Msg.BROADCAST, "HIT GROUND");
+		item.execute(location, executor);
+	}
+	private void hitEntity(BrItem item, LivingEntity executor, LivingEntity target) {
+		Messenger.debug(Msg.BROADCAST, "HIT ENTITY");
+		item.execute(executor, target);
+	}
+	/**
+	 * Handles throwing an item based on a LivingEntity and a BrItem.
+	 * @param entity LivingEntity that is throwing the brItem.
+	 * @param brItem BrItem that is being thrown.
+	 */
+	private void throwBrItem(LivingEntity entity, BrItem brItem) {
+		Location throwingLoc = new Location(entity.getWorld(), entity.getEyeLocation().getX(), entity.getEyeLocation().getY()-0.5, entity.getEyeLocation().getZ());
+		Item item = entity.getWorld().dropItem(throwingLoc, brItem.getItem());
 		item.setPickupDelay(Integer.MAX_VALUE);
-		double pitch = ((player.getLocation().getPitch() + 90) * Math.PI)/180;
-		double yaw = ((player.getLocation().getYaw() + 90) * Math.PI)/180;
+		double pitch = ((entity.getLocation().getPitch() + 90) * Math.PI)/180;
+		double yaw = ((entity.getLocation().getYaw() + 90) * Math.PI)/180;
 		double x = Math.sin(pitch) * Math.cos(yaw);
 		double y = Math.sin(pitch) * Math.sin(yaw);
 		double z = Math.cos(pitch);
 		item.setVelocity(new Vector(x,z,y).multiply(0.5));
-		new ItemDetection(player, brItem, item);
+		new ItemDetection(entity, brItem, item);
 	}
 	private class ItemDetection extends PatRunnable {
 		private final Item item;
 		private final BrItem brItem;
 		private final LivingEntity executor;
 		
+		private boolean hasLeftExecutor = false;
+		
 		public ItemDetection(LivingEntity executor, BrItem brItem, Item item) {
-			super(2, 1);
+			super(0, 1);
 			this.item = item;
 			this.brItem = brItem;
 			this.executor = executor;
 		}
-
 		@Override
 		public void run() {
 			Location loc = item.getLocation();
-			Collection<Entity> entities = item.getNearbyEntities(item.getWidth(), item.getHeight(), item.getWidth());
-			entities.remove(executor);
-			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR || !entities.isEmpty()){
+			List<Entity> entities = item.getNearbyEntities(item.getWidth(), item.getHeight(), item.getWidth());
+			// This allows us to ignore the executor whilst the object is being thrown away from them,
+			// but lets them be targetted on the way back (eg. throwing it directly upwards)
+			if(!entities.contains(executor))
+				hasLeftExecutor = true;
+			if(!hasLeftExecutor)
+				entities.remove(executor);
+			if(!entities.isEmpty()) {
+				List<LivingEntity> living = GeneralUtil.getLiving(entities);
+				if(living.isEmpty()) {
+					item.setPickupDelay(0);
+					item.remove();
+					hitGround(brItem, item.getLocation(), executor);
+					this.cancel();
+					return;
+				}
 				item.setPickupDelay(0);
 				item.remove();
-				brItem.execute(executor, item.getLocation());
+				hitEntity(brItem, executor, LocationsUtil.getClosest(living, item.getLocation()));
+				this.cancel();
+				return;
+			}
+			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR){
+				item.setPickupDelay(0);
+				item.remove();
+				hitGround(brItem, item.getLocation(), executor);
 				this.cancel();
 				return;
 			}
 		}
-		
 	}
+
 	private static BrItem getBrItem(ItemStack item){
-		if(!item.hasItemMeta())
+		String brItemName = ItemEncoder.extractTag(item);
+		if(brItemName == null)
 			return null;
-		ItemMeta itemMeta = item.getItemMeta();
-		if(itemMeta.getDisplayName() == null)
-			return null;
-		Matcher match = Pattern.compile(".* <Br\\-(\\w+)>").matcher(ItemsUtil.decodeItemData(itemMeta.getDisplayName()));
-		if(!match.matches())
-			return null;
-		String decodedName = match.group(1);
-		return Brewery.getItemCollection().getItem(decodedName);
+		return Brewery.getItemCollection().getItem(brItemName);
 	}
 }

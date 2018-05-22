@@ -31,13 +31,23 @@ public class Sticky extends Trigger{
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
+//		// If the effect ignores the executor, then remove them from the list (if they're on there)
+//		if(effect.ignoreUser())
+//			hitEntities.remove(executor);
 		new StickyTask(effect, impact, executor, hitEntities);
 	}
 
+	@Override
+	public void execute(BrEffect effect, LivingEntity executor, LivingEntity target) {
+		// Adding Single Hit entity into a 'hitEntity' array. This is purely to fit the format of a StickyTask.
+		List<LivingEntity> hitEntities = (effect.hasRadius() ? effect.getFilter().filter(target.getLocation(), effect.getRadius()) : effect.getFilter().filter(target));
+		new StickyTask(effect, executor, target, hitEntities);
+	}
 	protected class StickyTask extends PatTimedRunnable{
 		private final BrEffect effect;
 		private final Location impact;
 		private final LivingEntity executor;
+		private final LivingEntity target;
 		private final List<LivingEntity> entities;
 		
 		public StickyTask(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> entities){
@@ -46,6 +56,19 @@ public class Sticky extends Trigger{
 			this.impact = impact;
 			this.executor = executor;
 			this.entities = entities;
+			this.target = null;
+			
+			// Adds effect metadata to entities hit.
+			BrMetaDataHandler.addOrReset(this, entities, MetaDataHandler.id(effect.getName(), "sticky"));
+			effect.applyTag(this, entities);
+		}
+		public StickyTask(BrEffect effect, LivingEntity executor, LivingEntity target, List<LivingEntity> entities){
+			super(0, rate, duration);
+			this.effect = effect;
+			this.impact = null;
+			this.executor = executor;
+			this.target = target;
+			this.entities = entities;
 			
 			// Adds effect metadata to entities hit.
 			BrMetaDataHandler.addOrReset(this, entities, MetaDataHandler.id(effect.getName(), "sticky"));
@@ -53,8 +76,9 @@ public class Sticky extends Trigger{
 		}
 		@Override
 		public void task() {
-			applyByFocus(effect, impact, Focus.BLOCK);
-			executeOnEntities(effect, impact, executor, entities);
+			Location dynamicImpact = (impact == null ? target.getLocation() : impact);
+			applyByFocus(effect, dynamicImpact, Focus.BLOCK);
+			executeMany(effect, dynamicImpact, executor, entities);
 		}
 
 		@Override

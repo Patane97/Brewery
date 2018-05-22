@@ -16,7 +16,7 @@ public class Entity extends Formation{
 	@Override
 	public void form(BrEffect effect, Location location) {
 		// Location will always be 'entity.getEyeLocation()' as Focus system does not allow a non-entity location to be passed.
-		effect.getParticleEffect().spawn(location, 1);
+		effect.getParticleEffect().spawn(location, 1f);
 	}
 
 }

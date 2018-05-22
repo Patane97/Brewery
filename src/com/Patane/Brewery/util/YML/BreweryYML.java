@@ -30,20 +30,20 @@ public abstract class BreweryYML extends BasicYML{
 		try{
 			effectName = extractLast(section);
 			PotionEffectType type = PotionEffectType.getByName(effectName);
-			int duration = getIntFromString(section.getString("duration"));
-			int strength = getIntFromString(section.getString("strength"));
+			int duration = parseInt(section.getString("duration"));
+			int strength = parseInt(section.getString("strength"));
 			try{
-				boolean ambient = section.getBoolean("ambient");
+				boolean ambient = parseBoolean(section.getString("ambient"));
 				try{
-					boolean particles = section.getBoolean("particles");
+					boolean particles = parseBoolean(section.getString("particles"));
 					return new PotionEffect(type, duration, strength, ambient, particles);
-				} catch (NullPointerException e){
+				} catch (Exception e){
 					return new PotionEffect(type, duration, strength, ambient);
 				}
-			} catch(NullPointerException e){
+			} catch(Exception e){
 				return new PotionEffect(type, duration, strength);
 			}
-		} catch (NullPointerException | NumberFormatException e){
+		} catch (Exception e){
 			Messenger.warning("Potion Effect '"+effectName+"' retrieval has failed. Check all YML values are set correctly.");
 			e.printStackTrace();
 			return null;
