@@ -24,8 +24,6 @@ import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.general.GeneralUtil;
-import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.LocationsUtil;
 
@@ -161,11 +159,9 @@ public class GlobalListener implements Listener{
 	 *================================================================================================
 	 */
 	private void hitGround(BrItem item, Location location, LivingEntity executor) {
-		Messenger.debug(Msg.BROADCAST, "HIT GROUND");
 		item.execute(location, executor);
 	}
 	private void hitEntity(BrItem item, LivingEntity executor, LivingEntity target) {
-		Messenger.debug(Msg.BROADCAST, "HIT ENTITY");
 		item.execute(executor, target);
 	}
 	/**

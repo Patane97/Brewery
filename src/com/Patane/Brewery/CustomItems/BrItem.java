@@ -51,7 +51,7 @@ public class BrItem extends PatCollectable{
 		this.type = Check.nulled(type, "BrItem '"+name+"' has no set type. Please check YML files.");
 		this.item = Check.nulled(ItemEncoder.addTag(item, getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
-		this.cooldown = new CooldownHandler(this, cooldown, ItemsUtil.createItem(Material.GHAST_TEAR, 1, (short) 0, "COOLDOWN"));
+		this.cooldown = new CooldownHandler(this, cooldown, ItemsUtil.createItem(Material.GHAST_TEAR, 1, (short) 0, null));
 	}
 	public ItemStack getItem(){
 		return item;
