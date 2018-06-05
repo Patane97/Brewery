@@ -1,5 +1,8 @@
 package com.Patane.Brewery.CustomItems;
 
+import java.util.Date;
+
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -11,10 +14,11 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,6 +38,8 @@ public class CooldownHandler {
 	
 	private boolean active;
 	
+	Date finishTime;
+	
 	public CooldownHandler(BrItem brItem, float duration, ItemStack item) {
 		this.brItem = brItem;
 		this.duration = duration;
@@ -46,6 +52,10 @@ public class CooldownHandler {
 		// If we want to try to allow non-human entities to use items, maybe make two types of PatTimedRunnable cooldowns?
 		// One for HumanEntity, another for other entities <--- No need to update item name, only the use of the item
 		if(entity instanceof HumanEntity) {
+			if(((HumanEntity) entity).getGameMode() == GameMode.CREATIVE) {
+				Messenger.send(entity, "&cCooldowns are currently disabled whilst in Creative Mode due to Spigot Bugs.");
+				return;
+			}
 			new Cooldown((HumanEntity) entity, brItem);
 		}
 	}
@@ -63,6 +73,8 @@ public class CooldownHandler {
 			this.owner = owner;
 			this.brItem = brItem;
 			hiddenTag = "Cooldown ["+this.getID()+"]";
+			
+			active = true;
 			
 			// Creates the invItem with the 'bar' as its name (should be full at this point) and the appropriate hiddenTag.
 			invItem = ItemEncoder.addTag(ItemsUtil.createItem(item.getType(), 1, (short) 0, constructBar(ticksLeft(), duration(), 20)), hiddenTag);
@@ -85,6 +97,15 @@ public class CooldownHandler {
 			}
 		}
 		
+		@EventHandler
+		public void onItemFrameRightClick(PlayerInteractEntityEvent e){
+			if(!e.getPlayer().equals(owner)) 
+				return;
+			ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+			if(ItemEncoder.hasTag(item, hiddenTag))
+				e.setCancelled(true);
+		}
+		
 		@Override
 		public void task() {
 			try {
@@ -99,8 +120,9 @@ public class CooldownHandler {
 		public void complete() {
 			try {
 				HandlerList.unregisterAll(this);
-				Messenger.send(owner, "&aItem Cooldown complete! Ending current state...");
+				Messenger.debug(owner, "&aItem Cooldown complete! Ending current state...");
 				state.complete();
+				active = false;
 			} catch (Exception e) {
 				state.finish();
 				Messenger.send(Msg.WARNING, hiddenTag+" for item "+brItem.getName()+" has failed its completion: ");
@@ -121,6 +143,11 @@ public class CooldownHandler {
 			super(cooldown);
 			this.itemEntity = itemEntity;
 		}
+
+		/**
+		 * Event for CooldownItem entity being picked up by an entity
+		 * @param e
+		 */
 		@EventHandler
 		public void onItemPickup(EntityPickupItemEvent e) {
 			Messenger.debug(cooldown.owner, ">>>>>> Entity Pickup Item ["+e.getEntity().getName()+"]");
@@ -139,6 +166,24 @@ public class CooldownHandler {
 					e.setCancelled(true);
 			}
 		}
+		
+		/**
+		 * Event for CooldownItem entity being dropped into a Hopper
+		 * @param e
+		 */
+		@EventHandler
+		public void onItemMoveInventory(InventoryMoveItemEvent e) {
+			Messenger.debug(cooldown.owner, ">>>>>> Inventory Move Item ["+e.getDestination().getType()+"]");
+			ItemStack item = e.getItem();
+			if(ItemEncoder.hasTag(item, cooldown.hiddenTag)) {
+				if(e.getDestination().getType() != InventoryType.HOPPER && e.getInitiator().getType() != InventoryType.HOPPER) {
+					e.setCancelled(true);
+					return;
+				}
+				changeState(new InventoryState(cooldown, e.getDestination(), null));
+			}
+		}
+		
 		@Override
 		public void complete() {
 			itemEntity.setItemStack(cooldown.brItem.getItem());
@@ -159,7 +204,33 @@ public class CooldownHandler {
 			super(cooldown);
 			this.creativeComplete = (creativeView == true ? false : null);
 		}
-		
+
+		/**
+		 * Event for CooldownItem ItemStack being dragged from the cursor to an inventory
+		 * @param e
+		 */
+		@EventHandler
+		public void onItemDrag(InventoryDragEvent e) {
+			Messenger.debug(cooldown.owner, ">>>>>> Cursor Drag");
+			// If clicking outside inventory.
+			if(e.getInventory() == null)
+				return;
+			if(!validInventory(e.getInventory())) {
+				e.setCancelled(true);
+				Messenger.send(cooldown.owner, "&c &7"+cooldown.brItem.getName()+" &cis on cooldown. You cannot put a cooldown item in this type of inventory.");
+				return;
+			}
+			ItemStack cursor = e.getOldCursor();
+			// If the player clicks something that isnt a slot (such as the border of the Inventory)
+			if(cursor == null)
+				return;
+			if(ItemEncoder.hasTag(cursor, cooldown.hiddenTag))
+				changeState(new InventoryState(cooldown, e.getInventory(), null));
+		}
+		/**
+		 * Event for CooldownItem ItemStack being placed into an inventory
+		 * @param e
+		 */
 		@EventHandler
 		public void onItemClick(InventoryClickEvent e) {
 			Messenger.debug(cooldown.owner, ">>>>>> Cursor Click ["+e.getAction()+"]");
@@ -193,7 +264,7 @@ public class CooldownHandler {
 				return;
 			
 			/* *************************************************************************
-			 * SPIGOT BUXFIX CODE
+			 * SPIGOT BUXFIX CODE FOR CREATIVE MODE
 			 * 
 			 * If the cooldown is over and the player is placing the held item back into the inventory.
 			 * This is to avoid the following issue with no known cause:
@@ -225,7 +296,11 @@ public class CooldownHandler {
 			if(ItemEncoder.hasTag(cursor, cooldown.hiddenTag))
 				changeState(new InventoryState(cooldown, e.getClickedInventory(), null));
 		}
-		
+
+		/**
+		 * Event for Inventory being closed whilst item is on the cursor
+		 * @param e
+		 */
 		@EventHandler
 		public void onInventoryClose(InventoryCloseEvent e) {
 			Messenger.debug(cooldown.owner, ">>>>>> Inventory Close ["+e.getInventory().getName()+"]");
@@ -261,7 +336,7 @@ public class CooldownHandler {
 	private class InventoryState extends State {
 		Inventory inventory;
 		
-		boolean editingItem = false;
+//		boolean editingItem = false;
 		
 		// Used within task to reduce lag.
 		// Achieves this by removing the need to search for the item each tick.
@@ -273,33 +348,38 @@ public class CooldownHandler {
 			this.inventory = inventory;
 			this.slot = slot;
 		}
+		/**
+		 * Event for CooldownItem Itemstack being clicked within an inventory
+		 * @param e
+		 */
 		@EventHandler
-		public void onCreativeItemClick(InventoryCreativeEvent e) {
-			if(!e.getWhoClicked().equals(cooldown.owner) || e.getAction() == InventoryAction.NOTHING || editingItem)
+		public void onItemClick(InventoryClickEvent e) {
+			if(!e.getWhoClicked().equals(cooldown.owner) || e.getAction() == InventoryAction.NOTHING)
 				return;
-			Messenger.debug(cooldown.owner, ">>>>>> Creative Inventory Click ["+e.getAction()+"]");
-			onItemClickRun(e);
-		}
-		@EventHandler
-		public void onSurvivalItemClick(InventoryClickEvent e) {
-			if(!e.getWhoClicked().equals(cooldown.owner) || e.getAction() == InventoryAction.NOTHING || e.getView().getType() == InventoryType.CREATIVE)
-				return;
-			Messenger.debug(cooldown.owner, ">>>>>> Survival Inventory Click ["+e.getAction()+"]");
-			onItemClickRun(e);
+			Messenger.debug(cooldown.owner, ">>>>>> Inventory Click ["+e.getAction()+"]");
+			onItemClickRun(e, e.getView().getType() == InventoryType.CREATIVE);
 		}
 		
-		private void onItemClickRun(InventoryClickEvent e) {
+		private void onItemClickRun(InventoryClickEvent e, boolean creativeInventory) {
 			Messenger.debug(cooldown.owner, ">>>>>> view ["+e.getView().getType()+"]");
+			Messenger.debug(cooldown.owner, ">>>>>> click ["+e.getClick()+"]");
+			Messenger.debug(cooldown.owner, ">>>>>> slot ["+e.getSlot()+"]");
+			Messenger.debug(cooldown.owner, ">>>>>> rawSlot ["+e.getRawSlot()+"]");
 			ItemStack clicked = e.getCurrentItem();
 			if(ItemEncoder.hasTag(clicked, cooldown.hiddenTag)) {
-				if(e.getAction() == InventoryAction.CLONE_STACK) {
-					PataneUtil.getInstance().getServer().getScheduler().runTask(PataneUtil.getInstance(), new Runnable() {
-						public void run() {
-							cooldown.owner.setItemOnCursor(cooldown.brItem.getItem());
-						}
-					});
-				}
-				else if(e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+				// 'ClickType.MIDDLE never triggers in a creative inventory. Find workaround
+//				if(e.getClick() == ClickType.MIDDLE && creativeInventory) {
+//					Messenger.debug(cooldown.owner, "&7Cloning Stack 1");
+//					e.setCancelled(true);
+//					PataneUtil.getInstance().getServer().getScheduler().runTask(PataneUtil.getInstance(), new Runnable() {
+//						public void run() {
+//							Messenger.(cooldown.owner, "&7Cloning Stack 2");
+//							cooldown.owner.setItemOnCursor(cooldown.brItem.getItem());
+//						}
+//					});
+//					return;
+//				}
+				if(e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 					if(e.getRawSlot() < e.getView().getTopInventory().getSize())
 						inventory = e.getView().getBottomInventory();
 					else
@@ -314,23 +394,30 @@ public class CooldownHandler {
 					 || e.getAction() == InventoryAction.PLACE_SOME
 					 || e.getAction() == InventoryAction.COLLECT_TO_CURSOR
 					 || e.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-						changeState(new CursorState(cooldown, e.getView().getType() == InventoryType.CREATIVE));
+						changeState(new CursorState(cooldown, creativeInventory));
 				}
 			}
 		}
+		/**
+		 * Event for CooldownItem ItemStack being moved to another inventory
+		 * @param e
+		 */
 		@EventHandler
 		public void onItemMoveInventory(InventoryMoveItemEvent e) {
 			Messenger.debug(cooldown.owner, ">>>>>> Inventory Move ["+e.getDestination().getName()+"]");
 			ItemStack moved = e.getItem();
 			if(ItemEncoder.hasTag(moved, cooldown.hiddenTag)) {
-				if(!validInventory(e.getDestination()))
+				if(!validInventory(e.getDestination())) {
 					e.setCancelled(true);
+					return;
+				}
+				inventory = e.getDestination();
 			}
 		}
 		
 		@Override
 		public void task() {
-			editingItem = true;
+//			editingItem = true;
 			// slot will only ever be null on the first task().
 			ItemStack itemInSlot = (slot == null ? null : inventory.getItem(slot));
 			
@@ -347,7 +434,7 @@ public class CooldownHandler {
 			// If in an inventory thats not players, make it so it only updates if the inventory (eg. chest) has a VIEWER. Reduces lag.
 			//***************************
 			cooldown.invItem = ItemEncoder.addTag(ItemsUtil.setItemNameLore(itemInSlot, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), cooldown.hiddenTag);
-			editingItem = false;
+//			editingItem = false;
 //			cooldown.owner.getInventory().setItem(slot, ItemEncoder.addTag(ItemsUtil.setItemNameLore(cooldown.invItem, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), cooldown.hiddenTag));
 		}
 		@Override
@@ -379,7 +466,7 @@ public class CooldownHandler {
 		public void finish() {
 			HandlerList.unregisterAll(this);
 //			((Player) cooldown.owner).updateInventory();
-			Messenger.send(cooldown.owner, "&2Ended state &7"+this.getClass().getSimpleName()+"&2!");
+			Messenger.debug(cooldown.owner, "&2Ended state &7"+this.getClass().getSimpleName()+"&2!");
 		}
 	}
 	/**
