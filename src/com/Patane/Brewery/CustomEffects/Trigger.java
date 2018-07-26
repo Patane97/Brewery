@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
-import com.Patane.util.YML.MapParsable;
+import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Focusable.Focus;
 

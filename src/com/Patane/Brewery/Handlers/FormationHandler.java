@@ -10,7 +10,7 @@ import com.Patane.Brewery.CustomEffects.formations.Face;
 import com.Patane.Brewery.CustomEffects.formations.Point;
 import com.Patane.Brewery.CustomEffects.formations.Radius;
 import com.Patane.handlers.PatHandler;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
@@ -20,7 +20,7 @@ public class FormationHandler implements PatHandler{
 private static HashMap<String, Formation> formations;
 	
 	public static Formation get(String itemName){
-		Check.nulled(itemName, "Formation field is missing");
+		Check.notNull(itemName, "Formation field is missing");
 		for(String name : formations.keySet()){
 			if(itemName.equals(name))
 				return formations.get(name);

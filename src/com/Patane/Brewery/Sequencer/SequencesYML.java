@@ -2,14 +2,14 @@ package com.Patane.Brewery.Sequencer;
 
 import org.bukkit.plugin.Plugin;
 
-import com.Patane.util.YML.BasicYML;
+import com.Patane.util.YAML.types.YAMLEditable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 
-public class SequencesYML extends BasicYML{
+public class SequencesYML extends YAMLEditable{
 
 	public SequencesYML(Plugin plugin) {
-		super(plugin, "sequences.yml", "sequences", "YML File for each sequence\nExample:");
+		super(null, "sequences.yml", "sequences", "YML File for each sequence\nExample:");
 	}
 
 	@Override
@@ -18,10 +18,10 @@ public class SequencesYML extends BasicYML{
 
 	@Override
 	public void load() {
-		for(String seqName : header.getKeys(false)){
+		for(String seqName : getSelect().getKeys(false)){
 //			int currentDelay = 0;
-			setHeader(seqName);
-			for(String keyName : header.getKeys(false)){
+			setSelect(seqName);
+			for(String keyName : getSelect().getKeys(false)){
 				Messenger.debug(Msg.WARNING, keyName);
 //				switch(keyName){
 //				case "Effect":

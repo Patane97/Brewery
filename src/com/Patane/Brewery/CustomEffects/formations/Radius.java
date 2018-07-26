@@ -4,7 +4,7 @@ import org.bukkit.Location;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Formation;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 

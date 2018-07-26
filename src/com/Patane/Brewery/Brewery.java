@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.Collections.BrItemCollection;
+import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem;
@@ -15,7 +16,6 @@ import com.Patane.Brewery.Listeners.GlobalListener;
 import com.Patane.Brewery.Listeners.ParticlePacketAdapter;
 import com.Patane.Brewery.Sequencer.Sequencer;
 import com.Patane.Brewery.Sequencer.SequencesYML;
-import com.Patane.Brewery.commands.CommandHandler;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.main.PataneUtil;
 import com.comphenix.protocol.PacketType;
@@ -33,6 +33,8 @@ public class Brewery extends JavaPlugin{
 	private static BrItemCollection itemCollection;
 	private static BrEffectCollection effectCollection;
 	
+	private static BrCommandHandler commandHandler;
+	
 	private ProtocolManager protocolManager;
 	
 	public void onEnable() {
@@ -41,7 +43,7 @@ public class Brewery extends JavaPlugin{
 		itemCollection = new BrItemCollection();
 		effectCollection = new BrEffectCollection();
 		getServer().getPluginManager().registerEvents(new GlobalListener(), this);
-        CommandHandler commandHandler = new CommandHandler(this);
+        commandHandler = new BrCommandHandler();
 		this.getCommand("br").setExecutor(commandHandler);
 		
 		TriggerHandler.registerAll();
@@ -68,14 +70,14 @@ public class Brewery extends JavaPlugin{
 		// Loading message
 		Messenger.info("Brewery v" + this.getDescription().getVersion() + "Loaded!");
 	}
-	public void onDisable(){
+	public void onDisable() {
 		saveFiles();
 	}
-	private void saveFiles(){
+	private void saveFiles() {
 //		BrItem.YML().save();
 //		BrEffect.YML().save();
 	}
-	private void loadFiles(){
+	private void loadFiles() {
 		BrEffect.setYML(new BrEffectYML(this));
 		BrEffect.YML().load();
 		BrItem.setYML(new BrItemYML(this));
@@ -83,13 +85,16 @@ public class Brewery extends JavaPlugin{
 		Sequencer.setYML(new SequencesYML(this));
 		Sequencer.YML().load();
 	}
-	public static Brewery getInstance(){
+	public static Brewery getInstance() {
 		return brewery;
 	}
-	public static BrItemCollection getItemCollection(){
+	public static BrItemCollection getItemCollection() {
 		return itemCollection;
 	}
-	public static BrEffectCollection getEffectCollection(){
+	public static BrEffectCollection getEffectCollection() {
 		return effectCollection;
+	}
+	public static BrCommandHandler getCommandHandler() {
+		return commandHandler;
 	}
 }

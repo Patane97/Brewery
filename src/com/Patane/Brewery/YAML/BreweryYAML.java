@@ -1,4 +1,4 @@
-package com.Patane.Brewery.util.YML;
+package com.Patane.Brewery.YAML;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,15 +10,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
-import com.Patane.util.YML.BasicYML;
+import com.Patane.util.YAML.types.YAMLEditable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
-public abstract class BreweryYML extends BasicYML{
+public abstract class BreweryYAML extends YAMLEditable{
 
-	public BreweryYML(Plugin plugin, String config, String root, String header) {
-		super(plugin, config, root, header);
+	public BreweryYAML(Plugin plugin, String config, String root, String header) {
+		super(null, config, root, header);
 	}
 	/**
 	 * Retireves a potion effect from a YML and creates it based on the values given.

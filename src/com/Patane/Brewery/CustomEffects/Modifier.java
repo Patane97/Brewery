@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.util.YML.MapParsable;
+import com.Patane.util.YAML.MapParsable;
 
 public abstract class Modifier extends MapParsable{
 	

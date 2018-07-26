@@ -9,7 +9,7 @@ import com.Patane.Brewery.CustomEffects.triggers.Instant;
 import com.Patane.Brewery.CustomEffects.triggers.Lingering;
 import com.Patane.Brewery.CustomEffects.triggers.Sticky;
 import com.Patane.handlers.PatHandler;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;

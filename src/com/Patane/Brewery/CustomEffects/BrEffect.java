@@ -14,8 +14,8 @@ import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatRunnable;
-import com.Patane.util.YML.MapParsable;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.MapParsable;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.collections.PatCollectable;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
@@ -57,10 +57,10 @@ public class BrEffect extends PatCollectable{
 		
 		// ESSENTIAL VALUES.
 		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
-		this.modifier = (incompleteAllowed ? modifier : Check.nulled(modifier, "BrEffect needs more data: '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		this.modifier = (incompleteAllowed ? modifier : Check.notNull(modifier, "BrEffect needs more data: '"+name+"' has no modifiers set anywhere. Please check YML files."));
 		if(modifier == null) incomplete.add("modifier");
 		
-		this.trigger = (incompleteAllowed ? trigger : Check.nulled(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
+		this.trigger = (incompleteAllowed ? trigger : Check.notNull(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
 		if(trigger == null)	incomplete.add("trigger");
 		
 		// NON-ESSENTIAL VALUES.
@@ -208,7 +208,7 @@ public class BrEffect extends PatCollectable{
 
 		public BrParticleEffect(Map<String, String> fields){
 			this.type = getEnumValue(Particle.class, fields, "type");
-			this.formation = Check.nulled(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
+			this.formation = Check.notNull(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
 			try{ 
 				this.intensity = getInt(fields, "intensity");
 				this.velocity = getDouble(fields, "velocity");

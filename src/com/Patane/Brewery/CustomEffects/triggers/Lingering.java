@@ -11,7 +11,7 @@ import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focusable.Focus;
 

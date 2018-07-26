@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 /**
  * Extremely experimental, needs work

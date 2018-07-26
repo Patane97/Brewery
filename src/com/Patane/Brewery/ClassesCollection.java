@@ -2,8 +2,8 @@ package com.Patane.Brewery;
 
 import java.util.HashMap;
 
-import com.Patane.util.YML.Nameable;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Nameable;
+import com.Patane.util.YAML.Namer;
 
 public class ClassesCollection <T extends Nameable>{
 	private HashMap<String, T> items;

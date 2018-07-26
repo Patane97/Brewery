@@ -16,13 +16,13 @@ import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
-import com.Patane.Brewery.util.YML.BreweryYML;
+import com.Patane.Brewery.YAML.BreweryYAML;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
-public class BrEffectYML extends BreweryYML{
+public class BrEffectYML extends BreweryYAML{
 
 	public BrEffectYML(Plugin plugin) {
 		super(plugin, "effects.yml", "effects", "YML File for each effect\nExample:");
@@ -33,9 +33,9 @@ public class BrEffectYML extends BreweryYML{
 
 	@Override
 	public void load() {
-		setHeader(getRootSection());
-		for(String effectName : header.getKeys(false)){
-			load(getSectionAndWarn(header, effectName));
+		setSelect(getPrefix());
+		for(String effectName : getSelect().getKeys(false)){
+			load(getSectionAndWarn(getSelect(), effectName));
 		}
 		Messenger.info("Successfully loaded Effects: "+StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), ", "));
 	}
@@ -57,7 +57,7 @@ public class BrEffectYML extends BreweryYML{
 		String essentialTask = null;
 		try{			
 			// Making sure the baseHeader is not null.
-			Check.nulled(baseHeader);
+			Check.notNull(baseHeader);
 			
 			// Creating currentHeader to be used throughout this method.
 			ConfigurationSection currentHeader = baseHeader;

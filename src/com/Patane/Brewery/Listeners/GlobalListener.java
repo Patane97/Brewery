@@ -53,6 +53,16 @@ public class GlobalListener implements Listener{
 //		if(e.getEntity() instanceof LivingEntity && ((LivingEntity) e.getEntity()).getLastDamage() >= ((LivingEntity) e.getEntity()).getHealth())
 //			Messenger.debug(e.getDamager(), "&7You &ahave killed &7"+e.getEntity().getName());
 //	}
+	
+	/**
+	 * Called when a player Swings (Default left click) at a block.
+	 * 
+	 * If item in hand is a brItem, it will trigger as if it hit the ground at the swung block.
+	 * 
+	 * ItemTypes that can trigger from this: HITTABLE
+	 * 
+	 * @param e
+	 */
 	@EventHandler
 	public void onItemSwingBlock(PlayerInteractEvent e){
 		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
@@ -67,14 +77,26 @@ public class GlobalListener implements Listener{
 		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
 
 		// Starts the cooldown (if any)
-		brItem.getCD().start(player);
+		brItem.getCD().start(player, player.getInventory().getHeldItemSlot());
 		
 		hitGround(brItem, location, player);
 	}
+	/**
+	 * Called when an entity Damages another entity.
+	 * 
+	 * If item in hand is a brItem, it will trigger on the hit entity.
+	 * 
+	 * ItemTypes that can trigger from this: HITTABLE
+	 * 
+	 * @param e
+	 */
 	@EventHandler
 	public void onItemSwingEntity(EntityDamageByEntityEvent e){
 		if(!(e.getDamager() instanceof LivingEntity))
 			return;
+		// To avoid infinite damage loops, targets who are damaged by this plugin are tagged with "Brewery_DAMAGE".
+		// If they have this tag, then we do not want to trigger this damage event as this would create an infinite damage loop.
+		// This acts as "blocking" the registration of the BrItem's Damage and removing its DAMAGE metadata in the process.
 		if(e.getEntity().hasMetadata("Brewery_DAMAGE")){
 			e.getEntity().removeMetadata("Brewery_DAMAGE", Brewery.getInstance());
 			return;
@@ -82,12 +104,12 @@ public class GlobalListener implements Listener{
 		LivingEntity damager = (LivingEntity) e.getDamager();
 		BrItem brItem = getBrItem(damager.getEquipment().getItemInMainHand());
 		
-		
+		// Only 'HITTABLE' items will trigger in this way.
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
 		
 		// Starts the cooldown (if any)
-		brItem.getCD().start(damager);
+		brItem.getCD().start(damager, null);
 		
 		if(!(e.getEntity() instanceof LivingEntity)) {
 			Location location = e.getEntity().getLocation();
@@ -97,6 +119,15 @@ public class GlobalListener implements Listener{
 		LivingEntity damaged = (LivingEntity) e.getEntity();
 		hitEntity(brItem, damager, damaged);
 	}
+	/**
+	 * Called when a Player right clicks another entity.
+	 * 
+	 * If item in hand is a brItem, it will trigger on the hit entity.
+	 * 
+	 * ItemTypes that can trigger from this: THROWABLE, CLICKABLE
+	 * 
+	 * @param e
+	 */
 	@EventHandler
 	public void onItemRightClick(PlayerInteractEvent e){
 		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
@@ -109,7 +140,7 @@ public class GlobalListener implements Listener{
 		e.setCancelled(true);
 		
 		// Starts the cooldown (if any)
-		brItem.getCD().start(player);
+		brItem.getCD().start(player, player.getInventory().getHeldItemSlot());
 		
 		if(brItem.getType() == CustomType.THROWABLE) {
 			throwBrItem(player, brItem);
@@ -118,7 +149,6 @@ public class GlobalListener implements Listener{
 			hitEntity(brItem, player, player);
 		}
 	}
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onItemSwitch(PlayerItemHeldEvent e) {
 		Player player = e.getPlayer();

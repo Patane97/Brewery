@@ -48,8 +48,8 @@ public class BrItem extends PatCollectable{
 		if(Brewery.getItemCollection().contains(getID())){
 			throw new IllegalArgumentException(getID()+" already exists!");
 		}
-		this.type = Check.nulled(type, "BrItem '"+name+"' has no set type. Please check YML files.");
-		this.item = Check.nulled(ItemEncoder.addTag(item, getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
+		this.type = Check.notNull(type, "BrItem '"+name+"' has no set type. Please check YML files.");
+		this.item = Check.notNull(ItemEncoder.addTag(item, getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
 		this.cooldown = new CooldownHandler(this, cooldown, ItemsUtil.createItem(Material.GHAST_TEAR, 1, (short) 0, null));
 	}
@@ -85,8 +85,8 @@ public class BrItem extends PatCollectable{
 	public boolean execute(Location location, LivingEntity executor) {
 		try {
 			// Checks if either location or executor are null for any reason.
-			Check.nulled(location, "Location of impact is missing.");
-			Check.nulled(executor, "Executing entity is missing.");
+			Check.notNull(location, "Location of impact is missing.");
+			Check.notNull(executor, "Executing entity is missing.");
 			Messenger.debug(executor, "&7You &ahave activated &7"+getName()+"&a on a location.");
 			// Collects a list of all successfully deployed effects.
 			List<String> successful = new ArrayList<String>();
@@ -111,8 +111,8 @@ public class BrItem extends PatCollectable{
 	public boolean execute(LivingEntity executor, LivingEntity target) {
 		try {
 			// Checks if either executor or target are null for any reason.
-			Check.nulled(executor, "Executing entity is missing.");
-			Check.nulled(target, "Target of impact is missing.");
+			Check.notNull(executor, "Executing entity is missing.");
+			Check.notNull(target, "Target of impact is missing.");
 			Messenger.debug(executor, "&7You &ahave activated &7"+getName()+"&a on an entity.");
 			// Collects a list of all successfully deployed effects.
 			List<String> successful = new ArrayList<String>();

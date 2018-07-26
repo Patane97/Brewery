@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -23,7 +24,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.handlers.PlayerDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
+import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.ingame.InventoriesUtil;
@@ -38,7 +41,6 @@ public class CooldownHandler {
 	
 	private boolean active;
 	
-	Date finishTime;
 	
 	public CooldownHandler(BrItem brItem, float duration, ItemStack item) {
 		this.brItem = brItem;
@@ -48,7 +50,7 @@ public class CooldownHandler {
 	public boolean onCooldown() {
 		return active;
 	}
-	public void start(LivingEntity entity) {
+	public void start(LivingEntity entity, Integer slot) {
 		// If we want to try to allow non-human entities to use items, maybe make two types of PatTimedRunnable cooldowns?
 		// One for HumanEntity, another for other entities <--- No need to update item name, only the use of the item
 		if(entity instanceof HumanEntity) {
@@ -56,23 +58,25 @@ public class CooldownHandler {
 				Messenger.send(entity, "&cCooldowns are currently disabled whilst in Creative Mode due to Spigot Bugs.");
 				return;
 			}
-			new Cooldown((HumanEntity) entity, brItem);
+			new Cooldown((HumanEntity) entity, brItem, slot);
 		}
 	}
 	private class Cooldown extends PatTimedRunnable implements Listener {
 		HumanEntity owner;
 		ItemStack invItem;
 		BrItem brItem;
+		String completeTime;
 		
 		String hiddenTag;
 		
 		State state;
 		
-		public Cooldown(HumanEntity owner, BrItem brItem) {
+		public Cooldown(HumanEntity owner, BrItem brItem, Integer slot) {
 			super(0,1f, duration);
 			this.owner = owner;
 			this.brItem = brItem;
-			hiddenTag = "Cooldown ["+this.getID()+"]";
+			this.completeTime = completeTime();
+			this.hiddenTag = "Cooldown ["+this.getID()+"]";
 			
 			active = true;
 			
@@ -84,9 +88,10 @@ public class CooldownHandler {
 			
 			// Registers the listener (this)
 			Brewery.getInstance().getServer().getPluginManager().registerEvents(this, Brewery.getInstance());
-			state = new InventoryState(this, owner.getInventory(), null);
+			
+			state = new InventoryState(this, owner.getInventory(), slot);
 		}
-		
+
 		@EventHandler
 		public void onItemDrop(PlayerDropItemEvent e) {
 			if(!e.getPlayer().equals(owner))
@@ -118,11 +123,11 @@ public class CooldownHandler {
 
 		@Override
 		public void complete() {
+			active = false;
 			try {
 				HandlerList.unregisterAll(this);
 				Messenger.debug(owner, "&aItem Cooldown complete! Ending current state...");
 				state.complete();
-				active = false;
 			} catch (Exception e) {
 				state.finish();
 				Messenger.send(Msg.WARNING, hiddenTag+" for item "+brItem.getName()+" has failed its completion: ");
@@ -336,8 +341,6 @@ public class CooldownHandler {
 	private class InventoryState extends State {
 		Inventory inventory;
 		
-//		boolean editingItem = false;
-		
 		// Used within task to reduce lag.
 		// Achieves this by removing the need to search for the item each tick.
 		// Instead, searches for the item only if it cant find the correct ItemStack in slot.
@@ -347,6 +350,7 @@ public class CooldownHandler {
 			super(cooldown);
 			this.inventory = inventory;
 			this.slot = slot;
+			addData(cooldown.owner, slot);
 		}
 		/**
 		 * Event for CooldownItem Itemstack being clicked within an inventory
@@ -411,13 +415,27 @@ public class CooldownHandler {
 					e.setCancelled(true);
 					return;
 				}
+				HumanEntity before;
+				HumanEntity after;
+				if(inventory.getType() == InventoryType.PLAYER || inventory.getType() == InventoryType.CREATIVE) {
+					before = cooldown.owner;
+					after = null;
+				} else {
+					before = null;
+					after = cooldown.owner;
+				}
+				delData(before);
 				inventory = e.getDestination();
+				Brewery.getInstance().getServer().getScheduler().runTask(Brewery.getInstance(), new Runnable() {
+					public void run() {
+						addData(after, InventoriesUtil.findSlotWithTag(inventory, cooldown.hiddenTag));
+					}
+				});
 			}
 		}
 		
 		@Override
 		public void task() {
-//			editingItem = true;
 			// slot will only ever be null on the first task().
 			ItemStack itemInSlot = (slot == null ? null : inventory.getItem(slot));
 			
@@ -434,15 +452,12 @@ public class CooldownHandler {
 			// If in an inventory thats not players, make it so it only updates if the inventory (eg. chest) has a VIEWER. Reduces lag.
 			//***************************
 			cooldown.invItem = ItemEncoder.addTag(ItemsUtil.setItemNameLore(itemInSlot, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), cooldown.hiddenTag);
-//			editingItem = false;
-//			cooldown.owner.getInventory().setItem(slot, ItemEncoder.addTag(ItemsUtil.setItemNameLore(cooldown.invItem, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), cooldown.hiddenTag));
 		}
 		@Override
 		public void complete() {
 			inventory.setItem(slot, cooldown.brItem.getItem());
 			finish();
 		}
-		
 	}
 	
 	private abstract class State implements Listener {
@@ -456,16 +471,26 @@ public class CooldownHandler {
 		public abstract void complete();
 		
 		public void task() {}
-		public State changeState(State newState) {
+		protected State changeState(State newState) {
 			Messenger.debug(cooldown.owner, "&bChanging CD State to &7"+newState.getClass().getSimpleName()+"&b...");
 			HandlerList.unregisterAll(this);
 			cooldown.state = newState;
 			return newState;
 		}
-		
-		public void finish() {
+
+		protected void addData(HumanEntity entity, int slot) {
+			if(entity == null || entity instanceof Player) {
+				PlayerDataHandler.addData((Player) entity, cooldown.completeTime, "item_cooldowns", brItem.getName()+"["+cooldown.getID()+"]", "timestamp");
+				PlayerDataHandler.addData((Player) entity, slot, "item_cooldowns", brItem.getName()+"["+cooldown.getID()+"]", "slot");
+			}
+		}
+		protected void  delData(HumanEntity entity) {
+			if(entity == null || entity instanceof Player) {
+				PlayerDataHandler.removeData((Player) entity, "item_cooldowns", brItem.getName()+"["+cooldown.getID()+"]");
+			}
+		}
+		protected void finish() {
 			HandlerList.unregisterAll(this);
-//			((Player) cooldown.owner).updateInventory();
 			Messenger.debug(cooldown.owner, "&2Ended state &7"+this.getClass().getSimpleName()+"&2!");
 		}
 	}
@@ -476,6 +501,7 @@ public class CooldownHandler {
 	 */
 	private boolean validInventory(Inventory inventory) {
 		if(inventory.getType() == InventoryType.PLAYER
+		|| inventory.getType() == InventoryType.CREATIVE
 		|| inventory.getType() == InventoryType.CHEST
 		|| inventory.getType() == InventoryType.HOPPER)
 			return true;
@@ -503,5 +529,8 @@ public class CooldownHandler {
 		for(int i=0 ; i < remainder ; i++)
 			bar = bar+"█";
 		return bar;
+	}
+	private String completeTime() {
+		return YAMLData.simpleDateFormat().format(new Date(System.currentTimeMillis() + ((long)(duration * 1000))));
 	}
 }

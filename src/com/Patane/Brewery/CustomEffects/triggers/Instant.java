@@ -5,7 +5,7 @@ import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.ingame.Focusable.Focus;
 
 @Namer(name="INSTANT")

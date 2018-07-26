@@ -16,7 +16,7 @@ import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.modifiers.Polymorph;
 import com.Patane.Brewery.CustomEffects.modifiers.Smite;
 import com.Patane.handlers.PatHandler;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
