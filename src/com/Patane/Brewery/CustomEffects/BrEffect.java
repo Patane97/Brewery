@@ -12,7 +12,6 @@ import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.Brewery.Handlers.FormationHandler;
-import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.YAML.Namer;
@@ -99,7 +98,7 @@ public class BrEffect extends PatCollectable{
 	
 	// Filter
 	public boolean hasFilter() {
-		return (filter == null ? false : true);
+		return !filter.noFilters();
 	}
 	public Filter getFilter() {
 		return filter;
@@ -132,6 +131,40 @@ public class BrEffect extends PatCollectable{
 		return potionEffects.toArray(new PotionEffect[potionEffects.size()]);
 	}
 	
+	// Tags
+	public boolean hasTag() {
+		return (tag == null ? false : true);
+	}
+	public BrTag getTag() {
+		return tag;
+	}
+	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
+		if(tag != null)
+			tag.apply(run, entities);
+	}
+	public void clearTag(PatRunnable run) {
+		if(tag != null)
+			tag.clear(run);
+	}
+	// Completed
+	public boolean isComplete() {
+		return incomplete.isEmpty();
+	}
+	// Get incompleted essential values
+	public List<String> getIncomplete(){
+		return incomplete;
+	}
+
+	// Getters for Defaulted values.
+	
+	// Ignore_User
+	public boolean ignoreUser() {
+		return ignore_user;
+	}
+	// Stacks
+	public boolean stack() {
+		return stack;
+	}
 	/**
 	 * Executes the effect on an impact location using the effects radius.
 	 * @param executor LivingEntity who is executing the effect.
@@ -164,37 +197,6 @@ public class BrEffect extends PatCollectable{
 			e.printStackTrace();
 			return false;
 		}
-	}
-	// Tags
-	public BrTag getTag() {
-		return tag;
-	}
-	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
-		if(tag != null)
-			tag.apply(run, entities);
-	}
-	public void clearTag(PatRunnable run) {
-		if(tag != null)
-			tag.clear(run);
-	}
-	// Completed
-	public boolean isComplete() {
-		return incomplete.isEmpty();
-	}
-	// Get incompleted essential values
-	public List<String> getIncomplete(){
-		return incomplete;
-	}
-
-	// Getters for Defaulted values.
-	
-	// Ignore_User
-	public boolean ignoreUser() {
-		return ignore_user;
-	}
-	// Ignore_User
-	public boolean stack() {
-		return stack;
 	}
 /*
  *  PARTICLE EFFECTS
@@ -273,7 +275,7 @@ public class BrEffect extends PatCollectable{
 	@Namer(name = "Tag")
 	public static class BrTag extends MapParsable{
 		final public String name;
-
+		
 		public BrTag(Map<String, String> fields){
 			this.name = getString(fields, "name");
 		}
@@ -283,11 +285,11 @@ public class BrEffect extends PatCollectable{
 		
 
 		public void apply(PatRunnable task, List<LivingEntity> entities){
-			BrMetaDataHandler.addClean(task, entities, MetaDataHandler.id("tag", name), null);
+			BrMetaDataHandler.addClean(task, entities, "TAG", name);
 		}
 		
 		public void clear(PatRunnable task){
-			BrMetaDataHandler.remove(task, MetaDataHandler.id("tag", name));
+			BrMetaDataHandler.remove(task, "TAG");
 		}
 	}
 }

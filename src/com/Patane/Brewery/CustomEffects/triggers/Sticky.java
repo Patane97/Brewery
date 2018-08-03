@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
-import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
@@ -59,7 +58,7 @@ public class Sticky extends Trigger{
 			this.target = null;
 			
 			// Adds effect metadata to entities hit.
-			BrMetaDataHandler.addOrReset(this, entities, MetaDataHandler.id(effect.getName(), "sticky"));
+			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
 			effect.applyTag(this, entities);
 		}
 		public StickyTask(BrEffect effect, LivingEntity executor, LivingEntity target, List<LivingEntity> entities){
@@ -71,7 +70,7 @@ public class Sticky extends Trigger{
 			this.entities = entities;
 			
 			// Adds effect metadata to entities hit.
-			BrMetaDataHandler.addOrReset(this, entities, MetaDataHandler.id(effect.getName(), "sticky"));
+			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
 			effect.applyTag(this, entities);
 		}
 		@Override
@@ -84,7 +83,7 @@ public class Sticky extends Trigger{
 		@Override
 		public void complete() {
 			// Removes any effect metadatas leftover from the final task() tick.
-			BrMetaDataHandler.remove(this, MetaDataHandler.id(effect.getName(), "sticky"));
+			BrMetaDataHandler.remove(this, "STICKY, "+effect.getName());
 			effect.clearTag(this);
 		}
 	}

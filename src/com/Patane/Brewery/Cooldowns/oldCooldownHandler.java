@@ -1,4 +1,4 @@
-package com.Patane.Brewery.CustomItems;
+package com.Patane.Brewery.Cooldowns;
 
 import java.util.Date;
 
@@ -24,6 +24,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.handlers.PlayerDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.YAML.types.YAMLData;
@@ -34,7 +35,9 @@ import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.ItemsUtil;
 import com.Patane.util.main.PataneUtil;
 
-public class CooldownHandler {
+
+@Deprecated
+public class oldCooldownHandler {
 	final private BrItem brItem;
 	final private float duration;
 	final private ItemStack item;
@@ -42,26 +45,36 @@ public class CooldownHandler {
 	private boolean active;
 	
 	
-	public CooldownHandler(BrItem brItem, float duration, ItemStack item) {
+	public oldCooldownHandler(BrItem brItem, float duration, ItemStack item) {
 		this.brItem = brItem;
 		this.duration = duration;
 		this.item = item;
 	}
-	public boolean onCooldown() {
+	public boolean onoldCooldown() {
 		return active;
 	}
+	/**
+	 * @Deprecated
+	 * Function outdated. Use {@link #start()} instead.
+	 * @param entity
+	 * @param slot
+	 */
+	@Deprecated
 	public void start(LivingEntity entity, Integer slot) {
 		// If we want to try to allow non-human entities to use items, maybe make two types of PatTimedRunnable cooldowns?
 		// One for HumanEntity, another for other entities <--- No need to update item name, only the use of the item
 		if(entity instanceof HumanEntity) {
 			if(((HumanEntity) entity).getGameMode() == GameMode.CREATIVE) {
-				Messenger.send(entity, "&cCooldowns are currently disabled whilst in Creative Mode due to Spigot Bugs.");
+				Messenger.send(entity, "&coldCooldowns are currently disabled whilst in Creative Mode due to Spigot Bugs.");
 				return;
 			}
-			new Cooldown((HumanEntity) entity, brItem, slot);
+			new oldCooldown((HumanEntity) entity, brItem, slot);
 		}
 	}
-	private class Cooldown extends PatTimedRunnable implements Listener {
+	public void start() {
+		
+	}
+	private class oldCooldown extends PatTimedRunnable implements Listener {
 		HumanEntity owner;
 		ItemStack invItem;
 		BrItem brItem;
@@ -71,20 +84,20 @@ public class CooldownHandler {
 		
 		State state;
 		
-		public Cooldown(HumanEntity owner, BrItem brItem, Integer slot) {
+		public oldCooldown(HumanEntity owner, BrItem brItem, Integer slot) {
 			super(0,1f, duration);
 			this.owner = owner;
 			this.brItem = brItem;
 			this.completeTime = completeTime();
-			this.hiddenTag = "Cooldown ["+this.getID()+"]";
+			this.hiddenTag = "oldCooldown ["+this.getID()+"]";
 			
 			active = true;
 			
 			// Creates the invItem with the 'bar' as its name (should be full at this point) and the appropriate hiddenTag.
-			invItem = ItemEncoder.addTag(ItemsUtil.createItem(item.getType(), 1, (short) 0, constructBar(ticksLeft(), duration(), 20)), hiddenTag);
+			invItem = ItemEncoder.addTag(ItemsUtil.createItem(item.getType(), 1, (short) 0, constructBar(ticksLeft(), duration(), 20)), "CDTAG", hiddenTag);
 			
 			// Finds the slot which contains the brItem (this wont always be the players hand. etc-passive items)
-			owner.getInventory().setItem(InventoriesUtil.findSlot(owner.getInventory(), brItem.getItem().getItemMeta().getDisplayName()), invItem);
+			owner.getInventory().setItem(InventoriesUtil.findSlot(owner.getInventory(), brItem.getItemStack().getItemMeta().getDisplayName()), invItem);
 			
 			// Registers the listener (this)
 			Brewery.getInstance().getServer().getPluginManager().registerEvents(this, Brewery.getInstance());
@@ -126,7 +139,7 @@ public class CooldownHandler {
 			active = false;
 			try {
 				HandlerList.unregisterAll(this);
-				Messenger.debug(owner, "&aItem Cooldown complete! Ending current state...");
+				Messenger.debug(owner, "&aItem oldCooldown complete! Ending current state...");
 				state.complete();
 			} catch (Exception e) {
 				state.finish();
@@ -144,13 +157,13 @@ public class CooldownHandler {
 	private class DroppedState extends State {
 		Item itemEntity;
 		
-		DroppedState(Cooldown cooldown, Item itemEntity){
+		DroppedState(oldCooldown cooldown, Item itemEntity){
 			super(cooldown);
 			this.itemEntity = itemEntity;
 		}
 
 		/**
-		 * Event for CooldownItem entity being picked up by an entity
+		 * Event for oldCooldownItem entity being picked up by an entity
 		 * @param e
 		 */
 		@EventHandler
@@ -161,9 +174,9 @@ public class CooldownHandler {
 				if(e.getEntity() instanceof HumanEntity) {
 					// If the entity is not the original owner, change owners.
 					if(cooldown.owner != (HumanEntity) e.getEntity()) {
-						Messenger.debug(cooldown.owner, "&cYou are no longer the owner of a Cooldown Item");
+						Messenger.debug(cooldown.owner, "&cYou are no longer the owner of a oldCooldown Item");
 						cooldown.owner = (HumanEntity) e.getEntity();
-						Messenger.debug(cooldown.owner, "&aYou are now the owner of a Cooldown Item");
+						Messenger.debug(cooldown.owner, "&aYou are now the owner of a oldCooldown Item");
 					}
 					changeState(new InventoryState(cooldown, ((HumanEntity) e.getEntity()).getInventory(), null));
 				}
@@ -173,7 +186,7 @@ public class CooldownHandler {
 		}
 		
 		/**
-		 * Event for CooldownItem entity being dropped into a Hopper
+		 * Event for oldCooldownItem entity being dropped into a Hopper
 		 * @param e
 		 */
 		@EventHandler
@@ -191,7 +204,7 @@ public class CooldownHandler {
 		
 		@Override
 		public void complete() {
-			itemEntity.setItemStack(cooldown.brItem.getItem());
+			itemEntity.setItemStack(cooldown.brItem.getItemStack());
 			finish();
 		}
 		
@@ -205,13 +218,13 @@ public class CooldownHandler {
 	private class CursorState extends State {
 		Boolean creativeComplete;
 		
-		CursorState(Cooldown cooldown, boolean creativeView){
+		CursorState(oldCooldown cooldown, boolean creativeView){
 			super(cooldown);
 			this.creativeComplete = (creativeView == true ? false : null);
 		}
 
 		/**
-		 * Event for CooldownItem ItemStack being dragged from the cursor to an inventory
+		 * Event for oldCooldownItem ItemStack being dragged from the cursor to an inventory
 		 * @param e
 		 */
 		@EventHandler
@@ -233,7 +246,7 @@ public class CooldownHandler {
 				changeState(new InventoryState(cooldown, e.getInventory(), null));
 		}
 		/**
-		 * Event for CooldownItem ItemStack being placed into an inventory
+		 * Event for oldCooldownItem ItemStack being placed into an inventory
 		 * @param e
 		 */
 		@EventHandler
@@ -296,7 +309,7 @@ public class CooldownHandler {
 			
 			// *************************************************************************
 			ItemStack cursor = e.getCursor();
-			// Cooldown ItemStack is being placed in an inventory. 
+			// oldCooldown ItemStack is being placed in an inventory. 
 			// Change state to that inventory.
 			if(ItemEncoder.hasTag(cursor, cooldown.hiddenTag))
 				changeState(new InventoryState(cooldown, e.getClickedInventory(), null));
@@ -320,7 +333,7 @@ public class CooldownHandler {
 			// When an item is set using below function, it doesnt change item on cursor  after 
 			// item has been removed from cursor (such as placing it in an inventory).
 			
-			cooldown.owner.setItemOnCursor(cooldown.brItem.getItem());
+			cooldown.owner.setItemOnCursor(cooldown.brItem.getItemStack());
 			PataneUtil.getInstance().getServer().getScheduler().runTask(PataneUtil.getInstance(), new Runnable() {
 				public void run(){
 					if(creativeComplete != null)
@@ -346,14 +359,14 @@ public class CooldownHandler {
 		// Instead, searches for the item only if it cant find the correct ItemStack in slot.
 		Integer slot;
 		
-		InventoryState(Cooldown cooldown, Inventory inventory , Integer slot){
+		InventoryState(oldCooldown cooldown, Inventory inventory , Integer slot){
 			super(cooldown);
 			this.inventory = inventory;
 			this.slot = slot;
 			addData(cooldown.owner, slot);
 		}
 		/**
-		 * Event for CooldownItem Itemstack being clicked within an inventory
+		 * Event for oldCooldownItem Itemstack being clicked within an inventory
 		 * @param e
 		 */
 		@EventHandler
@@ -403,7 +416,7 @@ public class CooldownHandler {
 			}
 		}
 		/**
-		 * Event for CooldownItem ItemStack being moved to another inventory
+		 * Event for oldCooldownItem ItemStack being moved to another inventory
 		 * @param e
 		 */
 		@EventHandler
@@ -444,26 +457,26 @@ public class CooldownHandler {
 			|| !ItemsUtil.hasDisplayName(itemInSlot) 
 			|| !ItemsUtil.getDisplayName(itemInSlot).equals(ItemsUtil.getDisplayName(cooldown.invItem))) {
 				slot = InventoriesUtil.findSlotWithTag(inventory, cooldown.hiddenTag);
-				Messenger.debug(cooldown.owner, "&bCooldown slot updated to &7"+slot+"&b...");
+				Messenger.debug(cooldown.owner, "&boldCooldown slot updated to &7"+slot+"&b...");
 				itemInSlot = inventory.getItem(slot);
 			}
 			// Creates a new item with the correct bar size and hiddenTag and sets 'slot' to that item.
 			//***************************
 			// If in an inventory thats not players, make it so it only updates if the inventory (eg. chest) has a VIEWER. Reduces lag.
 			//***************************
-			cooldown.invItem = ItemEncoder.addTag(ItemsUtil.setItemNameLore(itemInSlot, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), cooldown.hiddenTag);
+			cooldown.invItem = ItemEncoder.addTag(ItemsUtil.setItemNameLore(itemInSlot, constructBar(cooldown.ticksLeft(), cooldown.duration(), 20)), "CDTAG", cooldown.hiddenTag);
 		}
 		@Override
 		public void complete() {
-			inventory.setItem(slot, cooldown.brItem.getItem());
+			inventory.setItem(slot, cooldown.brItem.getItemStack());
 			finish();
 		}
 	}
 	
 	private abstract class State implements Listener {
-		protected Cooldown cooldown;
+		protected oldCooldown cooldown;
 		
-		State(Cooldown cooldown) {
+		State(oldCooldown cooldown) {
 			this.cooldown = cooldown;
 			Brewery.getInstance().getServer().getPluginManager().registerEvents(this, Brewery.getInstance());
 		}
@@ -495,7 +508,7 @@ public class CooldownHandler {
 		}
 	}
 	/**
-	 * Checks if the given inventory is allowed to hold a Cooldown Item.
+	 * Checks if the given inventory is allowed to hold a oldCooldown Item.
 	 * @param inventory
 	 * @return
 	 */
@@ -509,7 +522,7 @@ public class CooldownHandler {
 	}
 	
 	/**
-	 * Constructs the ItemStack displayName for the Cooldown Item.
+	 * Constructs the ItemStack displayName for the oldCooldown Item.
 	 * @param current
 	 * @param max
 	 * @param width

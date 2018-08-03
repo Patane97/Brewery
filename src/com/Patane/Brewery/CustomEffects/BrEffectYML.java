@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -24,8 +23,8 @@ import com.Patane.util.general.StringsUtil;
 
 public class BrEffectYML extends BreweryYAML{
 
-	public BrEffectYML(Plugin plugin) {
-		super(plugin, "effects.yml", "effects", "YML File for each effect\nExample:");
+	public BrEffectYML() {
+		super("effects.yml", "effects", "YML File for each effect\nExample:");
 	}
 
 	@Override
@@ -205,7 +204,6 @@ public class BrEffectYML extends BreweryYAML{
 			
 			// BrTag is null if there are no tags in the base or default headers.
 			BrTag tag = null;
-
 			// If either the base or the default headers have a tag, then its added (base taking priority).
 			if(currentHeader != null){
 				// This is within a try/catch because it is optional.

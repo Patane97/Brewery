@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.Patane.Brewery.Brewery;
@@ -22,8 +21,8 @@ import com.Patane.util.ingame.ItemsUtil;
 
 public class BrItemYML extends BreweryYAML{
 
-	public BrItemYML(Plugin plugin) {
-		super(plugin, "items.yml", "items", "YML File for each item\nExample:");
+	public BrItemYML() {
+		super("items.yml", "items", "YML File for each item\nExample:");
 	}
 	@Override
 	public void save() {}
@@ -123,7 +122,7 @@ public class BrItemYML extends BreweryYAML{
 				}
 			}
 			// Creates the item with all given values.
-			BrItem item = new BrItem(itemName, type, itemStack, effects, 8f);
+			BrItem item = new BrItem(itemName, type, itemStack, effects, 10f);
 
 			// If item isnt already in the collection, it adds it.
 			if(!Brewery.getItemCollection().contains(item.getID()))

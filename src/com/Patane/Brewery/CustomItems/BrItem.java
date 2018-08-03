@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,7 +16,6 @@ import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.ItemEncoder;
-import com.Patane.util.ingame.ItemsUtil;
 
 
 public class BrItem extends PatCollectable{
@@ -38,10 +36,7 @@ public class BrItem extends PatCollectable{
 	final protected ItemStack item;
 	final protected CustomType type;
 	final protected List<BrEffect> effects;
-	// Contains list of UUID's currently executing this items effect. (Used to avoid DamageEntityEvent loops)
-	protected List <UUID> executing;
-	
-	final protected CooldownHandler cooldown;
+	final protected float cooldownDuration; // Measured in seconds
 	
 	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, float cooldown){
 		super(name);
@@ -49,33 +44,30 @@ public class BrItem extends PatCollectable{
 			throw new IllegalArgumentException(getID()+" already exists!");
 		}
 		this.type = Check.notNull(type, "BrItem '"+name+"' has no set type. Please check YML files.");
-		this.item = Check.notNull(ItemEncoder.addTag(item, getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
+		this.item = Check.notNull(ItemEncoder.addTag(item, "NAME", getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
-		this.cooldown = new CooldownHandler(this, cooldown, ItemsUtil.createItem(Material.GHAST_TEAR, 1, (short) 0, null));
+		this.cooldownDuration = cooldown;
 	}
-	public ItemStack getItem(){
+	/**
+	 * Generates an ItemStack appropriate to give to a player for use.
+	 */
+	public ItemStack generateItem() {
+		return ItemEncoder.addTag(item.clone(), "UUID", UUID.randomUUID().toString());
+	}
+	/**
+	 * <b>Do not use this method to give this BrItem to a player. Use {@link #generateItem()} instead!</b>
+	 */
+	public ItemStack getItemStack() {
 		return item;
 	}
-	public CustomType getType(){
+	public CustomType getType() {
 		return type;
 	}
-	public List<BrEffect> getEffects (){
+	public List<BrEffect> getEffects () {
 		return effects;
 	}
-	public CooldownHandler getCD() {
-		return cooldown;
-	}
-	/*
-	 * Not sure if using the 'executing' methods. Remove later (14/05/2018)
-	 */
-	public boolean addExecuting(UUID uuid){
-		return executing.add(uuid);
-	}
-	public boolean delExecuting(UUID uuid){
-		return executing.remove(uuid);
-	}
-	public boolean isExecuting(UUID uuid){
-		return executing.contains(uuid);
+	public float getCooldownDuration() {
+		return cooldownDuration;
 	}
 	/**
 	 * Executes the item's effects in a specific location (Generally the location of impact).

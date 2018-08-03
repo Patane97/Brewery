@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
-import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
@@ -69,14 +68,14 @@ public class Lingering extends Trigger{
 
 			// Executes tasks on hit LivingEntities and adds the appropriate metadata to each.
 			List<LivingEntity> hit = (impact == null ? executeMany(effect, executor, target) : executeMany(effect, impact, executor));
-			BrMetaDataHandler.addClean(this, hit, MetaDataHandler.id(effect.getName(), "lingering"), null);
+			BrMetaDataHandler.addClean(this, hit, effect.getName(), "lingering");
 			effect.applyTag(this, hit);
 		}
 
 		@Override
 		public void complete() {
 			// Removes any effect metadatas leftover from the final task() tick.
-			BrMetaDataHandler.remove(this, MetaDataHandler.id(effect.getName(), "lingering"));
+			BrMetaDataHandler.remove(this, effect.getName());
 			effect.clearTag(this);
 		}
 	}

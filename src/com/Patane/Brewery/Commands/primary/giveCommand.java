@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.all;
+package com.Patane.Brewery.Commands.primary;
 
 import java.util.Arrays;
 
@@ -15,7 +15,7 @@ import com.Patane.util.general.StringsUtil;
 @CommandInfo(
 	name = "give",
 	description = "Gives a specified player a specified Brewery item.",
-	usage = "/br give [player] [item name]",
+	usage = "/br give <player> <item name>",
 	permission = "brewery.give"
 )
 public class giveCommand implements PatCommand {
@@ -23,7 +23,7 @@ public class giveCommand implements PatCommand {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		// Checks if there is more than 1 argument. If not, player name is missing.
-		if(args.length < 1) {
+		if(args.length < 1) { 
 			Messenger.send(sender, "&cPlease specify a player name.");
 			return false;
 		}
@@ -31,7 +31,6 @@ public class giveCommand implements PatCommand {
 		Player target = null;
 		// Loops through each online player and checks if the first arg is their name.
 		for(Player player : Brewery.getInstance().getServer().getOnlinePlayers()) {
-			Messenger.send(sender, args[0]+"|"+player.getPlayerListName());
 			if(args[0].equalsIgnoreCase(player.getPlayerListName())) {
 				target = player;
 				break;
@@ -60,23 +59,9 @@ public class giveCommand implements PatCommand {
 			return false;
 		}
 		
-		target.getInventory().addItem(item.getItem());
+		target.getInventory().addItem(item.generateItem());
 		Messenger.send(sender, "&aGiving &7"+target.getDisplayName()+"&a a &7"+item.getName()+"&a.");
 			
 		return true;
-	}
-	public String grabArg(String[] args, int at) {
-		try{ 
-			return args[at];
-		} catch (Exception e) {
-			return "";
-		}
-	}
-	public String[] grabArgs(String[] args, int from, int to) {
-		try{ 
-			return Arrays.copyOfRange(args, from, to);
-		} catch (Exception e) {
-			return new String[0];
-		}
 	}
 }

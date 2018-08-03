@@ -24,6 +24,15 @@ public class Filter {
 		this.ignore = ignore;
 	}
 	
+	public FilterGroup getTarget() {
+		return target;
+	}
+	public FilterGroup getIgnore() {
+		return ignore;
+	}
+	public boolean noFilters() {
+		return (target.noFilter() && ignore.noFilter() ? true : false);
+	}
 	/**
 	 * Extracts each entity that fits the filter.
 	 * If given, the entity must not be on the ignore List.
@@ -90,6 +99,9 @@ public class Filter {
 		public List<String> getTags(){
 			return tags;
 		}
+		public boolean noFilter() {
+			return noFilter;
+		}
 		public boolean match(LivingEntity entity){
 			// If there is no filter, then the entity automatically passes.
 			if(noFilter){
@@ -112,13 +124,15 @@ public class Filter {
 				// Loop through player strings (can be name OR UUID)
 				for(String player : players){
 					// Checks if the name OR UUID matches. If so, they pass.
-					if(entity.getName().equals(player) || entity.getUniqueId().equals(player))
+					if(entity.getName().equals(player) || entity.getUniqueId().toString().equals(player))
 						return true;
 				}
-			}
-			// Implement once permissions are implemented.
-			for(@SuppressWarnings("unused") String permission : permissions){
-				
+				// Loop through permission strings
+				for(String permission : permissions){
+					// Checks if the player entity has given permission.
+					if(entity.hasPermission(permission))
+						return true;
+				}
 			}
 			return false;
 		}

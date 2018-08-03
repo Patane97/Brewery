@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -17,7 +16,7 @@ import com.Patane.util.general.StringsUtil;
 
 public abstract class BreweryYAML extends YAMLEditable{
 
-	public BreweryYAML(Plugin plugin, String config, String root, String header) {
+	public BreweryYAML(String config, String root, String header) {
 		super(null, config, root, header);
 	}
 	/**
