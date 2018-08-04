@@ -35,8 +35,6 @@ public class Brewery extends JavaPlugin{
 	private static BrItemCollection itemCollection;
 	private static BrEffectCollection effectCollection;
 	
-	private static BrCommandHandler commandHandler;
-	
 	private ProtocolManager protocolManager;
 	
 	public void onEnable() {
@@ -45,8 +43,8 @@ public class Brewery extends JavaPlugin{
 		itemCollection = new BrItemCollection();
 		effectCollection = new BrEffectCollection();
 		getServer().getPluginManager().registerEvents(new GlobalListener(), this);
-        commandHandler = new BrCommandHandler();
-		this.getCommand("br").setExecutor(commandHandler);
+		// Call 'BrCommandHandler.getInstance()' to get CommandHandler instance.
+		this.getCommand("br").setExecutor(new BrCommandHandler());
 		
 		TriggerHandler.registerAll();
 		ModifierHandler.registerAll();
@@ -54,21 +52,11 @@ public class Brewery extends JavaPlugin{
 		
 		protocolManager = ProtocolLibrary.getProtocolManager();
 		protocolManager.addPacketListener(new GenericPacketAdapter(ListenerPriority.NORMAL, PacketType.Play.Client.SET_CREATIVE_SLOT));
+		
 		loadFiles();
-		/////////////////////////
-//		List<EffectContainer> effects = new ArrayList<EffectContainer>();
-//		effects.add(new EffectContainer(new BrEffect("Life Drainer", new Modifier.Damage(DamageCause.FIRE, 5), 3), 
-//				new Instant(), 
-//				EntityType.SKELETON, EntityType.ZOMBIE));
-//		effects.add(new EffectContainer(new BrEffect("Mark of Light", new Modifier.Heal(2), 3, 
-//						new PotionEffect(PotionTrigger.GLOWING, 20, 1)), 
-//				new Lingering(5f, 0.5f), 
-//				EntityType.PLAYER));
-//		new BrItem("Vampiric Scepter", CustomType.THROWABLE, ItemsUtil.createItem(Material.SPLASH_POTION, 1, (short) 0, "&6Vampiric Scepter", "&7Damages Undead", "&7heals players"), effects);
-		/////////////////////////
-
-//		BrItem.YML().save();
-//		BrEffect.YML().save();
+		
+		CooldownHandler.onLoadChecks();
+		
 		// Loading message
 		Messenger.info("Brewery version " + this.getDescription().getVersion() + " successfully loaded!");
 	}
@@ -97,8 +85,5 @@ public class Brewery extends JavaPlugin{
 	}
 	public static BrEffectCollection getEffectCollection() {
 		return effectCollection;
-	}
-	public static BrCommandHandler getCommandHandler() {
-		return commandHandler;
 	}
 }

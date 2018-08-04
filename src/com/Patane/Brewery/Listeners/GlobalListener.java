@@ -1,7 +1,6 @@
 package com.Patane.Brewery.Listeners;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.GameMode;
@@ -32,7 +31,6 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Cooldowns.CooldownHandler;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
@@ -53,7 +51,7 @@ public class GlobalListener implements Listener{
 //	@EventHandler
 //	public void potionSplash (PotionSplashEvent e){
 //		// If it is not a BR item, return.
-//		BrItem brItem = getBrItem(e.getPotion().getItem());
+//		BrItem brItem = BrItem.get(e.getPotion().getItem());
 //		if(brItem == null || brItem.getType() != CustomType.THROWABLE)
 //			return;
 //		e.setCancelled(true);
@@ -83,7 +81,7 @@ public class GlobalListener implements Listener{
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
 		
@@ -92,7 +90,7 @@ public class GlobalListener implements Listener{
 		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
 
 		// Starts the cooldown (if any)
-		if(!CooldownHandler.start(player, item, brItem))
+		if(brItem.hasCooldown() && !CooldownHandler.start(player, item, brItem))
 			return;
 		
 		hitGround(brItem, location, player);
@@ -119,14 +117,14 @@ public class GlobalListener implements Listener{
 		}
 		LivingEntity damager = (LivingEntity) e.getDamager();
 		ItemStack item = damager.getEquipment().getItemInMainHand();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		
 		// Only 'HITTABLE' items will trigger in this way.
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
 		
 		// Starts the cooldown (if any)
-		if(!CooldownHandler.start(damager, item, brItem))
+		if(brItem.hasCooldown() && !CooldownHandler.start(damager, item, brItem))
 			return;
 		
 		if(!(e.getEntity() instanceof LivingEntity)) {
@@ -152,14 +150,14 @@ public class GlobalListener implements Listener{
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		if(brItem == null)
 			return;
 		// Cancels if its something like SplashPotion
 		e.setCancelled(true);
 		
 		// Starts the cooldown (if any)
-		if(!CooldownHandler.start(player, item, brItem))
+		if(brItem.hasCooldown() && !CooldownHandler.start(player, item, brItem))
 			return;
 		
 		if(brItem.getType() == CustomType.THROWABLE) {
@@ -181,7 +179,7 @@ public class GlobalListener implements Listener{
 		if(e.getPlayer().getGameMode() != GameMode.CREATIVE)
 			return;
 		ItemStack item = e.getItemDrop().getItemStack();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -205,7 +203,7 @@ public class GlobalListener implements Listener{
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
 		ItemStack item = e.getOldCursor();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -247,7 +245,7 @@ public class GlobalListener implements Listener{
 		if(!(e.getWhoClicked() instanceof Player) || e.getClickedInventory() == null || ((Player) e.getWhoClicked()).getGameMode() != GameMode.CREATIVE)
 			return;
 		ItemStack item = e.getCursor();
-		BrItem brItem = getBrItem(item);
+		BrItem brItem = BrItem.get(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -281,80 +279,69 @@ public class GlobalListener implements Listener{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////// COOLDOWN CHECKERS /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+	 * TODO: MaxStacks checks for each cooldown checker (when maxstacks is implemented)
+	 */
+	
+	// 4/8/18: Testing if this can be removed/replaced with method below it.
+//	@EventHandler
+//	public void onItemSwitch(PlayerItemHeldEvent e) {
+//		if(CooldownHandler.noCooldowns())
+//			return;
+//		Player player = e.getPlayer();
+//		ItemStack item = player.getInventory().getItem(e.getNewSlot());
+//		if(CooldownHandler.updateFromYAML(player, item, BrItem.get(item)))
+//			return;
+//		if(item == null || item.getType() == Material.AIR) {
+//			if(BrMetaDataHandler.hasValue(player, "showing_cooldown") && CooldownHandler.cooldowns().containsKey(BrMetaDataHandler.getValue(player, "showing_cooldown")))
+//				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
+//			return;
+//		}
+//		String uuidString = ItemEncoder.extractTag(item, "UUID");
+//		if(uuidString != null) {
+//			if(BrMetaDataHandler.hasValue(player, "showing_cooldown"))
+//				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
+//			for(UUID uuid : CooldownHandler.cooldowns().keySet()) {
+//				if(uuidString.equals(uuid.toString())) {
+//					CooldownHandler.cooldowns().get(uuid).addPlayer(player);
+//					return;
+//				}
+//			}
+//		}
+//	}
 	@EventHandler
 	public void onItemSwitch(PlayerItemHeldEvent e) {
-		if(CooldownHandler.noCooldowns())
-			return;
-		Player player = e.getPlayer();
-		ItemStack item = player.getInventory().getItem(e.getNewSlot());
-		if(CooldownHandler.updateFromYAML(player, item, getBrItem(item)))
-			return;
-		if(item == null || item.getType() == Material.AIR) {
-			if(BrMetaDataHandler.hasValue(player, "showing_cooldown"))
-				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
-			return;
-		}
-		String uuidString = ItemEncoder.extractTag(item, "UUID");
-		if(uuidString != null) {
-			if(BrMetaDataHandler.hasValue(player, "showing_cooldown"))
-				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
-			for(UUID uuid : CooldownHandler.cooldowns().keySet()) {
-				if(uuidString.equals(uuid.toString())) {
-					CooldownHandler.cooldowns().get(uuid).addPlayer(player);
-					return;
-				}
-			}
-		}
+		CooldownHandler.checkUpdateCooldowns(e.getPlayer());
 	}
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		Player player = e.getPlayer();
-		ItemStack item = player.getInventory().getItemInMainHand();
-		CooldownHandler.updateFromYAML(player, item, getBrItem(item));
+	public void onJoin(PlayerJoinEvent e) {
+		CooldownHandler.checkUpdateCooldowns(e.getPlayer());
 	}
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent e) {
 		if(!(e.getEntity() instanceof Player))
 			return;
-		checkUpdateCooldowns((Player) e.getEntity());
+		CooldownHandler.checkUpdateCooldowns((Player) e.getEntity());
 	}
 	@EventHandler
 	public void onItemMove(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
-		checkUpdateCooldowns((Player) e.getWhoClicked());
+		CooldownHandler.checkUpdateCooldowns((Player) e.getWhoClicked());
 	}
 	@EventHandler
 	public void onItemOffhandSwitch(PlayerSwapHandItemsEvent e) {
-		checkUpdateCooldowns(e.getPlayer());
+		CooldownHandler.checkUpdateCooldowns(e.getPlayer());
 	}
 	
-	private void checkUpdateCooldowns(Player player) {
-		if(CooldownHandler.noCooldowns())
-			return;
-		PataneUtil.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				ItemStack item = player.getInventory().getItemInMainHand();
-				String uuidString = ItemEncoder.extractTag(item, "UUID");
-				if(uuidString == null)
-					return;
-				if(CooldownHandler.updateFromYAML(player, item, getBrItem(item)))
-					return;
-				for(UUID uuid : CooldownHandler.cooldowns().keySet()) {
-					if(uuidString.equals(uuid.toString()))
-						CooldownHandler.cooldowns().get(uuid).addPlayer(player);
-				}
-			}
-		});
-	}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////// Passive ItemType Tests ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	@EventHandler
 //	public void onItemSwitch(PlayerItemHeldEvent e) {
 //		Player player = e.getPlayer();
-//		BrItem brItem = getBrItem(player.getInventory().getItem(e.getNewSlot()));
+//		BrItem brItem = BrItem.get(player.getInventory().getItem(e.getNewSlot()));
 //		int slot = e.getNewSlot();
 //		if(brItem == null || brItem.getType() != CustomType.MAIN_HAND)
 //			return;
@@ -400,6 +387,9 @@ public class GlobalListener implements Listener{
 	 * Handles throwing an item based on a LivingEntity and a BrItem.
 	 * @param entity LivingEntity that is throwing the brItem.
 	 * @param brItem BrItem that is being thrown.
+	 */
+	/*
+	 * TODO: Refine throwing mechanic to be more accurate to potions. Maybe add options for throwing intensity, direction, etc.
 	 */
 	private void throwBrItem(LivingEntity entity, BrItem brItem) {
 		Location throwingLoc = new Location(entity.getWorld(), entity.getEyeLocation().getX(), entity.getEyeLocation().getY()-0.5, entity.getEyeLocation().getZ());
@@ -459,12 +449,5 @@ public class GlobalListener implements Listener{
 				return;
 			}
 		}
-	}
-
-	private static BrItem getBrItem(ItemStack item){
-		String brItemName = ItemEncoder.extractTag(item, "NAME");
-		if(brItemName == null)
-			return null;
-		return Brewery.getItemCollection().getItem(brItemName);
 	}
 }

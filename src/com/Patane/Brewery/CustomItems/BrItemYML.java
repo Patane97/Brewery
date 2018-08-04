@@ -89,7 +89,18 @@ public class BrItemYML extends BreweryYAML{
 			Messenger.debug(Msg.INFO, " + Item["+material.name()+"]");
 			Messenger.debug(Msg.INFO, " +--[name: "+name+"]");
 			Messenger.debug(Msg.INFO, " +--[lore: "+lore+"]");
-
+			
+			/*
+			 * ==================> COOLDOWN <==================
+			 */
+			setSelect(itemName);
+			
+			Float cooldown = null;
+			try{
+				cooldown = getFloat("cooldown", getSelect());
+				if(cooldown != null) Messenger.debug(Msg.INFO, " + Cooldown["+cooldown+"]");
+			} catch (NullPointerException e){}
+			
 			/*
 			 * ==================> EFFECTS <==================
 			 */
@@ -122,7 +133,7 @@ public class BrItemYML extends BreweryYAML{
 				}
 			}
 			// Creates the item with all given values.
-			BrItem item = new BrItem(itemName, type, itemStack, effects, 10f);
+			BrItem item = new BrItem(itemName, type, itemStack, effects, cooldown);
 
 			// If item isnt already in the collection, it adds it.
 			if(!Brewery.getItemCollection().contains(item.getID()))

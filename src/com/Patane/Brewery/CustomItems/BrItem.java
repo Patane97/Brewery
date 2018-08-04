@@ -11,11 +11,13 @@ import org.bukkit.inventory.ItemStack;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.ItemEncoder;
+import com.Patane.util.ingame.ItemsUtil;
 
 
 public class BrItem extends PatCollectable{
@@ -36,9 +38,9 @@ public class BrItem extends PatCollectable{
 	final protected ItemStack item;
 	final protected CustomType type;
 	final protected List<BrEffect> effects;
-	final protected float cooldownDuration; // Measured in seconds
+	final protected Float cooldown; // Measured in seconds
 	
-	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, float cooldown){
+	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown){
 		super(name);
 		if(Brewery.getItemCollection().contains(getID())){
 			throw new IllegalArgumentException(getID()+" already exists!");
@@ -46,7 +48,7 @@ public class BrItem extends PatCollectable{
 		this.type = Check.notNull(type, "BrItem '"+name+"' has no set type. Please check YML files.");
 		this.item = Check.notNull(ItemEncoder.addTag(item, "NAME", getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
-		this.cooldownDuration = cooldown;
+		this.cooldown = cooldown;
 	}
 	/**
 	 * Generates an ItemStack appropriate to give to a player for use.
@@ -63,11 +65,19 @@ public class BrItem extends PatCollectable{
 	public CustomType getType() {
 		return type;
 	}
-	public List<BrEffect> getEffects () {
+	
+	
+	public boolean hasEffects() {
+		return !effects.isEmpty();
+	}
+	public List<BrEffect> getEffects() {
 		return effects;
 	}
-	public float getCooldownDuration() {
-		return cooldownDuration;
+	public boolean hasCooldown() {
+		return (cooldown == null ? false : true);
+	}
+	public float getCooldown() {
+		return cooldown;
 	}
 	/**
 	 * Executes the item's effects in a specific location (Generally the location of impact).
@@ -121,8 +131,40 @@ public class BrItem extends PatCollectable{
 			return false;
 		}
 	}
+	public String hoverDetails() {
+		List<String> effectNames = new ArrayList<String>();
+		for(BrEffect effect : getEffects())
+			effectNames.add(effect.getName());
+		
+		return Chat.translate("&7"+getName()
+		+"\n&2Type: &a"+getType()
+		+"\n&2Item: &a"+ItemsUtil.getDisplayName(getItemStack())
+		+(hasCooldown() ? "\n&2Cooldown: &a"+getCooldown() : "")
+		+(hasEffects() ? "\n&2Effects: &a"+StringsUtil.stringJoiner(effectNames, "&2, &a") : ""));
+	}
+	
+	public static BrItem get(ItemStack item){
+		String brItemName = ItemEncoder.extractTag(item, "NAME");
+		if(brItemName == null)
+			return null;
+		return Brewery.getItemCollection().getItem(brItemName);
+	}
+	
 	public static enum CustomType {
-		THROWABLE(), HITTABLE(), @Deprecated MAIN_HAND(), @Deprecated OFF_HAND(), CLICKABLE(), @Deprecated SHOOTABLE();
+		THROWABLE("Right click whilst holding to throw this item. Effects apply on impacted location or target."),
+		HITTABLE("Hit a block or target to apply the effects at that location."),
+		@Deprecated MAIN_HAND(""),
+		@Deprecated OFF_HAND(""),
+		CLICKABLE("Right click whilst holding to activate this item. Effects apply from the users location."),
+		@Deprecated SHOOTABLE("");
+		
+		private String description;
+		CustomType(String description){
+			this.description = description;
+		}
+		public String getDescription() {
+			return description;
+		}
 	}
 
 }

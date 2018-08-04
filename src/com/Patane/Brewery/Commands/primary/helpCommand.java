@@ -2,7 +2,7 @@ package com.Patane.Brewery.Commands.primary;
 
 import org.bukkit.command.CommandSender;
 
-import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.general.Chat;
@@ -27,7 +27,7 @@ public class helpCommand implements PatCommand {
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
 		Messenger.send(sender, StringsUtil.generateChatTitle("Brewery Commands"));
-		for(PatCommand cmd : Brewery.getCommandHandler().allParentCommands()) {
+		for(PatCommand cmd : BrCommandHandler.grabInstance().allParentCommands()) {
 			CommandInfo cmdInfo = PatCommand.grabInfo(cmd);
 			
 			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+cmdInfo.usage()));

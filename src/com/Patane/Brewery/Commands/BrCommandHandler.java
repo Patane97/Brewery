@@ -1,11 +1,11 @@
 package com.Patane.Brewery.Commands;
 
-import com.Patane.Brewery.Commands.primary.cooldownCommand;
 import com.Patane.Brewery.Commands.primary.giveCommand;
 import com.Patane.Brewery.Commands.primary.helpCommand;
 import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.Commands.primary.listCommand;
 import com.Patane.Brewery.Commands.secondary.infoEffect;
+import com.Patane.Brewery.Commands.secondary.infoItem;
 import com.Patane.Brewery.Commands.secondary.listEffects;
 import com.Patane.Brewery.Commands.secondary.listItems;
 import com.Patane.Commands.CommandHandler;
@@ -26,9 +26,9 @@ public class BrCommandHandler extends CommandHandler{
 		register(helpCommand.class);
 		register(listCommand.class);
 		register(infoCommand.class);
-		register(cooldownCommand.class);
 		register(listEffects.class);
 		register(listItems.class);
 		register(infoEffect.class);
+		register(infoItem.class);
 	}
 }

@@ -1,9 +1,7 @@
 package com.Patane.Brewery.Commands.secondary;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
@@ -15,26 +13,25 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
 import com.Patane.Commands.CommandInfo;
-import com.Patane.Commands.PatCommand;
-import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "info effect",
-	description = "Lists each registered Effect.",
-	usage = "/br info effect <effect name>",
-	parent = infoCommand.class
+	aliases = {"info effects"},
+	description = "Gives detailed information on a specific Effect.",
+	usage = "/br info effect <effect name>"
 )
-public class infoEffect implements PatCommand{
+public class infoEffect extends infoCommand{
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		String effectName = StringsUtil.stringJoiner(Arrays.copyOfRange(args, 0, args.length), " ");
+		String effectName = Commands.combineArgs(args);
 		BrEffect effect = Brewery.getEffectCollection().getItem(effectName);
 		if(effect == null) {
 			Messenger.send(sender, "&7"+StringsUtil.stringJoiner(args, " ")+"&c is not a registered Brewery effect.");
@@ -60,47 +57,6 @@ public class infoEffect implements PatCommand{
 			filterInfo(sender, effect.getFilter());
 		}
 		return true;
-	}
-	/**
-	 * Creates a chat message which displays the underlying type and name in the following format: "&2Type: &7Name"
-	 * On hover, it displays the specific MapParsables fields and values in a similar format.
-	 * @param sender
-	 * @param name
-	 * @param mapParsable
-	 */
-	private void mapParsableInfo(CommandSender sender, String type, MapParsable mapParsable) {
-		// Constructs the initial "&2Type: " format of the displayed string.
-		type = "&2"+type+": ";
-		
-		TextComponent infoText;
-		// If the MapParsable is null then it is underfined and has no information.
-		if(mapParsable == null) {
-			infoText = new TextComponent(Chat.translate(type+"&cUndefined"));
-			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&7No Information")).create()));
-		} else {
-			// Add the name to the string and construct a TextComponent from it (now looks like "&2Type: &7Name")
-			infoText = new TextComponent(Chat.translate(type+"&7"+mapParsable.name()));
-			
-			// Hovertext constructed to display the name of the MapParsable before anything else.
-			String hoverText = "&2Name: &7"+mapParsable.name();
-			
-			// Grabbing the fields and values of the MapParsable and saving as a Map<String, Object>.
-			Map<String, Object> fieldMap = mapParsable.mapFields();
-
-			// If there were no fields to loop through, then "&7No fields" is added under the MapParsable's name.
-			if(fieldMap.isEmpty())
-				hoverText += "\n&7&oNo fields";
-			
-			// Looping through each field and adding it to the string in the following format: "&2Field: &aValue".
-			else for(String fieldName : fieldMap.keySet())
-				hoverText += "\n&2"+StringsUtil.formaliseString(fieldName)+": &a"+fieldMap.get(fieldName).toString();
-
-			
-			// Saving the HoverEvent to our displayed text.
-			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(hoverText)).create()));
-		}
-		// Sends either the undefined or defined MapParsable object to sender.
-		Messenger.sendRaw(sender, infoText);
 	}
 	
 	private void potionEffectsInfo(CommandSender sender, List<PotionEffect> potionEffects) {

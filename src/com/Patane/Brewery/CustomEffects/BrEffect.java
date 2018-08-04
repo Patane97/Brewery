@@ -16,6 +16,7 @@ import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 
@@ -197,6 +198,18 @@ public class BrEffect extends PatCollectable{
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public String hoverDetails() {
+		return Chat.translate("&7"+getName()
+		+"\n&2Modifier: &a"+(getModifier() != null ? getModifier().name() : "&cUndefined")
+		+"\n&2Trigger: &a"+(getTrigger() != null ? getTrigger().name() : "&cUndefined")
+		+(hasRadius() ? "\n&2Radius: &a"+getRadius() : "")
+		+(hasTag() ? "\n&2Tag: &a"+getTag().name : "")
+		+(hasParticle() ? "\n&2Particles: &aApplied" : "")
+		+(hasSound() ? "\n&2Sounds: &aApplied" : "")
+		+(hasPotions() ? "\n&2Potion Effects: &a"+getPotions().size() : "")
+		+(hasFilter() ? "\n&2Filters: &aApplied" : ""));
 	}
 /*
  *  PARTICLE EFFECTS

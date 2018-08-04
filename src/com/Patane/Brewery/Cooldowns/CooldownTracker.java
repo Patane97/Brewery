@@ -12,7 +12,6 @@ import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.ingame.ItemEncoder;
 
 import net.md_5.bungee.api.ChatMessageType;
@@ -23,9 +22,9 @@ public class CooldownTracker extends PatTimedRunnable {
 	final private UUID uuid;
 	private ArrayList<Player> showing = new ArrayList<Player>();
 	public CooldownTracker(LivingEntity entity, UUID uuid, BrItem item) {
-		super(0, 0.05f, item.getCooldownDuration());
+		super(0, 0.05f, item.getCooldown());
 		this.uuid = uuid;
-		this.date = completeTime(item.getCooldownDuration());
+		this.date = completeTime(item.getCooldown());
 		if(entity instanceof Player)
 			addPlayer((Player) entity);
 	}
@@ -35,15 +34,18 @@ public class CooldownTracker extends PatTimedRunnable {
 	public void addPlayer(Player player) {
 		if(showing.contains(player))
 			return;
-		Messenger.debug(Msg.INFO, "Adding "+player.getDisplayName()+" to cooldown (UUID="+uuid.toString()+")");
+//		Messenger.debug(Msg.INFO, "Adding "+player.getDisplayName()+" to cooldown (UUID="+uuid.toString()+")");
 		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(Chat.translate(constructBar(ticksLeft(), duration(), 20))));
 		showing.add(player);
 		BrMetaDataHandler.add(player, "showing_cooldown", uuid);
 	}
+	public boolean hasPlayer(Player player) {
+		return showing.contains(player);
+	}
 	public void removePlayer(Player player) {
 		if(!showing.contains(player))
 			return;
-		Messenger.debug(Msg.INFO, "Removing "+player.getDisplayName()+" from cooldown (UUID="+uuid.toString()+")");
+//		Messenger.debug(Msg.INFO, "Removing "+player.getDisplayName()+" from cooldown (UUID="+uuid.toString()+")");
 		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(""));
 		showing.remove(player);
 		BrMetaDataHandler.remove("showing_cooldown");
