@@ -62,7 +62,7 @@ public class CooldownHandler {
 		Messenger.debug(Msg.INFO, "Cooldown ending: UUID="+uuid.toString());
 	}
 	public static UUID getUUID(ItemStack item) throws IllegalArgumentException{
-		String uuidString = ItemEncoder.extractTag(item, "UUID");
+		String uuidString = ItemEncoder.getString(item, "UUID");
 		if(uuidString == null)
 			throw new IllegalArgumentException("UUID required for Cooldown is missing!");
 		return UUID.fromString(uuidString);
@@ -133,7 +133,7 @@ public class CooldownHandler {
 			public void run() {
 				// Gravving ItemStack and uuidString information
 				ItemStack item = player.getInventory().getItemInMainHand();
-				String uuidString = ItemEncoder.extractTag(item, "UUID");
+				String uuidString = ItemEncoder.getString(item, "UUID");
 				if(uuidString == null)
 					return;
 				

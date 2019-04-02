@@ -53,7 +53,7 @@ public class CooldownTracker extends PatTimedRunnable {
 	@Override
 	public void task() {
 		for(Player player : new ArrayList<Player>(showing)) {
-			String uuidString = ItemEncoder.extractTag(player.getInventory().getItemInMainHand(), "UUID");
+			String uuidString = ItemEncoder.getString(player.getInventory().getItemInMainHand(), "UUID");
 			if(uuidString == null || !uuidString.equals(uuid.toString())) {
 				removePlayer(player);
 				return;

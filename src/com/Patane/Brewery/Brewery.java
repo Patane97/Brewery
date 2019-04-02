@@ -34,6 +34,7 @@ public class Brewery extends JavaPlugin{
 	private static Brewery brewery;
 	private static BrItemCollection itemCollection;
 	private static BrEffectCollection effectCollection;
+	private static GlobalListener globalListener;
 	
 	private ProtocolManager protocolManager;
 	
@@ -42,8 +43,9 @@ public class Brewery extends JavaPlugin{
 		PataneUtil.setup(brewery, true);
 		itemCollection = new BrItemCollection();
 		effectCollection = new BrEffectCollection();
-		getServer().getPluginManager().registerEvents(new GlobalListener(), this);
-		// Call 'BrCommandHandler.getInstance()' to get CommandHandler instance.
+		
+		globalListener = new GlobalListener();
+		
 		this.getCommand("br").setExecutor(new BrCommandHandler());
 		
 		TriggerHandler.registerAll();
@@ -85,5 +87,8 @@ public class Brewery extends JavaPlugin{
 	}
 	public static BrEffectCollection getEffectCollection() {
 		return effectCollection;
+	}
+	public static GlobalListener getGlobalListener() {
+		return globalListener;
 	}
 }

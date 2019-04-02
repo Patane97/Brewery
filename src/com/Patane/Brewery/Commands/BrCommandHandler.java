@@ -1,9 +1,11 @@
 package com.Patane.Brewery.Commands;
 
 import com.Patane.Brewery.Commands.primary.giveCommand;
+import com.Patane.Brewery.Commands.primary.guiCommand;
 import com.Patane.Brewery.Commands.primary.helpCommand;
 import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.Commands.primary.listCommand;
+import com.Patane.Brewery.Commands.primary.tagCommand;
 import com.Patane.Brewery.Commands.secondary.infoEffect;
 import com.Patane.Brewery.Commands.secondary.infoItem;
 import com.Patane.Brewery.Commands.secondary.listEffects;
@@ -18,7 +20,7 @@ public class BrCommandHandler extends CommandHandler{
 	public BrCommandHandler() {
 		super();
 		registerAll();
-		Messenger.debug(Msg.INFO, "REGISTERED COMMANDS: "+StringsUtil.stringJoiner(commands.keySet(), ", "));
+		Messenger.debug(Msg.INFO, "Registered Commands: " + StringsUtil.stringJoiner(commands.keySet(), ", "));
 	}
 	
 	private void registerAll() {
@@ -26,6 +28,8 @@ public class BrCommandHandler extends CommandHandler{
 		register(helpCommand.class);
 		register(listCommand.class);
 		register(infoCommand.class);
+		register(tagCommand.class);
+		register(guiCommand.class);
 		register(listEffects.class);
 		register(listItems.class);
 		register(infoEffect.class);

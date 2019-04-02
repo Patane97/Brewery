@@ -11,7 +11,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -31,6 +30,7 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Cooldowns.CooldownHandler;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
+import com.Patane.listeners.BaseListener;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
@@ -39,32 +39,7 @@ import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.LocationsUtil;
 import com.Patane.util.main.PataneUtil;
 
-public class GlobalListener implements Listener{
-	
-	/**
-	 * Detects when a potion has been hit
-	 * Checks if it is from a BrItem
-	 * Checks if BrItem is of type "THROWABLE"
-	 * Executes BrItem
-	 * @param e
-	 */
-//	@EventHandler
-//	public void potionSplash (PotionSplashEvent e){
-//		// If it is not a BR item, return.
-//		BrItem brItem = BrItem.get(e.getPotion().getItem());
-//		if(brItem == null || brItem.getType() != CustomType.THROWABLE)
-//			return;
-//		e.setCancelled(true);
-////		Location location = e.getEntity().getLocation();
-//		Location location = e.getHitEntity().getLocation();
-//		LivingEntity executor = (e.getEntity().getShooter() instanceof LivingEntity ? (LivingEntity) e.getEntity().getShooter() : null);
-//		brItem.execute(executor, location);
-//	}
-//	@EventHandler
-//	public void onLivingEntityDeath(EntityDamageByEntityEvent e){
-//		if(e.getEntity() instanceof LivingEntity && ((LivingEntity) e.getEntity()).getLastDamage() >= ((LivingEntity) e.getEntity()).getHealth())
-//			Messenger.debug(e.getDamager(), "&7You &ahave killed &7"+e.getEntity().getName());
-//	}
+public class GlobalListener extends BaseListener{
 	
 	/**
 	 * Called when a player Swings (Default left click) at a block.
@@ -188,12 +163,12 @@ public class GlobalListener implements Listener{
 		}
 		ItemStack[] invItems = grabInvItems(e.getPlayer().getOpenInventory());
 		for(ItemStack invItem : invItems) {
-			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.extractTag(invItem, "UUID").equals(ItemEncoder.extractTag(item, "UUID"))) {
+			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.getString(invItem, "UUID").equals(ItemEncoder.getString(item, "UUID"))) {
 				if(e.isCancelled())
 					return;
-				Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.extractTag(item, "UUID"));
+				Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
 				e.getItemDrop().setItemStack(brItem.generateItem());
-				Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.extractTag(e.getItemDrop().getItemStack(), "UUID"));
+				Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getItemDrop().getItemStack(), "UUID"));
 				return;
 			}
 		}
@@ -215,16 +190,16 @@ public class GlobalListener implements Listener{
 		ItemStack[] invItems = grabInvItems(e.getView());
 		
 		for(ItemStack invItem : invItems) {
-			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.extractTag(invItem, "UUID").equals(ItemEncoder.extractTag(item, "UUID"))) {
+			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.getString(invItem, "UUID").equals(ItemEncoder.getString(item, "UUID"))) {
 				PataneUtil.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
 					@Override
 					public void run() {
 						if(e.isCancelled())
 							return;
 						for(int slot : e.getRawSlots()) {
-							Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.extractTag(item, "UUID"));
+							Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
 							e.getView().setItem(slot, brItem.generateItem());
-							Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.extractTag(e.getView().getItem(slot), "UUID"));
+							Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getView().getItem(slot), "UUID"));
 						}
 					}
 				});
@@ -255,15 +230,15 @@ public class GlobalListener implements Listener{
 		ItemStack[] invItems = grabInvItems(e.getView());
 		
 		for(ItemStack invItem : invItems) {
-			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.extractTag(invItem, "UUID").equals(ItemEncoder.extractTag(item, "UUID"))) {
+			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.getString(invItem, "UUID").equals(ItemEncoder.getString(item, "UUID"))) {
 				PataneUtil.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
 					@Override
 					public void run() {
 						if(e.isCancelled())
 							return;
-						Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.extractTag(item, "UUID"));
+						Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
 						e.setCurrentItem(brItem.generateItem());
-						Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.extractTag(e.getCurrentItem(), "UUID"));
+						Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getCurrentItem(), "UUID"));
 					}
 				});
 				return;
@@ -297,7 +272,7 @@ public class GlobalListener implements Listener{
 //				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
 //			return;
 //		}
-//		String uuidString = ItemEncoder.extractTag(item, "UUID");
+//		String uuidString = ItemEncoder.getString(item, "UUID");
 //		if(uuidString != null) {
 //			if(BrMetaDataHandler.hasValue(player, "showing_cooldown"))
 //				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
