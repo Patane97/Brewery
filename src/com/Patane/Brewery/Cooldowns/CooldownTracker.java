@@ -34,7 +34,7 @@ public class CooldownTracker extends PatTimedRunnable {
 	public void addPlayer(Player player) {
 		if(showing.contains(player))
 			return;
-//		Messenger.debug(Msg.INFO, "Adding "+player.getDisplayName()+" to cooldown (UUID="+uuid.toString()+")");
+//		Messenger.debug("Adding "+player.getDisplayName()+" to cooldown (UUID="+uuid.toString()+")");
 		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(Chat.translate(constructBar(ticksLeft(), duration(), 20))));
 		showing.add(player);
 		BrMetaDataHandler.add(player, "showing_cooldown", uuid);
@@ -45,7 +45,7 @@ public class CooldownTracker extends PatTimedRunnable {
 	public void removePlayer(Player player) {
 		if(!showing.contains(player))
 			return;
-//		Messenger.debug(Msg.INFO, "Removing "+player.getDisplayName()+" from cooldown (UUID="+uuid.toString()+")");
+//		Messenger.debug("Removing "+player.getDisplayName()+" from cooldown (UUID="+uuid.toString()+")");
 		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(""));
 		showing.remove(player);
 		BrMetaDataHandler.remove("showing_cooldown");

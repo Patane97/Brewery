@@ -7,9 +7,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.util.YAML.MapParsable;
+import com.Patane.util.YAML.TypeParsable;
 
-public abstract class Modifier extends MapParsable{
+public abstract class Modifier extends TypeParsable{
 	
 	protected Modifier(){};
 	public Modifier(Map<String, String> fields){}

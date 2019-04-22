@@ -21,7 +21,7 @@ import com.Patane.util.general.StringsUtil;
 public class giveCommand implements PatCommand {
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		// Checks if there is more than 1 argument. If not, player name is missing.
 		if(args.length < 1) { 
 			Messenger.send(sender, "&cPlease specify a player name.");

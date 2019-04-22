@@ -13,7 +13,6 @@ import com.Patane.handlers.PatHandler;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
 public class FormationHandler implements PatHandler{
@@ -33,7 +32,7 @@ private static HashMap<String, Formation> formations;
 		register(new Face());
 		register(new Point());
 		register(new Entity());
-		Messenger.debug(Msg.INFO, "Registered Formations: "+StringsUtil.stringJoiner(formations.keySet(), ", "));
+		Messenger.debug("Registered Formations: "+StringsUtil.stringJoiner(formations.keySet(), ", "));
 	}
 	private static void register(Formation formation){
 		Namer info = formation.getClass().getAnnotation(Namer.class);

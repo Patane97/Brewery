@@ -14,7 +14,6 @@ import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.main.PataneUtil;
 
@@ -50,7 +49,7 @@ public class CooldownHandler {
 			return false;
 		cooldowns.put(uuid, new CooldownTracker(entity, uuid, brItem));
 		YML().addData(cooldowns.get(uuid).getDate(), uuid.toString());
-		Messenger.debug(Msg.INFO, "Cooldown starting: UUID="+uuid.toString()+", brItem="+brItem.getName());
+		Messenger.debug("Cooldown starting: UUID="+uuid.toString()+", brItem="+brItem.getName());
 		return true;
 	}
 	public static boolean ready(UUID uuid) {
@@ -59,7 +58,7 @@ public class CooldownHandler {
 	public static void end(UUID uuid) {
 		cooldowns.remove(uuid);
 		YML().removeData(uuid.toString());
-		Messenger.debug(Msg.INFO, "Cooldown ending: UUID="+uuid.toString());
+		Messenger.debug("Cooldown ending: UUID="+uuid.toString());
 	}
 	public static UUID getUUID(ItemStack item) throws IllegalArgumentException{
 		String uuidString = ItemEncoder.getString(item, "UUID");

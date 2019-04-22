@@ -18,7 +18,6 @@ import com.Patane.Brewery.CustomEffects.modifiers.Smite;
 import com.Patane.handlers.PatHandler;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
 public class ModifierHandler implements PatHandler{
@@ -45,7 +44,7 @@ public class ModifierHandler implements PatHandler{
 		register(Polymorph.class);
 		register(Kill.class);
 		register(Effect.class);
-		Messenger.debug(Msg.INFO, "Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
+		Messenger.debug("Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
 	}
 	private static void register(Class< ? extends Modifier> modifierClass){
 		Namer info = modifierClass.getAnnotation(Namer.class);

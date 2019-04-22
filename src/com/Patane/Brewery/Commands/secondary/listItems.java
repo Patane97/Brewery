@@ -16,20 +16,21 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "list items",
+	aliases = {"item"},
 	description = "Lists each registered Item.",
 	usage = "/br list items"
 )
 public class listItems extends listCommand{
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		Messenger.send(sender, StringsUtil.generateChatTitle("Registered Items"));
 		for(BrItem item : Brewery.getItemCollection().getAllItems()) {			
 			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+item.getName()));
 
 			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(item.hoverDetails()).create()));
 			
-			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br info items "+item.getName()));
+			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br info item "+item.getName()));
 			
 			Messenger.sendRaw(sender, commandText);
 			

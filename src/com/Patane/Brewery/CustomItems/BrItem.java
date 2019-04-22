@@ -49,13 +49,11 @@ public class BrItem extends PatCollectable{
 	
 	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown){
 		super(name);
-		Messenger.debug(Msg.INFO, "brItem-0");
 		if(Brewery.getItemCollection().contains(getID())){
 			throw new IllegalArgumentException(getID()+" already exists!");
 		}
-		this.type = Check.notNull(type, "BrItem '"+name+"' has no set type. Please check YML files.");
-		this.item = Check.notNull(ItemEncoder.addTag(item, "NAME", getID()), "BrItem '"+name+"' has no item. Did it fail to create? Please check YML files.");
-		Messenger.debug(Msg.INFO, "brItem-1");
+		setType(type);
+		setItemStack(item);
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
 		this.cooldown = cooldown;
 		constructGUI();
@@ -66,50 +64,8 @@ public class BrItem extends PatCollectable{
 	public GUIPage guiPage() {
 		return guiPage;
 	}
-	/**
-	 * ********************** GUI SECTION ***********************
-	 */
-	public void constructGUI() {
-		GUIPage mainPage = new GUIPage(this.getName(), 1);
-		guiPage = mainPage;
-		
-		//
-		GUIIcon typeIcon = new GUIIcon(type.getGuiIcon());
-		typeIcon.addAction(GUIClick.LEFT, new GUIAction() {
-
-			@Override
-			public boolean execute() {
-				Iterator<CustomType> iter = Arrays.stream(CustomType.values()).iterator();
-				while(iter.next() != type) {}
-				type = (iter.hasNext() ? iter.next() : CustomType.values()[0]);
-				typeIcon.icon = type.getGuiIcon();
-				mainPage.updateIcon(typeIcon);
-				return true;
-			}
-		});
-		mainPage.addIcon(1, typeIcon);
-		//
-		GUIPage effectsPage = new GUIPage(this.getName() + " Effects", 1);
-		effectsPage.addBackIcon(effectsPage.getInventory().getSize()-1, mainPage);
-		
-		// implement 'icon dragging'
-//		GUIIcon item = new GUIIcon();
-		GUIIcon effectIcon = new GUIIcon(ItemsUtil.addFlavourText(ItemsUtil.createItem(Material.BOOK, effects.size(), (short) 0, "&6Effects: &2"+effects.size()), "Click to edit"));
-		effectIcon.addAction(GUIClick.LEFT, new GUIAction() {
-
-			@Override
-			public boolean execute() {
-				mainPage.open(effectsPage);
-				return true;
-			}
-			
-		});
-		mainPage.addIcon(2, effectIcon);
-		//
-	}
-	/**
-	 * **********************************************************
-	 */
+	
+	
 	/**
 	 * Generates an ItemStack appropriate to give to a player for use.
 	 */
@@ -122,8 +78,16 @@ public class BrItem extends PatCollectable{
 	public ItemStack getItemStack() {
 		return item;
 	}
+	public void setItemStack(ItemStack item) {
+		this.item = Check.notNull(ItemEncoder.addTag(item, "NAME", getID()), "BrItem '"+this.getName()+"' has no item. Did it fail to create?");
+	}
+	
+	
 	public CustomType getType() {
 		return type;
+	}
+	public void setType(CustomType type) {
+		this.type = Check.notNull(type, "BrItem '"+this.getName()+"' has no set type.");
 	}
 	
 	
@@ -133,11 +97,16 @@ public class BrItem extends PatCollectable{
 	public List<BrEffect> getEffects() {
 		return effects;
 	}
+	
+	
 	public boolean hasCooldown() {
-		return (cooldown == null ? false : true);
+		return (cooldown == null ? false :  true);
 	}
 	public float getCooldown() {
 		return cooldown;
+	}
+	public void setCooldown(Float cooldown) {
+		this.cooldown = cooldown;
 	}
 	/**
 	 * Executes the item's effects in a specific location (Generally the location of impact).
@@ -209,7 +178,51 @@ public class BrItem extends PatCollectable{
 			return null;
 		return Brewery.getItemCollection().getItem(brItemName);
 	}
-	
+
+	/**
+	 * ********************** GUI SECTION ***********************
+	 */
+	public void constructGUI() {
+		GUIPage mainPage = new GUIPage(this.getName(), 1, false);
+		guiPage = mainPage;
+		
+		//
+		GUIIcon typeIcon = new GUIIcon(type.getGuiIcon());
+		typeIcon.addAction(GUIClick.LEFT, new GUIAction() {
+
+			@Override
+			public boolean execute() {
+				Iterator<CustomType> iter = Arrays.stream(CustomType.values()).iterator();
+				while(iter.next() != type) {}
+				type = (iter.hasNext() ? iter.next() : CustomType.values()[0]);
+				typeIcon.icon = type.getGuiIcon();
+				mainPage.updateIcon(typeIcon);
+				return true;
+			}
+		});
+		mainPage.addIcon(1, typeIcon);
+		//
+		GUIPage effectsPage = new GUIPage(this.getName() + " Effects", 1, false);
+		effectsPage.addBackIcon(effectsPage.getInventory().getSize()-1, mainPage);
+		
+		// implement 'icon dragging'
+//		GUIIcon item = new GUIIcon();
+		GUIIcon effectIcon = new GUIIcon(ItemsUtil.addFlavourText(ItemsUtil.createItem(Material.BOOK, Math.max(effects.size(), 1), "&6Effects: &2"+effects.size()), "Click to edit"));
+		effectIcon.addAction(GUIClick.LEFT, new GUIAction() {
+
+			@Override
+			public boolean execute() {
+				mainPage.open(effectsPage);
+				return true;
+			}
+			
+		});
+		mainPage.addIcon(2, effectIcon);
+		//
+	}
+	/**
+	 * **********************************************************
+	 */
 	public static enum CustomType {
 		THROWABLE(Material.SPLASH_POTION, "Right click whilst holding to throw this item. Effects apply on impacted location or target."),
 		HITTABLE(Material.IRON_SWORD, "Hit a block or target to apply the effects at that location."),
@@ -220,7 +233,7 @@ public class BrItem extends PatCollectable{
 		private String description;
 		
 		CustomType(Material material, String description){
-			this.icon = ItemsUtil.hideFlags(ItemsUtil.createItem(material, 1, (short) 0, StringsUtil.formaliseString(this.name()), StringsUtil.wordSplitter(description, 5, "&7")));
+			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.wordSplitter(description, 5, "&7")));
 			this.guiItem = ItemsUtil.addFlavourText(ItemsUtil.setItemNameLore(icon,"&6Item Type: &2"+ItemsUtil.getDisplayName(icon)), "Click to change");
 			this.description = description;
 		}

@@ -19,7 +19,7 @@ import com.Patane.util.ingame.ItemEncoder;
 public class tagCommand implements PatCommand {
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		if(!(sender instanceof Player))
 			return false;
 		Player player = (Player) sender;

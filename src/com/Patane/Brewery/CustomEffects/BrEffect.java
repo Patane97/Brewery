@@ -38,19 +38,18 @@ public class BrEffect extends PatCollectable{
 	private final Modifier modifier;
 	private final Trigger trigger;
 	private final Float radius;
-	// NEED TO ADD: if radius is 0, projectile must HIT an entity to damage/affect it and only it.
 	private final Filter filter;
-	private final List<PotionEffect> potionEffects;
-	private final BrParticleEffect particleEffect;
-	private final BrSoundEffect soundEffect;
+	private final BrParticleEffect particles;
+	private final BrSoundEffect sounds;
+	private final List<PotionEffect> potion_effects;// *** Change to set OR standard Array
 	private final BrTag tag;
 	private final boolean ignore_user;
-	private final boolean stack;
+//	private final boolean stack;
 
 	private List<String> incomplete = new ArrayList<String>();
 	
 	public BrEffect(boolean incompleteAllowed, String name, Modifier modifier, Trigger trigger, Float radius, 
-			Filter filter, BrParticleEffect particleEffect, BrSoundEffect soundEffect, List<PotionEffect> potionEffects, 
+			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potion_effects, 
 			BrTag tag, Boolean ignore_user) {
 		// Setting the name
 		super(name);
@@ -63,20 +62,20 @@ public class BrEffect extends PatCollectable{
 		this.trigger = (incompleteAllowed ? trigger : Check.notNull(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
 		if(trigger == null)	incomplete.add("trigger");
 		
-		// NON-ESSENTIAL VALUES.
+		// NULLABLE VALUES.
 		// These values can be null. However if some objects are null, they are converted to empty objects.
 		// If radius isnt set, then it only applies to any entities hit?
 		this.radius = radius;
-		this.filter = (filter == null ? new Filter() : filter);
-		this.particleEffect = particleEffect;
-		this.soundEffect = soundEffect;
-		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
+		this.particles = particles;
+		this.sounds = sounds;
 		this.tag = tag;
 		
 		// DEFAULTED VALUES.
 		// These values will always have a setting. If the given value is null, then the default is set.
+		this.filter = (filter == null ? new Filter() : filter);
+		this.potion_effects = (potion_effects == null ? new ArrayList<PotionEffect>() : potion_effects);
 		this.ignore_user = (ignore_user == null ? true : ignore_user);
-		this.stack = false;
+//		this.stack = false;
 	}
 	
 	// Getters for essential values.
@@ -107,29 +106,29 @@ public class BrEffect extends PatCollectable{
 	
 	// Particle
 	public boolean hasParticle() {
-		return (particleEffect == null ? false : true);
+		return (particles == null ? false : true);
 	}
 	public BrParticleEffect getParticleEffect() {
-		return particleEffect;
+		return particles;
 	}
 
 	// Sound
 	public boolean hasSound() {
-		return (soundEffect == null ? false : true);
+		return (sounds == null ? false : true);
 	}
 	public BrSoundEffect getSoundEffect() {
-		return soundEffect;
+		return sounds;
 	}
 
 	// Potion Effects
 	public boolean hasPotions() {
-		return (potionEffects.isEmpty() ? false : true);
+		return (potion_effects.isEmpty() ? false : true);
 	}
 	public List<PotionEffect> getPotions(){
-		return potionEffects;
+		return potion_effects;
 	}
 	public PotionEffect[] getPotionsArray(){
-		return potionEffects.toArray(new PotionEffect[potionEffects.size()]);
+		return potion_effects.toArray(new PotionEffect[potion_effects.size()]);
 	}
 	
 	// Tags
@@ -163,9 +162,9 @@ public class BrEffect extends PatCollectable{
 		return ignore_user;
 	}
 	// Stacks
-	public boolean stack() {
-		return stack;
-	}
+//	public boolean stack() {
+//		return stack;
+//	}
 	/**
 	 * Executes the effect on an impact location using the effects radius.
 	 * @param executor LivingEntity who is executing the effect.

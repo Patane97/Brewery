@@ -11,13 +11,25 @@ import org.bukkit.potion.PotionEffectType;
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
 import com.Patane.util.YAML.types.YAMLEditable;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
-import com.Patane.util.general.StringsUtil;
 
 public abstract class BreweryYAML extends YAMLEditable{
 
-	public BreweryYAML(String config, String root, String header) {
-		super(null, config, root, header);
+	public BreweryYAML(String fileName, String prefix, String... filePath) {
+		super(fileName, prefix, filePath);
+	}
+	/**
+	 * Posts a potion effect to a YML.
+	 * @param section Base header section to post to.
+	 * @param effect PotionEffect to post.
+	 */
+	public static void postPotionEffect(ConfigurationSection section, PotionEffect effect) {
+		section = section.createSection(effect.getType().toString());
+		section.set("duration", effect.getDuration());
+		section.set("strength", effect.getAmplifier());
+		if(!effect.isAmbient())
+			section.set("ambient", effect.isAmbient());
+		if(!effect.hasParticles())
+			section.set("particles", effect.hasParticles());
 	}
 	/**
 	 * Retireves a potion effect from a YML and creates it based on the values given.
@@ -60,9 +72,30 @@ public abstract class BreweryYAML extends YAMLEditable{
 		return string;
 	}
 	
+	public static void setFilterGroup(ConfigurationSection section, FilterGroup filterGroup) {
+		
+		if(!filterGroup.getEntities().isEmpty()) {
+			
+			// Converting EntityType's into String that are safe for YML
+			List<String> entityNames = new ArrayList<String>();
+			for(EntityType entityType : filterGroup.getEntities()) {
+				entityNames.add(entityType.toString());
+			}
+			
+			section.set("entities", entityNames);
+		}
+		if(!filterGroup.getPlayers().isEmpty())
+			section.set("players", filterGroup.getPlayers());
+		
+		if(!filterGroup.getPermissions().isEmpty())
+			section.set("permissions", filterGroup.getPermissions());
+		
+		if(!filterGroup.getTags().isEmpty())
+			section.set("tags", filterGroup.getTags());
+	}
+	
 	public static FilterGroup getFilterGroup(ConfigurationSection section, boolean defaultReturn) throws ClassNotFoundException, NullPointerException{
 		if(section != null){
-			Messenger.debug(Msg.INFO, "    +--- "+extractLast(section)+": ");
 			List<EntityType> entities = new ArrayList<EntityType>();
 			for(String entityName : section.getStringList("entities")){
 				EntityType entityType = getEnumFromString(entityName, EntityType.class);
@@ -70,13 +103,9 @@ public abstract class BreweryYAML extends YAMLEditable{
 					entities.add(entityType);
 				}
 			}
-			if(!entities.isEmpty())Messenger.debug(Msg.INFO, "    +------ entities: "+StringsUtil.stringJoiner(section.getStringList("entities"), ", "));
 			List<String> player = section.getStringList("players");
-			if(!player.isEmpty())Messenger.debug(Msg.INFO, "    +------ players: "+StringsUtil.stringJoiner(player, ", "));
 			List<String> permissions = section.getStringList("permissions");
-			if(!permissions.isEmpty())Messenger.debug(Msg.INFO, "    +------ permissions: "+StringsUtil.stringJoiner(permissions, ", "));
 			List<String> tags = section.getStringList("tags");
-			if(!tags.isEmpty())Messenger.debug(Msg.INFO, "    +------ tags: "+StringsUtil.stringJoiner(tags, ", "));
 			return new FilterGroup(entities, player, permissions, tags, defaultReturn);
 		}
 		return new FilterGroup(null, null, null, null, defaultReturn);

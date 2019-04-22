@@ -25,10 +25,13 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class helpCommand implements PatCommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		Messenger.send(sender, StringsUtil.generateChatTitle("Brewery Commands"));
 		for(PatCommand cmd : BrCommandHandler.grabInstance().allParentCommands()) {
 			CommandInfo cmdInfo = PatCommand.grabInfo(cmd);
+			
+			if(cmdInfo.hideCommand())
+				continue;
 			
 			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+cmdInfo.usage()));
 			

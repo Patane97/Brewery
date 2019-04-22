@@ -8,11 +8,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
-import com.Patane.util.YAML.MapParsable;
+import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Focusable.Focus;
 
-public abstract class Trigger extends MapParsable{
+public abstract class Trigger extends TypeParsable{
 
 	protected Trigger(){};
 	public Trigger(Map<String, String> fields){}

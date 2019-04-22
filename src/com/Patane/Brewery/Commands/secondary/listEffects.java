@@ -16,13 +16,14 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "list effects",
+	aliases = {"effect"},
 	description = "Lists each registered Effect.",
 	usage = "/br list effects"
 )
 public class listEffects extends listCommand{
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		Messenger.send(sender, StringsUtil.generateChatTitle("Registered Effects"));
 		for(BrEffect effect : Brewery.getEffectCollection().getAllItems()) {
 			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+effect.getName()));

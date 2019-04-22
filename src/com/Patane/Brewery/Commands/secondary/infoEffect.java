@@ -23,14 +23,13 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "info effect",
-	aliases = {"info effects"},
 	description = "Gives detailed information on a specific Effect.",
 	usage = "/br info effect <effect name>"
 )
 public class infoEffect extends infoCommand{
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		String effectName = Commands.combineArgs(args);
 		BrEffect effect = Brewery.getEffectCollection().getItem(effectName);
 		if(effect == null) {

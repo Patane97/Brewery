@@ -33,6 +33,12 @@ public class Filter {
 	public boolean noFilters() {
 		return (target.noFilter() && ignore.noFilter() ? true : false);
 	}
+	
+	public boolean equals(Filter other) {
+		if(getTarget().equals(other.getTarget()) && getIgnore().equals(other.getIgnore()))
+			return true;
+		return false;
+	}
 	/**
 	 * Extracts each entity that fits the filter.
 	 * If given, the entity must not be on the ignore List.
@@ -101,6 +107,24 @@ public class Filter {
 		}
 		public boolean noFilter() {
 			return noFilter;
+		}
+		public boolean equals(FilterGroup other) {
+			for(String tag : getTags())
+				if(!other.getTags().contains(tag))
+					return false;
+
+			for(String permission : getPermissions())
+				if(!other.getPermissions().contains(permission))
+					return false;
+			
+			for(String player : getPlayers())
+				if(!other.getPlayers().contains(player))
+					return false;
+			
+			for(EntityType entityType : getEntities())
+				if(!other.getEntities().contains(entityType))
+					return false;
+			return true;
 		}
 		public boolean match(LivingEntity entity){
 			// If there is no filter, then the entity automatically passes.

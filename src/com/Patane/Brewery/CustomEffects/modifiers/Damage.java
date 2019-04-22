@@ -21,6 +21,7 @@ public class Damage extends Modifier{
 	public Damage(DamageCause cause, double amount){
 		this.cause = cause;
 		this.amount = amount;
+		
 	}
 	@Override
 	public void modify(ModifierInfo info) {

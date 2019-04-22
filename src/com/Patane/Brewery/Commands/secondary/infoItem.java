@@ -21,14 +21,13 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "info item",
-	aliases = {"info items"},
 	description = "Gives detailed information on a specific Item.",
 	usage = "/br info item <item name>"
 )
 public class infoItem extends infoCommand{
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		String itemName = Commands.combineArgs(args);
 		BrItem item = Brewery.getItemCollection().getItem(itemName);
 		if(item == null) {
@@ -37,14 +36,14 @@ public class infoItem extends infoCommand{
 		}
 		Messenger.send(sender, StringsUtil.generateChatTitle(StringsUtil.formaliseString(item.getName())+" info"));
 		
-		TextComponent text = StringsUtil.simpleHoverText("&9&lSpawn Item", "&7Click here to get this item");
+		TextComponent text = StringsUtil.hoverText("&9&lSpawn Item", "&7Click here to get this item");
 		text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br give "+sender.getName()+" "+item.getName()));
 		Messenger.sendRaw(sender, text);
 		// Type
-		Messenger.sendRaw(sender, StringsUtil.simpleHoverText("&2Type: &7"+item.getType().name(), "&7"+item.getType().getDescription()));
+		Messenger.sendRaw(sender, StringsUtil.hoverText("&2Type: &7"+item.getType().name(), "&7"+item.getType().getDescription()));
 		
 		// Item
-		text = StringsUtil.simpleHoverText("&2Item: &7"+item.getItemStack().getType().toString(), itemText(item.getItemStack()));
+		text = StringsUtil.hoverText("&2Item: &7"+item.getItemStack().getType().toString(), itemText(item.getItemStack()));
 		text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br give "+sender.getName()+" "+item.getName()));
 		Messenger.sendRaw(sender, text);
 		

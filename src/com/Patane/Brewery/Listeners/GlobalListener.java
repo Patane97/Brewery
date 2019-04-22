@@ -34,7 +34,6 @@ import com.Patane.listeners.BaseListener;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.LocationsUtil;
 import com.Patane.util.main.PataneUtil;
@@ -166,9 +165,9 @@ public class GlobalListener extends BaseListener{
 			if(ItemEncoder.hasTag(invItem, "UUID") && ItemEncoder.getString(invItem, "UUID").equals(ItemEncoder.getString(item, "UUID"))) {
 				if(e.isCancelled())
 					return;
-				Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
+				Messenger.debug("UUID Before: "+ItemEncoder.getString(item, "UUID"));
 				e.getItemDrop().setItemStack(brItem.generateItem());
-				Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getItemDrop().getItemStack(), "UUID"));
+				Messenger.debug("UUID After: "+ItemEncoder.getString(e.getItemDrop().getItemStack(), "UUID"));
 				return;
 			}
 		}
@@ -186,7 +185,6 @@ public class GlobalListener extends BaseListener{
 			return;
 		}
 		e.setCancelled(true);
-		Messenger.debug(Msg.INFO, "Size="+e.getRawSlots().size());
 		ItemStack[] invItems = grabInvItems(e.getView());
 		
 		for(ItemStack invItem : invItems) {
@@ -197,9 +195,9 @@ public class GlobalListener extends BaseListener{
 						if(e.isCancelled())
 							return;
 						for(int slot : e.getRawSlots()) {
-							Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
+							Messenger.debug("UUID Before: "+ItemEncoder.getString(item, "UUID"));
 							e.getView().setItem(slot, brItem.generateItem());
-							Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getView().getItem(slot), "UUID"));
+							Messenger.debug("UUID After: "+ItemEncoder.getString(e.getView().getItem(slot), "UUID"));
 						}
 					}
 				});
@@ -236,9 +234,9 @@ public class GlobalListener extends BaseListener{
 					public void run() {
 						if(e.isCancelled())
 							return;
-						Messenger.debug(Msg.INFO, "UUID Before: "+ItemEncoder.getString(item, "UUID"));
+						Messenger.debug("UUID Before: "+ItemEncoder.getString(item, "UUID"));
 						e.setCurrentItem(brItem.generateItem());
-						Messenger.debug(Msg.INFO, "UUID After: "+ItemEncoder.getString(e.getCurrentItem(), "UUID"));
+						Messenger.debug("UUID After: "+ItemEncoder.getString(e.getCurrentItem(), "UUID"));
 					}
 				});
 				return;

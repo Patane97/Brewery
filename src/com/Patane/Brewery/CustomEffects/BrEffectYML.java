@@ -18,31 +18,190 @@ import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.YAML.BreweryYAML;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
+import com.sun.istack.internal.NotNull;
 
 public class BrEffectYML extends BreweryYAML{
 
 	public BrEffectYML() {
-		super("effects.yml", "effects", "YML File for each effect\nExample:");
+		super("effects", "effects");
 	}
 
 	@Override
-	public void save() {}
+	public void save() throws IllegalStateException {
+		List<String> savedNames = new ArrayList<String>();
+		setSelect(getPrefix());
+		for(BrEffect effect : Brewery.getEffectCollection().getAllItems()) {
+			if(save(effect))
+				savedNames.add(effect.getName());
+		}
+		if(configHandler.saveConfig())
+			Messenger.info("Successfully saved Effects: "+StringsUtil.stringJoiner(savedNames, ", "));
+	}
 
 	@Override
-	public void load() {
+	public void load() throws IllegalStateException {
+		List<String> loadedNames = new ArrayList<String>();
 		setSelect(getPrefix());
-		for(String effectName : getSelect().getKeys(false)){
-			load(getSectionAndWarn(getSelect(), effectName));
+		for(String effectName : getSelect().getKeys(false)) {
+			BrEffect effect = load(getSectionAndWarn(getSelect(), effectName));
+			if(effect != null)
+				loadedNames.add(effect.getName());
 		}
-		Messenger.info("Successfully loaded Effects: "+StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), ", "));
+		Messenger.info("Successfully loaded Effects: "+StringsUtil.stringJoiner(loadedNames, ", "));
 	}
 	
-	public void load(ConfigurationSection section){
-		retrieve(section, null, true);
+	public boolean save(BrEffect effect) throws IllegalStateException {
+		if(post(getPrefix(), effect, null, null)) {
+			configHandler.saveConfig();
+			return true;
+		}
+		return false;
+	}
+	
+	public BrEffect load(ConfigurationSection section) {
+		return retrieve(section, null, true);
 	}
 
+	/**
+	 * This function will save an effect to a YML location.
+	 * If a default YML location & effect is provided then it will save any common values between the effect and defaulteffect in the default location.
+	 * eg. If effect has a radius=5 and defaultEffect has radius=3, then radius=5 will be saved onlyin baseHeader location.
+	 *     Otherwise, if effect has a radius=4 and defaultEffect has radius=4, then radius=4 will be saved only in the defaultHeader location.
+	 * 
+	 * @param baseHeader
+	 * @param defaultHeader
+	 * @param effect
+	 * @param defaultEffect
+	 */
+	public static boolean post(@NotNull ConfigurationSection baseHeader, @NotNull BrEffect effect, ConfigurationSection defaultHeader, BrEffect defaultEffect) {
+		try {
+			Check.notNull(baseHeader);
+			if(defaultHeader == null)
+				defaultHeader = baseHeader;
+			Check.notNull(effect);
+			if(defaultEffect == null)
+				defaultEffect = effect;
+			
+			ConfigurationSection currentHeader = baseHeader;
+
+			/*
+			 * ==================> NAME <==================
+			 */
+			
+			// Name will always be displayed on both header and default.
+			baseHeader = baseHeader.createSection(effect.getName());
+			defaultHeader = defaultHeader.createSection(effect.getName());
+			
+			/*
+			 * ==================> MODIFIER <==================
+			 */
+			
+			if(effect.getModifier() != null)
+				setMapParsable(baseHeader.createSection("modifier"), defaultHeader.createSection("modifier"), effect.getModifier(), defaultEffect.getModifier());
+			else 
+				baseHeader.set("modifier", null);
+			/*
+			 * ==================> TRIGGER <==================
+			 */
+
+			if(effect.getTrigger() != null)
+				setMapParsable(baseHeader.createSection("trigger"), defaultHeader.createSection("trigger"), effect.getTrigger(), defaultEffect.getTrigger());
+			else 
+				baseHeader.set("trigger", null);
+			/*
+			 * ==================> RADIUS <==================
+			 */
+			
+			if(effect.hasRadius()) {
+				if(effect.getRadius().equals(defaultEffect.getRadius()))
+					defaultHeader.set("radius", effect.getRadius());
+				else
+					baseHeader.set("radius", effect.getRadius());
+			}
+			else 
+				baseHeader.set("radius", null);
+			/*
+			 * ==================> IGNORE USER <==================
+			 */
+			
+			if(!effect.ignoreUser()) {
+				if(effect.ignoreUser() == defaultEffect.ignoreUser())
+					defaultHeader.set("ignore user", effect.ignoreUser());
+				else
+					baseHeader.set("ignore user", effect.ignoreUser());
+			}
+			else 
+				baseHeader.set("ignore user", null);
+			
+			/*
+			 * ==================> TAG <==================
+			 */
+			
+			if(effect.hasTag())
+				setMapParsable(baseHeader.createSection("tag"), defaultHeader.createSection("tag"), effect.getTag(), defaultEffect.getTag());
+			else 
+				baseHeader.set("tag", null);
+			/*
+			 * ==================> PARTICLE EFFECTS <==================
+			 */
+			if(effect.hasParticle())
+				setMapParsable(baseHeader.createSection("particles"), defaultHeader.createSection("particles"), effect.getParticleEffect(), defaultEffect.getParticleEffect());
+			else 
+				baseHeader.set("particles", null);
+			/*
+			 * ==================> SOUND EFFECTS <==================
+			 */
+			
+			if(effect.hasSound())
+				setMapParsable(baseHeader.createSection("sounds"), defaultHeader.createSection("sounds"), effect.getSoundEffect(), defaultEffect.getSoundEffect());
+			else 
+				baseHeader.set("sounds", null);
+			/*
+			 * ==================> POTION EFFECTS <==================
+			 */
+			
+			if(effect.hasPotions()) {
+				if(effect.getPotions().equals(defaultEffect.getPotions()))
+					currentHeader = defaultHeader.createSection("potion effects");
+				else
+					currentHeader = baseHeader.createSection("potion effects");
+				
+				for(PotionEffect potionEffect : effect.getPotions())
+					BrEffectYML.postPotionEffect(currentHeader, potionEffect);
+			}
+			else 
+				baseHeader.set("potion effects", null);
+			/*
+			 * ==================> FILTERS <==================
+			 */
+			
+			if(effect.hasFilter()) {
+				if(effect.getFilter().equals(defaultEffect.getFilter()))
+					currentHeader = defaultHeader.createSection("filter");
+				else
+					currentHeader = baseHeader.createSection("filter");
+				// >>> Target
+				if(!effect.getFilter().getTarget().noFilter()) {
+					setFilterGroup(currentHeader.createSection("target"), effect.getFilter().getTarget());
+				}
+				// >>> Ignore
+				if(!effect.getFilter().getIgnore().noFilter()) {
+					setFilterGroup(currentHeader.createSection("ignore"), effect.getFilter().getIgnore());
+				}
+			}
+			else 
+				baseHeader.set("filter", null);
+			
+			return true;
+		} catch (Exception e) {
+			if(effect == null)
+				Messenger.warning("An Unknown Effect failed to save:");
+			Messenger.warning("'"+effect.getName()+"' Effect failed to save:");
+			e.printStackTrace();
+		}
+		return false;
+	}
 	/**
 	 * This function will extract a BrEffect from a YML file.
 	 * If the BrEffect is not complete, a default effect can be applied to fill in any null values.
@@ -65,11 +224,6 @@ public class BrEffectYML extends BreweryYAML{
 			// Getting the effect name from the last portion of the baseHeader.
 			String effectName = extractLast(baseHeader);
 			
-			// Checks if the effect's name is valid. Must be in upper case and with no spaces (Underscores replace spaces).
-			safeFormatCheck(effectName);
-			
-			Messenger.debug(Msg.INFO, " + Effect["+effectName+"]");
-			
 			// Adding effect to the processing list. This avoids any infinite loops of processing effects.
 			BrEffectCollection.addProcessing(effectName);
 			
@@ -89,7 +243,7 @@ public class BrEffectYML extends BreweryYAML{
 			// If this effect is allowed to be incomplete then this can be null.
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
-				modifier = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
+				modifier = getMapParsable(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
 			} catch (YAMLException e){
 			} catch (ClassNotFoundException e){
 				throw new ClassNotFoundException("Type required for 'modifier' is missing.");
@@ -111,7 +265,7 @@ public class BrEffectYML extends BreweryYAML{
 			// If this effect is allowed to be incomplete then this can be null.
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
-				trigger = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
+				trigger = getMapParsable(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
 			} catch (YAMLException e){
 			} catch (ClassNotFoundException e){
 				throw new ClassNotFoundException("'type' field is required but missing.");
@@ -138,7 +292,6 @@ public class BrEffectYML extends BreweryYAML{
 			if(currentHeader != null) {
 				try {
 					radius = getFloat("radius", currentHeader, defaultHeader);
-					if(radius != null) Messenger.debug(Msg.INFO, "    + Radius: "+radius);
 				} catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" radius:");
 					e.printStackTrace();
@@ -146,22 +299,21 @@ public class BrEffectYML extends BreweryYAML{
 			}
 
 			/*
-			 * ==================> IGNORE_USER <==================
+			 * ==================> IGNORE USER <==================
 			 */
 
 			// Setting currentHeader to the baseHeader.
 			// If this doesnt have an ignore_user, then currentHeader is set to the defaultSection.
 			// If defaultSection doesnt have a ignore_user, then currentHeader is null.
-			currentHeader = getAvailableWithSet("ignore_user", getSection(baseHeader), getSection(defaultHeader));
+			currentHeader = getAvailableWithSet("ignore user", getSection(baseHeader), getSection(defaultHeader));
 
 			// Extracting the nullable Boolean from the radius, currentHeader and defaultHeader.
-			Boolean ignore_user = null;
+			Boolean ignoreUser = null;
 			if(currentHeader != null) {
 				try{
-					ignore_user = getBoolean("ignore_user", currentHeader, defaultHeader);
-					if(ignore_user != null) Messenger.debug(Msg.INFO, "    + Ignore_User: "+ignore_user);
+					ignoreUser = getBoolean("ignore user", currentHeader, defaultHeader);
 				} catch(Exception e) {
-					Messenger.warning("Failed to retrieve "+effectName+" ignore_user:");
+					Messenger.warning("Failed to retrieve "+effectName+" ignore user:");
 					e.printStackTrace();
 				}
 			}
@@ -179,7 +331,6 @@ public class BrEffectYML extends BreweryYAML{
 			
 			// If either the base or the default headers have a filter, then its added (base taking priority).
 				if(currentHeader != null){
-					Messenger.debug(Msg.INFO, "    + Filter: ");
 					// This is within a try/catch because it is optional.
 					// If it failed, we dont want to halt the entire retrieval process.
 					try{
@@ -211,7 +362,7 @@ public class BrEffectYML extends BreweryYAML{
 				try{
 
 					// Setting the tag using the currentHeader, defaultHeader and getSimpleClassDefault method.
-					tag = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "tag"), BrTag.class);
+					tag = getMapParsable(currentHeader, getSection(defaultHeader, "tag"), BrTag.class);
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
@@ -227,7 +378,7 @@ public class BrEffectYML extends BreweryYAML{
 			
 			// Setting currentHeader to the baseHeader's particles.
 			// If this is unavailable, then currentHeader is set to the defaultSection's particles.
-			currentHeader = getAvailable(getSection(baseHeader, "particle"), getSection(defaultHeader, "particle"));
+			currentHeader = getAvailable(getSection(baseHeader, "particles"), getSection(defaultHeader, "particles"));
 			
 			// ParticleEffect is null if there are no particles in the base or default headers.
 			BrParticleEffect particleEffect = null;
@@ -239,7 +390,7 @@ public class BrEffectYML extends BreweryYAML{
 				try{
 
 					// Setting the particle effect using the currentHeader, defaultHeader and getSimpleClassDefault method.
-					particleEffect = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "particle"), BrParticleEffect.class);
+					particleEffect = getMapParsable(currentHeader, getSection(defaultHeader, "particles"), BrParticleEffect.class);
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
@@ -254,7 +405,7 @@ public class BrEffectYML extends BreweryYAML{
 			 */
 			// Setting currentHeader to the baseHeader's sounds.
 			// If this is unavailable, then currentHeader is set to the defaultSection's sounds.
-			currentHeader = getAvailable(getSection(baseHeader, "sound"), getSection(defaultHeader, "sound"));
+			currentHeader = getAvailable(getSection(baseHeader, "sounds"), getSection(defaultHeader, "sounds"));
 			
 			// SoundEffect is null if there are no sounds in the base or default headers.
 			BrSoundEffect soundEffect = null;
@@ -266,7 +417,7 @@ public class BrEffectYML extends BreweryYAML{
 				try{
 
 					// Setting the sound effect using the currentHeader, defaultHeader and getSimpleClassDefault method.
-					soundEffect = getSimpleClassDefault(currentHeader, getSection(defaultHeader, "sound"), BrSoundEffect.class);
+					soundEffect = getMapParsable(currentHeader, getSection(defaultHeader, "sounds"), BrSoundEffect.class);
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
@@ -282,14 +433,13 @@ public class BrEffectYML extends BreweryYAML{
 
 			// Setting currentHeader to the baseHeader's potion effects.
 			// If this is unavailable, then currentHeader is set to the defaultSection's potion effects.
-			currentHeader = getAvailable(getSection(baseHeader, "potion_effects"), getSection(defaultHeader, "potion_effects"));
+			currentHeader = getAvailable(getSection(baseHeader, "potion effects"), getSection(defaultHeader, "potion effects"));
 			
 			// Creates a new ArrayList for the entities
 			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 			
 			// If either the base or the default headers have potion effects, then they are added (base taking priority).
 			if(currentHeader != null){
-				Messenger.debug(Msg.INFO, "    + Potion Effects: ");
 				
 				// Loops through each potion effect on the list.
 				for(String potionName : currentHeader.getKeys(false)){
@@ -299,13 +449,6 @@ public class BrEffectYML extends BreweryYAML{
 						
 						// Attempts to retireve the potion effect from the given section.
 						PotionEffect potionEffect = retrievePotionEffect(getSection(currentHeader, potionName));
-						
-						// Prints relevant potion effect information for debugging.
-						Messenger.debug(Msg.INFO,"    +---"+potionName);
-						Messenger.debug(Msg.INFO,"    +-----[duration: "+potionEffect.getDuration()+"]");
-						Messenger.debug(Msg.INFO,"    +-----[strength: "+potionEffect.getAmplifier()+"]");
-						Messenger.debug(Msg.INFO,"    +-----[ambient: "+potionEffect.isAmbient()+"]");
-						Messenger.debug(Msg.INFO,"    +-----[particles: "+potionEffect.hasParticles()+"]");
 						
 						// If the potion effect is not null, adds it to the potion effects ArrayList.
 						if(potionEffect != null) potionEffects.add(potionEffect);
@@ -318,10 +461,8 @@ public class BrEffectYML extends BreweryYAML{
 				}
 			}
 			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, 
-					filter, particleEffect, soundEffect, potionEffects, tag, ignore_user);
+					filter, particleEffect, soundEffect, potionEffects, tag, ignoreUser);
 
-			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
-			BrEffectCollection.delProcessing(effectName);
 			
 			// If effect isnt already in the collection, it adds it.
 			if(!Brewery.getEffectCollection().contains(effect.getID()))
@@ -332,13 +473,14 @@ public class BrEffectYML extends BreweryYAML{
 			Messenger.warning("An effect failed to be found and loaded:");
 			e.printStackTrace();
 		} catch(Exception e) {
-			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
-			BrEffectCollection.delProcessing(extractLast(baseHeader));
 			if(essentialTask != null)
 				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load due to an error with the "+essentialTask+":");
 			else
-				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load :");
+				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
 			e.printStackTrace();
+		} finally {
+			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
+			BrEffectCollection.delProcessing(extractLast(baseHeader));
 		}
 		return null;
 		

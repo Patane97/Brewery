@@ -35,7 +35,7 @@ public class GenericPacketAdapter extends PacketAdapter{
 //				int slot = packet.getIntegers().getValues().get(0);
 //				ItemStack item = player.getInventory().getItem(slot);
 //				if(item != null && item.getType() != Material.AIR)
-//					Messenger.debug(Msg.INFO, "Ping.");
+//					Messenger.debug("Ping.");
 //			}
 //		});
 	}

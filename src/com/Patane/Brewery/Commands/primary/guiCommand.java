@@ -1,13 +1,9 @@
 package com.Patane.Brewery.Commands.primary;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
-import com.Patane.GUI.GUIInstance;
 
 @CommandInfo(
 	name = "gui",
@@ -18,10 +14,10 @@ import com.Patane.GUI.GUIInstance;
 public class guiCommand implements PatCommand {
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		Player player = (Player) sender;
-		BrItem item = Brewery.getItemCollection().getItem(args[0]);
-		GUIInstance gui = new GUIInstance(item.guiPage(), player);
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
+//		Player player = (Player) sender;
+//		BrItem item = Brewery.getItemCollection().getItem(args[0]);
+//		GUIInstance gui = new GUIInstance(item.guiPage(), player);
 //		GUIHandler gui = new GUIHandler();
 //		GUIPage page1 = new GUIPage("Page1", 3);
 //		GUIPage page2 = new GUIPage("Page2", 4);	

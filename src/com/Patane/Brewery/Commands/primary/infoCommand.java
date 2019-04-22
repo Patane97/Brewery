@@ -5,13 +5,13 @@ import java.util.Map;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Commands.BrCommandHandler;
+import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -26,7 +26,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class infoCommand implements PatCommand{
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		// Reason we dont check for length < 1 is because CommandHandler already checks for that and handles it appropriately.
 		if(args.length < 2) { 
 			Messenger.send(sender, "&cPlease specify a type name.");
@@ -37,7 +37,8 @@ public class infoCommand implements PatCommand{
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid info type.");
 			return false;
 		}
-		return child.execute(sender, Commands.grabArgs(args, 1, args.length));
+		CommandHandler.grabInstance().handleCommand(sender, child, args);
+		return true;
 	}
 	/**
 	 * Creates a chat message which displays the underlying type and name in the following format: "&2Type: &7Name"

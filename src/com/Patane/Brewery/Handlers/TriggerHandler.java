@@ -11,7 +11,6 @@ import com.Patane.Brewery.CustomEffects.triggers.Sticky;
 import com.Patane.handlers.PatHandler;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
 public class TriggerHandler implements PatHandler{
@@ -36,7 +35,7 @@ public class TriggerHandler implements PatHandler{
 		register(Instant.class);
 		register(Lingering.class);
 		register(Sticky.class);
-		Messenger.debug(Msg.INFO, "Registered Types: "+StringsUtil.stringJoiner(effectTypes.keySet(), ", "));
+		Messenger.debug("Registered Types: "+StringsUtil.stringJoiner(effectTypes.keySet(), ", "));
 	}
 	private static void register(Class< ? extends Trigger> effectType){
 		Namer info = effectType.getAnnotation(Namer.class);

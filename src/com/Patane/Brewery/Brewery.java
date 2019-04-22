@@ -10,20 +10,14 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItemYML;
+import com.Patane.Brewery.Editing.EditSession;
 import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
-import com.Patane.Brewery.Listeners.GenericPacketAdapter;
 import com.Patane.Brewery.Listeners.GlobalListener;
-import com.Patane.Brewery.Sequencer.Sequencer;
-import com.Patane.Brewery.Sequencer.SequencesYML;
 import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.main.PataneUtil;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
 
 /*
  * @author Patane
@@ -36,48 +30,67 @@ public class Brewery extends JavaPlugin{
 	private static BrEffectCollection effectCollection;
 	private static GlobalListener globalListener;
 	
-	private ProtocolManager protocolManager;
-	
 	public void onEnable() {
 		brewery = this;
-		PataneUtil.setup(brewery, true);
-		itemCollection = new BrItemCollection();
-		effectCollection = new BrEffectCollection();
-		
-		globalListener = new GlobalListener();
+		PataneUtil.setup(brewery, true, "&2[&aBrewery&2]&r ", "&2[&aBR&2]&r ");
 		
 		this.getCommand("br").setExecutor(new BrCommandHandler());
+
+		
+		globalListener = new GlobalListener();
 		
 		TriggerHandler.registerAll();
 		ModifierHandler.registerAll();
 		FormationHandler.registerAll();
 		
-		protocolManager = ProtocolLibrary.getProtocolManager();
-		protocolManager.addPacketListener(new GenericPacketAdapter(ListenerPriority.NORMAL, PacketType.Play.Client.SET_CREATIVE_SLOT));
+		loadPlugin();
+	}
+	public void unLoadPlugin() {
+		EditSession.reset();
+	}
+	
+	public void loadPlugin() {
+		
+		itemCollection = new BrItemCollection();
+		effectCollection = new BrEffectCollection();
 		
 		loadFiles();
 		
 		CooldownHandler.onLoadChecks();
 		
-		// Loading message
 		Messenger.info("Brewery version " + this.getDescription().getVersion() + " successfully loaded!");
 	}
 	public void onDisable() {
-		saveFiles();
+		unLoadPlugin();
+//		saveFiles();
 	}
+	@SuppressWarnings("unused")
 	private void saveFiles() {
-//		BrItem.YML().save();
-//		BrEffect.YML().save();
+		try {
+			BrItem.YML().save();
+		} catch (IllegalStateException e) {}
+		try {
+			BrEffect.YML().save();
+		} catch (IllegalStateException e) {}
 	}
 	private void loadFiles() {
-		BrEffect.setYML(new BrEffectYML());
-		BrEffect.YML().load();
-		BrItem.setYML(new BrItemYML());
-		BrItem.YML().load();
-		Sequencer.setYML(new SequencesYML());
-		Sequencer.YML().load();
-		// Data YAML's
-		CooldownHandler.setYML(new YAMLData("data", "cooldowns"));
+		try {
+			BrEffect.setYML(new BrEffectYML());
+			BrEffect.YML().load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			BrItem.setYML(new BrItemYML());
+			BrItem.YML().load();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			CooldownHandler.setYML(new YAMLData("cooldowns", "data"));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	public static Brewery getInstance() {
 		return brewery;
