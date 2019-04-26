@@ -53,14 +53,14 @@ public class BrEffectYML extends BreweryYAML{
 	
 	public boolean save(BrEffect effect) throws IllegalStateException {
 		if(post(getPrefix(), effect, null, null)) {
-			configHandler.saveConfig();
+			configHandler.saveConfigQuietly();
 			return true;
 		}
 		return false;
 	}
 	
 	public BrEffect load(ConfigurationSection section) {
-		return retrieve(section, null, true);
+		return retrieve(section, null);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class BrEffectYML extends BreweryYAML{
 	 * @param defaultHeader The default root that will be used to fill any values that could not be determined/found in the YML. If this is set to null, then the YML MUST provide all details, or the effect's retrieval will fail.
 	 * @param incompleteAllowed Whether essential values (such as Trigger) can be missing. Generally true if this is retireving a default effect.
 	 */
-	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader, boolean incompleteAllowed){
+	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader){
 		// Setting the name of the current essential task. Used to give a little bit of info when errors occur.
 		String essentialTask = null;
 		try{			
@@ -460,7 +460,7 @@ public class BrEffectYML extends BreweryYAML{
 					}
 				}
 			}
-			BrEffect effect = new BrEffect(incompleteAllowed, effectName, modifier, trigger, radius, 
+			BrEffect effect = new BrEffect(effectName, modifier, trigger, radius, 
 					filter, particleEffect, soundEffect, potionEffects, tag, ignoreUser);
 
 			

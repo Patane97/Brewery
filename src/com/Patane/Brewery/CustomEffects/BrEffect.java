@@ -19,6 +19,7 @@ import com.Patane.util.collections.PatCollectable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.general.StringsUtil;
 
 public class BrEffect extends PatCollectable{
 	/**
@@ -35,20 +36,20 @@ public class BrEffect extends PatCollectable{
 	/**
 	 * **********************************************************
 	 */
-	private final Modifier modifier;
-	private final Trigger trigger;
-	private final Float radius;
-	private final Filter filter;
-	private final BrParticleEffect particles;
-	private final BrSoundEffect sounds;
-	private final List<PotionEffect> potion_effects;// *** Change to set OR standard Array
-	private final BrTag tag;
-	private final boolean ignore_user;
-//	private final boolean stack;
+	protected Modifier modifier;
+	protected Trigger trigger;
+	protected Float radius;
+	protected Filter filter;
+	protected BrParticleEffect particles;
+	protected BrSoundEffect sounds;
+	protected List<PotionEffect> potion_effects;// *** Change to set OR standard Array
+	protected BrTag tag;
+	protected boolean ignore_user;
+//	protected boolean stack;
 
-	private List<String> incomplete = new ArrayList<String>();
+	protected List<String> incomplete = new ArrayList<String>();
 	
-	public BrEffect(boolean incompleteAllowed, String name, Modifier modifier, Trigger trigger, Float radius, 
+	public BrEffect(String name, Modifier modifier, Trigger trigger, Float radius, 
 			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potion_effects, 
 			BrTag tag, Boolean ignore_user) {
 		// Setting the name
@@ -56,10 +57,10 @@ public class BrEffect extends PatCollectable{
 		
 		// ESSENTIAL VALUES.
 		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
-		this.modifier = (incompleteAllowed ? modifier : Check.notNull(modifier, "BrEffect needs more data: '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		this.modifier = modifier;
 		if(modifier == null) incomplete.add("modifier");
 		
-		this.trigger = (incompleteAllowed ? trigger : Check.notNull(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
+		this.trigger = trigger;
 		if(trigger == null)	incomplete.add("trigger");
 		
 		// NULLABLE VALUES.
@@ -76,14 +77,22 @@ public class BrEffect extends PatCollectable{
 		this.potion_effects = (potion_effects == null ? new ArrayList<PotionEffect>() : potion_effects);
 		this.ignore_user = (ignore_user == null ? true : ignore_user);
 //		this.stack = false;
+		if(!isComplete())
+			Messenger.info(name+" effect is incomplete. Missing: "+StringsUtil.stringJoiner(incomplete, ", "));
 	}
 	
 	// Getters for essential values.
 	public Modifier getModifier() {
 		return modifier;
 	}
+	public void setModifier(Modifier modifier) {
+		this.modifier = modifier;
+	}
 	public Trigger getTrigger() {
 		return trigger;
+	}
+	public void setTrigger(Trigger trigger) {
+		this.trigger = trigger;
 	}
 	
 	// Has & Getters for non-essential values.
@@ -95,7 +104,9 @@ public class BrEffect extends PatCollectable{
 	public Float getRadius() {
 		return radius;
 	}
-	
+	public void setRadius(Float radius) {
+		this.radius = radius;
+	}
 	// Filter
 	public boolean hasFilter() {
 		return !filter.noFilters();
@@ -103,7 +114,6 @@ public class BrEffect extends PatCollectable{
 	public Filter getFilter() {
 		return filter;
 	}
-	
 	// Particle
 	public boolean hasParticle() {
 		return (particles == null ? false : true);
@@ -111,13 +121,20 @@ public class BrEffect extends PatCollectable{
 	public BrParticleEffect getParticleEffect() {
 		return particles;
 	}
-
+	public void setParticle(BrParticleEffect particles) {
+		this.particles = particles;
+	}
+	
+	
 	// Sound
 	public boolean hasSound() {
 		return (sounds == null ? false : true);
 	}
 	public BrSoundEffect getSoundEffect() {
 		return sounds;
+	}
+	public void setSound(BrSoundEffect sounds) {
+		this.sounds = sounds;
 	}
 
 	// Potion Effects

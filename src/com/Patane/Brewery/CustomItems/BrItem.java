@@ -94,10 +94,35 @@ public class BrItem extends PatCollectable{
 	public boolean hasEffects() {
 		return !effects.isEmpty();
 	}
+	public boolean hasEffect(String effectName) {
+		for(BrEffect effect : effects)
+			if(effect.getName().equalsIgnoreCase(effectName))
+				return true;
+		return false;
+	}
+	public BrEffect getEffect(String effectName) {
+		for(BrEffect effect : effects)
+			if(effect.getName().equalsIgnoreCase(effectName))
+				return effect;
+		return null;
+	}
 	public List<BrEffect> getEffects() {
 		return effects;
 	}
-	
+	public void addEffect(BrEffect effect) {
+		Messenger.debug("Adding "+effect.getName()+" effect to "+this.getName());
+		effects.add(effect);
+	}
+
+	public void removeEffect(String effectName) {
+		for(BrEffect effect : effects) {
+			if(effect.getName().equalsIgnoreCase(effectName)) {
+				Messenger.debug("Removing "+effect.getName()+" effect from "+this.getName());
+				effects.remove(effect);
+				return;
+			}
+		}
+	}
 	
 	public boolean hasCooldown() {
 		return (cooldown == null ? false :  true);
@@ -126,10 +151,11 @@ public class BrItem extends PatCollectable{
 			for(BrEffect effect : effects) {
 				// If the effect has a radius, then it can be executed.
 				// If the effect does not have a radius, then it cannot be executed on a specific location.
-				if(effect.hasRadius())
-					// If the effect executes successfully, add it to the successful array.
-					if(effect.execute(location, executor))
-						successful.add(effect.getID());
+				if(effect.isComplete())
+					if(effect.hasRadius())
+						// If the effect executes successfully, add it to the successful array.
+						if(effect.execute(location, executor))
+							successful.add(effect.getID());
 			}
 			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
 			return true;
@@ -149,8 +175,9 @@ public class BrItem extends PatCollectable{
 			List<String> successful = new ArrayList<String>();
 			// Loops through each effect within this BrItem.
 			for(BrEffect effect : effects) {
-				if(effect.execute(executor, target))
-					successful.add(effect.getID());
+				if(effect.isComplete())
+					if(effect.execute(executor, target))
+						successful.add(effect.getID());
 			}
 			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
 			return true;

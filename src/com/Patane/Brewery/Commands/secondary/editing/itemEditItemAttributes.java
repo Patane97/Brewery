@@ -37,7 +37,7 @@ public class itemEditItemAttributes extends itemEditItem {
 		
 		PatCommand child = BrCommandHandler.grabInstance().getChildCommand(this, args[0]);
 		if(child == null) {
-			Messenger.send(sender, "&7"+args[1]+" &cis an invalid argument.");
+			Messenger.send(sender, "&7"+args[0]+" &cis an invalid argument.");
 			return false;
 		}
 		CommandHandler.grabInstance().handleCommand(sender, child, args, attribute);

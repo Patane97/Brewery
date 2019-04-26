@@ -234,6 +234,7 @@ public class BrItemYML extends BreweryYAML{
 			/*
 			 * ==================> EFFECTS <==================
 			 */
+			getSelect().set("effects", null);
 			if(item.hasEffects()) {
 				setSelect(item.getName(), "effects");
 				for(BrEffect effect : item.getEffects())
@@ -462,7 +463,7 @@ public class BrItemYML extends BreweryYAML{
 				// doesnt stop other effects from being retrieved.
 				try{
 					// Retrieves the effect using the yml given, the default BrEffectYML and the retrieve() function.
-					BrEffect effect = BrEffectYML.retrieve(getSectionAndWarn(getSelect(), effectName), BrEffect.YML().getSection(effectName), false);
+					BrEffect effect = BrEffectYML.retrieve(getSectionAndWarn(getSelect(), effectName), BrEffect.YML().getSection(effectName));
 					
 					// Checks if the effect is null or not.
 					Check.notNull(effect);

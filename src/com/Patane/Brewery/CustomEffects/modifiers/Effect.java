@@ -36,11 +36,11 @@ public class Effect extends Modifier{
 		// Otherwise, retrieve the item from the effects.yml NOW.
 		// This will add it to the collection (if fully loaded) and stop it from being reloaded later.
 		else
-			tempEffect = BrEffectYML.retrieve(YAMLFile.getSectionAndWarn(BrEffect.YML().getPrefix(), effectName), null, false);
+			tempEffect = BrEffectYML.retrieve(YAMLFile.getSectionAndWarn(BrEffect.YML().getPrefix(), effectName), null);
 		
 		// Creates a new BrEffect clones the previous, however it has no filter and doesnt ignore the user.
 		// This is done because the first effect already filters and ignores user. It doesnt need to do it twice.
-		effect = new BrEffect(false, tempEffect.getName(), tempEffect.getModifier(), tempEffect.getTrigger(), tempEffect.getRadius(), 
+		effect = new BrEffect(tempEffect.getName(), tempEffect.getModifier(), tempEffect.getTrigger(), tempEffect.getRadius(), 
 				null, tempEffect.getParticleEffect(), tempEffect.getSoundEffect(), tempEffect.getPotions(), tempEffect.getTag(), false);
 		// If the effect failed to load, it prints this error.
 		Check.notNull(effect, "Effect is missing. Did it fail to load?");

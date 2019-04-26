@@ -55,7 +55,7 @@ public class infoItem extends infoCommand{
 		if(item.hasEffects()) {
 			Messenger.sendRaw(sender, "&2Effects:\n");
 			for(BrEffect effect : item.getEffects()) {
-				BrEffect completeEffect = BrEffectYML.retrieve(BrItem.YML().getSection(item.getName(), "effects", effect.getName()), BrEffect.YML().getSection(effect.getName()), false);
+				BrEffect completeEffect = BrEffectYML.retrieve(BrItem.YML().getSection(item.getName(), "effects", effect.getName()), BrEffect.YML().getSection(effect.getName()));
 				TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+effect.getName()));
 				commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(completeEffect.hoverDetails()).create()));
 				commandText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br info effect "+effect.getName()));

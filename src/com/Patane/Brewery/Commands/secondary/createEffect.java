@@ -39,7 +39,7 @@ public class createEffect extends createCommand {
 			return false;
 		}
 		try {
-			BrEffect brEffect = new BrEffect(false, name, new None(), new Instant(), null, null, null, null, null, null, null);
+			BrEffect brEffect = new BrEffect(name, new None(), new Instant(), null, null, null, null, null, null, null);
 
 			// Attempt to save the effect to YML. If this gives us exceptions then we dont add the effect to the collection
 			BrEffect.YML().save(brEffect);

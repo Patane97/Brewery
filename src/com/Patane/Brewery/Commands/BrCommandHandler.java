@@ -59,5 +59,11 @@ public class BrCommandHandler extends CommandHandler{
 		register(itemEditItemAttributesRemove.class);
 		register(itemEditType.class);
 		register(itemEditCooldown.class);
+		register(itemEditEffects.class);
+		register(itemEditEffectsAdd.class);
+		register(itemEditEffectsRemove.class);
+		register(itemEditEffectsEdit.class);
+		register(itemEditEffectsEditSet.class);
+		register(itemEditEffectsEditSetModifier.class);
 	}
 }
