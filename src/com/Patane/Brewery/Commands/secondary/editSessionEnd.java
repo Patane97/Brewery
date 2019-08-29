@@ -11,7 +11,7 @@ import com.Patane.util.general.Messenger;
 	name = "editsession end",
 	aliases = {"finish", "complete"},
 	description = "Ends the currently active editing session.",
-	usage = "/br editsession end"
+	usage = "/brewery editsession end"
 )
 public class editSessionEnd extends editSessionCommand {
 	

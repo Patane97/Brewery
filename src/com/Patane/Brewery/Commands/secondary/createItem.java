@@ -1,5 +1,8 @@
 package com.Patane.Brewery.Commands.secondary;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -9,13 +12,15 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Commands.primary.createCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Commands;
 @CommandInfo(
 	name = "create item",
 	description = "Creates a new item using the item held in hand.",
-	usage = "/br create item <item name>"
+	usage = "/brewery create item <item name>",
+	maxArgs = 1
 )
 public class createItem extends createCommand {
 
@@ -68,5 +73,10 @@ public class createItem extends createCommand {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Arrays.asList("<item name>");
 	}
 }

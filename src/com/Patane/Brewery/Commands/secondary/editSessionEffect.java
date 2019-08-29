@@ -1,11 +1,14 @@
 package com.Patane.Brewery.Commands.secondary;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Commands.primary.editSessionCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.Editing.EditSession;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Commands;
@@ -13,7 +16,8 @@ import com.Patane.util.ingame.Commands;
 @CommandInfo(
 	name = "editsession effect",
 	description = "Starts an editing session for a Brewery Effect.",
-	usage = "/br editsession effect <effect name>"
+	usage = "/brewery editsession effect <effect name>",
+	maxArgs = 1
 )
 public class editSessionEffect extends editSessionCommand {
 	
@@ -30,5 +34,10 @@ public class editSessionEffect extends editSessionCommand {
 		BrEffect brEffect = Brewery.getEffectCollection().getItem(name);
 		EditSession.start(sender.getName(), brEffect);
 		return true;
+	}
+
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Brewery.getEffectCollection().getAllIDs();
 	}
 }

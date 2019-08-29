@@ -1,11 +1,15 @@
 package com.Patane.Brewery.Commands.primary;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Brewery.Commands.secondary.editSessionEnd;
 import com.Patane.Brewery.Editing.EditSession;
 import com.Patane.Commands.CommandHandler;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.general.Messenger;
@@ -18,10 +22,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 	name = "editsession",
 	aliases = {"editmode"},
 	description = "Starts an editing session for something in Brewery.",
-	usage = "/br editsession [type] <name>",
+	usage = "/brewery editsession [type] <name>",
 	permission = "brewery.editsession"
 )
-public class editSessionCommand implements PatCommand {
+public class editSessionCommand extends PatCommand {
 	
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -36,12 +40,20 @@ public class editSessionCommand implements PatCommand {
 			return true;
 		}
 		
-		PatCommand child = BrCommandHandler.grabInstance().getChildCommand(this, args[0]);
+		CommandPackage child = BrCommandHandler.getChildPackage(this.getClass(), args[0]);
 		if(child == null) {
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid type for editing.");
 			return false;
 		}
-		CommandHandler.grabInstance().handleCommand(sender, child, args);
+		CommandHandler.grabInstance().handleCommand(sender, child.command(), args);
 		return true;
+	}
+	
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		if(EditSession.active(sender.getName()))
+			return Arrays.asList("end");
+		List<String> children = thisPackage.trimmedChildren();
+		children.remove("end");
+		return children;
 	}
 }

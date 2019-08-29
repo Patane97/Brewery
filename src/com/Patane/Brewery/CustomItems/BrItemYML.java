@@ -238,8 +238,8 @@ public class BrItemYML extends BreweryYAML{
 			if(item.hasEffects()) {
 				setSelect(item.getName(), "effects");
 				for(BrEffect effect : item.getEffects())
-					BrEffectYML.post(getSelect(), effect, BrEffect.YML().getPrefix(), Brewery.getEffectCollection().getItem(effect.getID()));
-				BrEffect.YML().save();
+					BrEffectYML.post(getSelect(), effect, BrEffect.YML().getPrefix(), Brewery.getEffectCollection().getItem(effect.getName()));
+//				BrEffect.YML().save();
 			}
 			else
 				// If the item has no effects then clear its effects section from the yml
@@ -484,7 +484,7 @@ public class BrItemYML extends BreweryYAML{
 			BrItem item = new BrItem(itemName, type, itemStack, effects, cooldown);
 
 			// If item isnt already in the collection, it adds it.
-			if(!Brewery.getItemCollection().contains(item.getID()))
+			if(!Brewery.getItemCollection().hasItem(item.getName()))
 				Brewery.getItemCollection().add(item);
 			return item;
 		} catch(YAMLException e){

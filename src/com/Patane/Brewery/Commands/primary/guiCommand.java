@@ -8,10 +8,10 @@ import com.Patane.Commands.PatCommand;
 @CommandInfo(
 	name = "gui",
 	description = "GUI stuff.",
-	usage = "/br gui",
+	usage = "/brewery gui",
 	permission = "brewery.gui"
 )
-public class guiCommand implements PatCommand {
+public class guiCommand extends PatCommand {
 	
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

@@ -18,7 +18,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 	name = "list effects",
 	aliases = {"effect"},
 	description = "Lists each registered Effect.",
-	usage = "/br list effects"
+	usage = "/brewery list effects"
 )
 public class listEffects extends listCommand{
 

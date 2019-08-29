@@ -2,10 +2,10 @@ package com.Patane.Brewery.Listeners;
 
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;

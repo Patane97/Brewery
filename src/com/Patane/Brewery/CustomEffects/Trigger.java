@@ -101,7 +101,7 @@ public abstract class Trigger extends TypeParsable{
 			applyModifiers(effect, impact, executor, hitEntity);
 			
 			// Debug to tell the entity it has been affected by certain effect
-			Messenger.debug(hitEntity, "&cAffected by &7"+effect.getName()+"&c effect.");
+			Messenger.debug(hitEntity, "&cAffected by &7"+effect.getName()+" &ceffect.");
 			return hitEntity;
 		}
 		return null;

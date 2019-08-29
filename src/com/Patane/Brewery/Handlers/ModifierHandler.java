@@ -24,11 +24,9 @@ public class ModifierHandler implements PatHandler{
 	private static HashMap<String, Class< ? extends Modifier>> modifiers;
 	
 	public static Class< ? extends Modifier> get(String modifier){
-		if(modifier == null)
-			return null;
-		for(String modName : modifiers.keySet()){
-			if(modifier.equals(modName))
-				return modifiers.get(modName);
+		for(String modifierName : modifiers.keySet()){
+			if(modifierName.equalsIgnoreCase(modifier))
+				return modifiers.get(modifierName);
 		}
 		return null;
 	}

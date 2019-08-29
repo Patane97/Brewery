@@ -49,8 +49,8 @@ public class BrItem extends PatCollectable{
 	
 	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown){
 		super(name);
-		if(Brewery.getItemCollection().contains(getID())){
-			throw new IllegalArgumentException(getID()+" already exists!");
+		if(Brewery.getItemCollection().hasItem(getName())){
+			throw new IllegalArgumentException(getName()+" already exists!");
 		}
 		setType(type);
 		setItemStack(item);
@@ -79,7 +79,7 @@ public class BrItem extends PatCollectable{
 		return item;
 	}
 	public void setItemStack(ItemStack item) {
-		this.item = Check.notNull(ItemEncoder.addTag(item, "NAME", getID()), "BrItem '"+this.getName()+"' has no item. Did it fail to create?");
+		this.item = Check.notNull(ItemEncoder.addTag(item, "name", getName()), "BrItem '"+this.getName()+"' has no item. Did it fail to create?");
 	}
 	
 	
@@ -123,6 +123,15 @@ public class BrItem extends PatCollectable{
 			}
 		}
 	}
+	public void updateEffect(BrEffect newBrEffect) {
+		for(BrEffect brEffect : effects) {
+			if(brEffect.getName().equalsIgnoreCase(newBrEffect.getName())) {
+				effects.remove(brEffect);
+				effects.add(newBrEffect);
+				return;
+			}
+		}
+	}
 	
 	public boolean hasCooldown() {
 		return (cooldown == null ? false :  true);
@@ -155,7 +164,7 @@ public class BrItem extends PatCollectable{
 					if(effect.hasRadius())
 						// If the effect executes successfully, add it to the successful array.
 						if(effect.execute(location, executor))
-							successful.add(effect.getID());
+							successful.add(effect.getName());
 			}
 			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
 			return true;
@@ -177,7 +186,7 @@ public class BrItem extends PatCollectable{
 			for(BrEffect effect : effects) {
 				if(effect.isComplete())
 					if(effect.execute(executor, target))
-						successful.add(effect.getID());
+						successful.add(effect.getName());
 			}
 			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
 			return true;
@@ -200,7 +209,7 @@ public class BrItem extends PatCollectable{
 	}
 	
 	public static BrItem get(ItemStack item){
-		String brItemName = ItemEncoder.getString(item, "NAME");
+		String brItemName = ItemEncoder.getString(item, "name");
 		if(brItemName == null)
 			return null;
 		return Brewery.getItemCollection().getItem(brItemName);

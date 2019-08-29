@@ -1,6 +1,7 @@
 package com.Patane.Brewery.Commands.secondary.editing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
@@ -17,7 +19,8 @@ import com.Patane.util.ingame.ItemsUtil;
 	name = "edit item lore set",
 	aliases = {"add"},
 	description = "Sets a specific line of an items lore.",
-	usage = "/br edit item lore set <line> <text>",
+	usage = "/brewery edit item lore set <line> <text>",
+	maxArgs = 2,
 	hideCommand = true
 )
 public class itemEditItemLoreSet extends itemEditItemLore {
@@ -60,5 +63,13 @@ public class itemEditItemLoreSet extends itemEditItemLore {
 		else
 			Messenger.send(sender, "&aLore text for line &7"+line+"&a set to the following: &7"+text);
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		switch(args.length) {
+			case 5: return Arrays.asList("<line>");
+			default: return Arrays.asList("<text>");
+		}
 	}
 }

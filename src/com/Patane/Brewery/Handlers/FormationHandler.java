@@ -18,11 +18,11 @@ import com.Patane.util.general.StringsUtil;
 public class FormationHandler implements PatHandler{
 private static HashMap<String, Formation> formations;
 	
-	public static Formation get(String itemName){
-		Check.notNull(itemName, "Formation field is missing");
-		for(String name : formations.keySet()){
-			if(itemName.equals(name))
-				return formations.get(name);
+	public static Formation get(String formation){
+		Check.notNull(formation);
+		for(String formationName : formations.keySet()){
+			if(formation.equalsIgnoreCase(formationName))
+				return formations.get(formationName);
 		}
 		return null;
 	}

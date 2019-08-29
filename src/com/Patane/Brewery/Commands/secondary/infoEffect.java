@@ -12,6 +12,7 @@ import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
@@ -24,7 +25,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "info effect",
 	description = "Gives detailed information on a specific Effect.",
-	usage = "/br info effect <effect name>"
+	usage = "/brewery info effect <effect name>",
+	maxArgs = 1
 )
 public class infoEffect extends infoCommand{
 
@@ -33,7 +35,7 @@ public class infoEffect extends infoCommand{
 		String effectName = Commands.combineArgs(args);
 		BrEffect effect = Brewery.getEffectCollection().getItem(effectName);
 		if(effect == null) {
-			Messenger.send(sender, "&7"+StringsUtil.stringJoiner(args, " ")+"&c is not a registered Brewery effect.");
+			Messenger.send(sender, "&7"+StringsUtil.stringJoiner(args, " ")+" &cis not a registered Brewery effect.");
 			return false;
 		}
 		Messenger.send(sender, StringsUtil.generateChatTitle(StringsUtil.formaliseString(effect.getName())+" effect"));
@@ -56,6 +58,11 @@ public class infoEffect extends infoCommand{
 			filterInfo(sender, effect.getFilter());
 		}
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Brewery.getEffectCollection().getAllIDs();
 	}
 	
 	private void potionEffectsInfo(CommandSender sender, List<PotionEffect> potionEffects) {

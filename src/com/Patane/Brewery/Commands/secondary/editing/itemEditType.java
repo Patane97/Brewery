@@ -1,5 +1,8 @@
 package com.Patane.Brewery.Commands.secondary.editing;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Commands.primary.editCommand;
@@ -7,13 +10,16 @@ import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.Editing.EditSession;
 import com.Patane.Brewery.Editing.EditingInfo;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 @CommandInfo(
 	name = "edit type",
 	description = "Edits the Item Type for a Brewery Item.",
-	usage = "/br edit type [type]"
+	usage = "/brewery edit type [type]",
+	maxArgs = 1,
+	hideCommand = true
 )
 @EditingInfo(type = BrItem.class)
 public class itemEditType extends editCommand {
@@ -37,5 +43,9 @@ public class itemEditType extends editCommand {
 		
 		Messenger.send(sender, "&aSet Item Type to &7"+type+"&a.");
 		return true;
+	}
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Arrays.asList(StringsUtil.enumValueStrings(CustomType.class));
 	}
 }

@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Commands.CommandHandler;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.YAML.MapParsable;
@@ -20,10 +21,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 	name = "info",
 	aliases = {"information","detail"},
 	description = "Gives detailed information about a specific Brewery product.",
-	usage = "/br info [type] <type name>",
+	usage = "/brewery info [type] <type name>",
 	permission = "brewery.info"
 )
-public class infoCommand implements PatCommand{
+public class infoCommand extends PatCommand{
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -32,14 +33,15 @@ public class infoCommand implements PatCommand{
 			Messenger.send(sender, "&cPlease specify a type name.");
 			return false;
 		}
-		PatCommand child = BrCommandHandler.grabInstance().getChildCommand(this, args[0]);
+		CommandPackage child = BrCommandHandler.getChildPackage(this.getClass(), args[0]);
 		if(child == null) {
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid info type.");
 			return false;
 		}
-		CommandHandler.grabInstance().handleCommand(sender, child, args);
+		CommandHandler.grabInstance().handleCommand(sender, child.command(), args);
 		return true;
 	}
+	
 	/**
 	 * Creates a chat message which displays the underlying type and name in the following format: "&2Type: &7Name"
 	 * On hover, it displays the specific MapParsables fields and values in a similar format.

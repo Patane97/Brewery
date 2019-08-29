@@ -30,7 +30,7 @@ public class Effect extends Modifier{
 		}
 		BrEffect tempEffect;
 		// If the item has already been fully loaded, simply grab it from the collection.
-		if(Brewery.getEffectCollection().contains(effectName))
+		if(Brewery.getEffectCollection().hasItem(effectName))
 			tempEffect = Brewery.getEffectCollection().getItem(effectName);
 		
 		// Otherwise, retrieve the item from the effects.yml NOW.

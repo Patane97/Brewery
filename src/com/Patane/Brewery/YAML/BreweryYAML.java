@@ -23,13 +23,15 @@ public abstract class BreweryYAML extends YAMLEditable{
 	 * @param effect PotionEffect to post.
 	 */
 	public static void postPotionEffect(ConfigurationSection section, PotionEffect effect) {
-		section = section.createSection(effect.getType().toString());
+		section = section.createSection(effect.getType().getName());
 		section.set("duration", effect.getDuration());
-		section.set("strength", effect.getAmplifier());
+		section.set("amplifier", effect.getAmplifier());
 		if(!effect.isAmbient())
 			section.set("ambient", effect.isAmbient());
 		if(!effect.hasParticles())
 			section.set("particles", effect.hasParticles());
+		if(!effect.hasIcon())
+			section.set("icon", effect.hasParticles());
 	}
 	/**
 	 * Retireves a potion effect from a YML and creates it based on the values given.
@@ -42,17 +44,22 @@ public abstract class BreweryYAML extends YAMLEditable{
 			effectName = extractLast(section);
 			PotionEffectType type = PotionEffectType.getByName(effectName);
 			int duration = parseInt(section.getString("duration"));
-			int strength = parseInt(section.getString("strength"));
+			int amplifier = parseInt(section.getString("amplifier"));
 			try{
 				boolean ambient = parseBoolean(section.getString("ambient"));
 				try{
 					boolean particles = parseBoolean(section.getString("particles"));
-					return new PotionEffect(type, duration, strength, ambient, particles);
+					try {
+						boolean icon = parseBoolean(section.getString("icon"));
+						return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
+					} catch (Exception e) {
+						return new PotionEffect(type, duration, amplifier, ambient, particles);
+					}
 				} catch (Exception e){
-					return new PotionEffect(type, duration, strength, ambient);
+					return new PotionEffect(type, duration, amplifier, ambient);
 				}
 			} catch(Exception e){
-				return new PotionEffect(type, duration, strength);
+				return new PotionEffect(type, duration, amplifier);
 			}
 		} catch (Exception e){
 			Messenger.warning("Potion Effect '"+effectName+"' retrieval has failed. Check all YML values are set correctly.");

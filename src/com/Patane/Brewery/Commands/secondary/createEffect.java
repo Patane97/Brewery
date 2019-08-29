@@ -1,5 +1,8 @@
 package com.Patane.Brewery.Commands.secondary;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -8,13 +11,15 @@ import com.Patane.Brewery.Commands.primary.createCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.triggers.Instant;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Commands;
 @CommandInfo(
 	name = "create effect",
 	description = "Creates a new effect using default values.",
-	usage = "/br create effect <effect name>"
+	usage = "/brewery create effect <effect name>",
+	maxArgs = 1
 )
 public class createEffect extends createCommand {
 
@@ -57,5 +62,10 @@ public class createEffect extends createCommand {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Arrays.asList("<effect name>");
 	}
 }

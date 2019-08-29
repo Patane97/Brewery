@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Commands.primary.listCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
+import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
@@ -18,7 +19,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 	name = "list items",
 	aliases = {"item"},
 	description = "Lists each registered Item.",
-	usage = "/br list items"
+	usage = "/brewery list items"
 )
 public class listItems extends listCommand{
 
@@ -30,7 +31,7 @@ public class listItems extends listCommand{
 
 			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(item.hoverDetails()).create()));
 			
-			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/br info item "+item.getName()));
+			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  CommandHandler.getPackage(infoItem.class).buildString(item.getName())));
 			
 			Messenger.sendRaw(sender, commandText);
 			

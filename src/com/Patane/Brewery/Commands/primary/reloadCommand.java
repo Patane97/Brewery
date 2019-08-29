@@ -9,10 +9,10 @@ import com.Patane.util.general.Messenger;
 @CommandInfo(
 	name = "reload",
 	description = "Reloads the plugin or a specific part of the plugin.",
-	usage = "/br reload",
+	usage = "/brewery reload",
 	permission = "brewery.reload"
 )
-public class reloadCommand implements PatCommand{
+public class reloadCommand extends PatCommand{
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -25,11 +25,11 @@ public class reloadCommand implements PatCommand{
 		return true;
 		// Maybe add individual YML reloads here.
 //		// Reload individual YML's here
-//		PatCommand child = BrCommandHandler.grabInstance().getChildCommand(this, args[0]);
+//		CommandPackage child = BrCommandHandler.getChildPackage(this.getClass(), args[0]);
 //		if(child == null) {
 //			Messenger.send(sender, "&7"+args[0]+" &cis not a valid info type.");
 //			return false;
 //		}
-//		CommandHandler.grabInstance().handleCommand(sender, child, args);
+//		CommandHandler.grabInstance().handleCommand(sender, child.command(), args);
 	}
 }

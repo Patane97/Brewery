@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.Brewery.Handlers.FormationHandler;
@@ -87,12 +88,17 @@ public class BrEffect extends PatCollectable{
 	}
 	public void setModifier(Modifier modifier) {
 		this.modifier = modifier;
+		if(incomplete.contains("modifier") && this.modifier != null)
+			incomplete.remove("modifier");
 	}
 	public Trigger getTrigger() {
 		return trigger;
 	}
 	public void setTrigger(Trigger trigger) {
 		this.trigger = trigger;
+		if(incomplete.contains("trigger") && this.trigger != null)
+			incomplete.remove("trigger");
+		
 	}
 	
 	// Has & Getters for non-essential values.
@@ -113,6 +119,9 @@ public class BrEffect extends PatCollectable{
 	}
 	public Filter getFilter() {
 		return filter;
+	}
+	public void setFilter(Filter filter) {
+		this.filter = filter;
 	}
 	// Particle
 	public boolean hasParticle() {
@@ -144,8 +153,19 @@ public class BrEffect extends PatCollectable{
 	public List<PotionEffect> getPotions(){
 		return potion_effects;
 	}
-	public PotionEffect[] getPotionsArray(){
-		return potion_effects.toArray(new PotionEffect[potion_effects.size()]);
+	public void setPotions(List<PotionEffect> potionEffects) {
+		this.potion_effects = potionEffects;
+	}
+	public void addPotion(PotionEffect potionEffect) {
+		potion_effects.add(potionEffect);
+	}
+	public void removePotions(PotionEffectType potionEffectType) {
+		List<PotionEffect> newPotionEffects = new ArrayList<PotionEffect>();
+		for(PotionEffect potionEffect : potion_effects) {
+			if(!potionEffect.getType().getName().equals(potionEffectType.getName()))
+				newPotionEffects.add(potionEffect);
+		}
+		setPotions(newPotionEffects);
 	}
 	
 	// Tags
@@ -154,6 +174,9 @@ public class BrEffect extends PatCollectable{
 	}
 	public BrTag getTag() {
 		return tag;
+	}
+	public void setTag(String tag) {
+		this.tag = new BrTag(tag);
 	}
 	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
 		if(tag != null)
@@ -178,6 +201,10 @@ public class BrEffect extends PatCollectable{
 	public boolean ignoreUser() {
 		return ignore_user;
 	}
+
+	public void setIgnoreUser(boolean ignore_user) {
+		this.ignore_user = ignore_user;		
+	}
 	// Stacks
 //	public boolean stack() {
 //		return stack;
@@ -192,7 +219,7 @@ public class BrEffect extends PatCollectable{
 			trigger.execute(this, impact, executor);
 			return true;
 		} catch(Exception e) {
-			Messenger.warning("Failed to execute '"+getID()+"' effect onto specific Location:");
+			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Location:");
 			e.printStackTrace();
 			return false;
 		}
@@ -210,7 +237,7 @@ public class BrEffect extends PatCollectable{
 			trigger.execute(this, executor, target);
 			return true;
 		} catch(Exception e) {
-			Messenger.warning("Failed to execute '"+getID()+"' effect onto specific Living Entity:");
+			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Living Entity:");
 			e.printStackTrace();
 			return false;
 		}
@@ -308,7 +335,7 @@ public class BrEffect extends PatCollectable{
 		public BrTag(Map<String, String> fields){
 			this.name = getString(fields, "name");
 		}
-		public BrTag(Particle type, String name, float duration){
+		public BrTag(String name){
 			this.name = name;
 		}
 		

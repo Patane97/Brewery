@@ -13,10 +13,11 @@ import com.Patane.util.ingame.ItemEncoder;
 @CommandInfo(
 	name = "tags",
 	description = "Adds or Checks a tag on the currently held item.",
-	usage = "/br tags [name] [value]",
-	permission = "brewery.tags"
+	usage = "/brewery tags [name] [value]",
+	permission = "brewery.tags",
+	maxArgs = 2
 )
-public class tagCommand implements PatCommand {
+public class tagCommand extends PatCommand {
 	
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

@@ -13,20 +13,19 @@ import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
+// *** Combine all Handler junk into 'PatHandler'. Formation/Modifier/Trigger handlers have the same code :(
 public class TriggerHandler implements PatHandler{
-	private static HashMap<String, Class< ? extends Trigger>> effectTypes;
+	private static HashMap<String, Class< ? extends Trigger>> triggers;
 	
-	public static Class< ? extends Trigger> get(String effectType){
-		if(effectType == null)
-			return null;
-		for(String effectName : effectTypes.keySet()){
-			if(effectType.equals(effectName))
-				return effectTypes.get(effectName);
+	public static Class< ? extends Trigger> get(String trigger){
+		for(String triggerName : triggers.keySet()){
+			if(triggerName.equalsIgnoreCase(trigger))
+				return triggers.get(triggerName);
 		}
 		return null;
 	}
 	public static void registerAll() {
-		effectTypes = new HashMap<String, Class< ? extends Trigger>>();
+		triggers = new HashMap<String, Class< ? extends Trigger>>();
 //		Reflections reflections = new Reflections("com.Patane.Brewery.CustomEffects.types");
 //		Set<Class<? extends Trigger>> allClasses = reflections.getSubTypesOf(Trigger.class);
 //		for(Class<? extends Trigger> clazz : allClasses){
@@ -35,17 +34,17 @@ public class TriggerHandler implements PatHandler{
 		register(Instant.class);
 		register(Lingering.class);
 		register(Sticky.class);
-		Messenger.debug("Registered Types: "+StringsUtil.stringJoiner(effectTypes.keySet(), ", "));
+		Messenger.debug("Registered Types: "+StringsUtil.stringJoiner(triggers.keySet(), ", "));
 	}
-	private static void register(Class< ? extends Trigger> effectType){
-		Namer info = effectType.getAnnotation(Namer.class);
+	private static void register(Class< ? extends Trigger> triggerClass){
+		Namer info = triggerClass.getAnnotation(Namer.class);
 		if(info == null){
-			Messenger.warning("Failed to register Trigger '"+effectType.getSimpleName()+".class': Missing annotation!");
+			Messenger.warning("Failed to register Trigger '"+triggerClass.getSimpleName()+".class': Missing annotation!");
 			return;
 		}
-		effectTypes.put(info.name(), effectType);
+		triggers.put(info.name(), triggerClass);
 	}
 	public static List<String> getKeys() {
-		return new ArrayList<String>(effectTypes.keySet());
+		return new ArrayList<String>(triggers.keySet());
 	}
 }

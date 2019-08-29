@@ -8,12 +8,11 @@ import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 @CommandInfo(
-	name = "edit item lore",
-	description = "Edits an items lore.",
-	usage = "/brewery edit item lore [set|delete]",
-	hideCommand = true
+	name = "edit effects edit <effectname> set potions",
+	description = "Sets the Potion Effects for an Effect that is attached to a Brewery Item.",
+	usage = "/brewery edit effects edit <effect name> set potions [add|remove]"
 )
-public class itemEditItemLore extends itemEditItem {
+public class itemEditEffectsEditSetPotions extends itemEditEffectsEditSet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -22,7 +21,7 @@ public class itemEditItemLore extends itemEditItem {
 			Messenger.send(sender, "&7"+args[0]+" &cis an invalid argument.");
 			return false;
 		}
-		CommandHandler.grabInstance().handleCommand(sender, child.command(), args);
+		CommandHandler.grabInstance().handleCommand(sender, child.command(), args, objects);
 		return true;
 	}
 }

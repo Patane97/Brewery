@@ -1,18 +1,22 @@
 package com.Patane.Brewery.Commands.secondary;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Commands.primary.removeCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Commands;
 @CommandInfo(
 	name = "remove effect",
 	description = "Removes an effect from Brewery.",
-	usage = "/br remove effect <effect name>"
+	usage = "/brewery remove effect <effect name>",
+	maxArgs = 1
 )
 public class removeEffect extends removeCommand {
 
@@ -38,7 +42,7 @@ public class removeEffect extends removeCommand {
 			// Attempt to clear the effect from YML
 			BrEffect.YML().clearSection(brEffect.getName());
 			
-			Brewery.getEffectCollection().remove(brEffect.getID());
+			Brewery.getEffectCollection().remove(brEffect.getName());
 			
 			Messenger.send(sender, "&aRemoved effect &7"+ brEffect.getName() +"&a.");
 			// Maybe print a more detailed 'create' message in console?
@@ -51,5 +55,10 @@ public class removeEffect extends removeCommand {
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		return Brewery.getEffectCollection().getAllIDs();
 	}
 }

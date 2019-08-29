@@ -1,5 +1,7 @@
 package com.Patane.Brewery.Commands.secondary.editing;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
@@ -8,17 +10,17 @@ import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.triggers.Instant;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
-import com.Patane.Brewery.Editing.EditingInfo;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
 @CommandInfo(
 	name = "edit effects add",
-	description = "Adds an Effect to a Brewery Item.",
-	usage = "/br edit effects add <effect name>"
+	description = "Adds or Creates an Effect to a Brewery Item. ",
+	usage = "/brewery edit effects add <effect name>",
+	maxArgs = 1
 )
-@EditingInfo(type = BrItem.class)
 public class itemEditEffectsAdd extends itemEditEffects {
 
 	@Override
@@ -55,5 +57,12 @@ public class itemEditEffectsAdd extends itemEditEffects {
 		BrItem.YML().save(brItem);
 		Messenger.send(sender, successMsg);
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		List<String> effects = Brewery.getEffectCollection().getAllIDs();
+		effects.add("<new effect>");
+		return effects;
 	}
 }

@@ -1,5 +1,7 @@
 package com.Patane.Brewery.Commands.secondary.editing;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -7,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
+import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.ItemsUtil;
@@ -14,7 +17,8 @@ import com.Patane.util.ingame.ItemsUtil;
 	name = "edit item lore delete",
 	aliases = {"del", "remove", "rem"},
 	description = "Deletes a specific line from an items lore.",
-	usage = "/br edit item lore delete <line>",
+	usage = "/brewery edit item lore delete <line>",
+	maxArgs = 1,
 	hideCommand = true
 )
 public class itemEditItemLoreDelete extends itemEditItemLore {
@@ -57,5 +61,16 @@ public class itemEditItemLoreDelete extends itemEditItemLore {
 		
 		Messenger.send(sender, "&aLine &7"+line+" &aremoved from the item lore.");
 		return true;
+	}
+	
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+		if(!(EditSession.get(sender.getName()) instanceof BrItem))
+			return Arrays.asList();
+		BrItem brItem = (BrItem) EditSession.get(sender.getName());
+		List<String> lines = new ArrayList<String>();
+		for(int i=1 ; i<=ItemsUtil.getLore(brItem.getItemStack()).size() ; i++)
+			lines.add(String.valueOf(i));
+		return lines;
 	}
 }

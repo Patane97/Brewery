@@ -9,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
+import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.LocationsUtil;
 
 public class Filter {
@@ -29,6 +30,64 @@ public class Filter {
 	}
 	public FilterGroup getIgnore() {
 		return ignore;
+	}
+	public void add(String group, String type, String value) throws IllegalArgumentException {
+		 FilterGroup filterGroup = null;
+		 switch(group.toLowerCase()) {
+		 case "target":
+			 filterGroup = target;
+			 break;
+		 case "ignore":
+			 filterGroup = ignore;
+			 break;
+		 }
+		 switch(type.toLowerCase()) {
+		 case "entities":
+			 try {
+				 filterGroup.addEntity(StringsUtil.constructEnum(value, EntityType.class));
+				 break;
+			 } catch(IllegalArgumentException e) {
+				 throw new IllegalArgumentException("&7"+value+"&c is not a valid Entity Type.");
+			 }
+		 case "players":
+			 filterGroup.addPlayer(value);
+			 break;
+		 case "permissions":
+			 filterGroup.addPermission(value);
+			 break;
+		 case "tags":
+			 filterGroup.addTag(value);
+			 break;
+		 }
+	}
+	public void remove(String group, String type, String value) throws IllegalArgumentException {
+		 FilterGroup filterGroup = null;
+		 switch(group.toLowerCase()) {
+		 case "target":
+			 filterGroup = target;
+			 break;
+		 case "ignore":
+			 filterGroup = ignore;
+			 break;
+		 }
+		 switch(type.toLowerCase()) {
+		 case "entities":
+			 try {
+				 filterGroup.removeEntity(StringsUtil.constructEnum(value, EntityType.class));
+				 break;
+			 } catch(IllegalArgumentException e) {
+				 throw new IllegalArgumentException("&7"+value+"&c is not a valid Entity Type.");
+			 }
+		 case "players":
+			 filterGroup.removePlayer(value);
+			 break;
+		 case "permissions":
+			 filterGroup.removePermission(value);
+			 break;
+		 case "tags":
+			 filterGroup.removeTag(value);
+			 break;
+		 }
 	}
 	public boolean noFilters() {
 		return (target.noFilter() && ignore.noFilter() ? true : false);
@@ -80,33 +139,61 @@ public class Filter {
 		private List<String> permissions;
 		private List<String> tags;
 		
+		public static String[] types = {"entities", "players", "permissions", "tags"};
+		
 		private boolean defaultReturn;
-		private boolean noFilter;
-
+		
 		public FilterGroup(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn){
 			this.entities = (entities == null ? new ArrayList<EntityType>() : entities);
 			this.players = (players == null ? new ArrayList<String>() : players);
 			this.permissions = (permissions == null ? new ArrayList<String>() : permissions);
 			this.tags = (tags == null ? new ArrayList<String>() : tags);
 			this.defaultReturn = defaultReturn;
-			if(this.entities.isEmpty() && this.players.isEmpty() && this.permissions.isEmpty() && this.tags.isEmpty())
-				noFilter = true;
 		}
 		
 		public List<EntityType> getEntities(){
 			return entities;
 		}
+		private void addEntity(EntityType entityType) {
+			entities.add(entityType);
+		}
+		private void removeEntity(EntityType entityType) {
+			entities.remove(entityType);
+		}
+		
 		public List<String> getPlayers(){
 			return players;
 		}
+		private void addPlayer(String player) {
+			players.add(player);
+		}
+		private void removePlayer(String player) {
+			players.remove(player);
+		}
+		
 		public List<String> getPermissions(){
 			return permissions;
 		}
+		private void addPermission(String permission) {
+			permissions.add(permission);
+		}
+		private void removePermission(String permission) {
+			permissions.remove(permission);
+		}
+		
 		public List<String> getTags(){
 			return tags;
 		}
+		private void addTag(String tag) {
+			tags.add(tag);
+		}
+		private void removeTag(String tag) {
+			tags.remove(tag);
+		}
+		
+		
 		public boolean noFilter() {
-			return noFilter;
+			return this.entities.isEmpty() && this.players.isEmpty() && this.permissions.isEmpty() && this.tags.isEmpty();
 		}
 		public boolean equals(FilterGroup other) {
 			for(String tag : getTags())
@@ -128,7 +215,7 @@ public class Filter {
 		}
 		public boolean match(LivingEntity entity){
 			// If there is no filter, then the entity automatically passes.
-			if(noFilter){
+			if(noFilter()){
 				return defaultReturn;
 			}
 			// Looping through each EntityType in entities
