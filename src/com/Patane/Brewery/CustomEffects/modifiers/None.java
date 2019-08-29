@@ -1,7 +1,7 @@
 package com.Patane.Brewery.CustomEffects.modifiers;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 
 @Namer(name="NONE")
 public class None extends Modifier{

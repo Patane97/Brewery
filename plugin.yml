@@ -1,8 +1,10 @@
 main: com.Patane.Brewery.Brewery
-version: ALPHA-4.0
+version: ALPHA-6.0
 name: Brewery
+api-version: 1.14
 commands:
-  br:
+  brewery:
     description: Primary Brewery command.
-    usage: /br
+    aliases: [brew, br]
+    usage: /brewery
 depend: [ProtocolLib]

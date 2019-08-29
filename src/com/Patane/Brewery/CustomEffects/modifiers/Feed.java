@@ -5,7 +5,7 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
 @Namer(name="FEED")

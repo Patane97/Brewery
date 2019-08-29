@@ -16,20 +16,17 @@ import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.modifiers.Polymorph;
 import com.Patane.Brewery.CustomEffects.modifiers.Smite;
 import com.Patane.handlers.PatHandler;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 
 public class ModifierHandler implements PatHandler{
 	private static HashMap<String, Class< ? extends Modifier>> modifiers;
 	
 	public static Class< ? extends Modifier> get(String modifier){
-		if(modifier == null)
-			return null;
-		for(String modName : modifiers.keySet()){
-			if(modifier.equals(modName))
-				return modifiers.get(modName);
+		for(String modifierName : modifiers.keySet()){
+			if(modifierName.equalsIgnoreCase(modifier))
+				return modifiers.get(modifierName);
 		}
 		return null;
 	}
@@ -45,7 +42,7 @@ public class ModifierHandler implements PatHandler{
 		register(Polymorph.class);
 		register(Kill.class);
 		register(Effect.class);
-		Messenger.debug(Msg.INFO, "Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
+		Messenger.debug("Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
 	}
 	private static void register(Class< ? extends Modifier> modifierClass){
 		Namer info = modifierClass.getAnnotation(Namer.class);

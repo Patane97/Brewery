@@ -9,9 +9,8 @@ import org.bukkit.entity.LivingEntity;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
-import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focusable.Focus;
 
@@ -33,34 +32,50 @@ public class Lingering extends Trigger{
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		new LingeringTask(effect, impact, executor);
 	}
+	@Override
+	public void execute(BrEffect effect, LivingEntity executor, LivingEntity target) {
+		new LingeringTask(effect, executor, target);
+	}
 
 	protected class LingeringTask extends PatTimedRunnable{
 		private final BrEffect effect;
 		private final Location impact;
 		private final LivingEntity executor;
+		private final LivingEntity target;
 		
 		public LingeringTask(BrEffect effect, Location impact, LivingEntity executor){
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = impact;
 			this.executor = executor;
+			this.target = null;
+		}
+		public LingeringTask(BrEffect effect, LivingEntity executor, LivingEntity target){
+			super(0, rate, duration);
+			this.effect = effect;
+			this.impact = null;
+			this.executor = executor;
+			this.target = target;
 		}
 
 		@Override
 		public void task() {
+			// A dynamicImpact location is used to simulate the effect either 
+			// hitting and sticking to a spot on the ground OR sticking to an entity and moving the effect along to wherever they are.
+			Location dynamicImpact = (impact == null ? target.getLocation() : impact);
 			// Applies Visual/Auditory effects via a focus point.
-			applyByFocus(effect, impact, Focus.BLOCK);
+			applyByFocus(effect, dynamicImpact, Focus.BLOCK);
 
 			// Executes tasks on hit LivingEntities and adds the appropriate metadata to each.
-			List<LivingEntity> hit = executeOnEntities(effect, impact, executor);
-			BrMetaDataHandler.addClean(this, hit, MetaDataHandler.id(effect.getName(), "lingering"), null);
+			List<LivingEntity> hit = (impact == null ? executeMany(effect, executor, target) : executeMany(effect, impact, executor));
+			BrMetaDataHandler.addClean(this, hit, effect.getName(), "lingering");
 			effect.applyTag(this, hit);
 		}
 
 		@Override
 		public void complete() {
 			// Removes any effect metadatas leftover from the final task() tick.
-			BrMetaDataHandler.remove(this, MetaDataHandler.id(effect.getName(), "lingering"));
+			BrMetaDataHandler.remove(this, effect.getName());
 			effect.clearTag(this);
 		}
 	}

@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YML.Namer;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
 @Namer(name="FORCE")
@@ -24,6 +24,9 @@ public class Force extends Modifier{
 	}
 	@Override
 	public void modify(ModifierInfo info) {
+		// If the target IS the location, do nothing.
+		if(info.getTarget().getLocation().equals(info.getImpact()))
+			return;
 		double speed = direction.getIntensity(info.getTarget().getLocation(), info.getImpact())*(1+intensity/10);
         Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
         info.getTarget().setVelocity(velocity);

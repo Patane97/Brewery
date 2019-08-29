@@ -9,16 +9,18 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.Brewery.Handlers.FormationHandler;
-import com.Patane.handlers.MetaDataHandler;
 import com.Patane.runnables.PatRunnable;
-import com.Patane.util.YML.Namer;
-import com.Patane.util.YML.YMLParsable;
+import com.Patane.util.YAML.MapParsable;
+import com.Patane.util.YAML.Namer;
 import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.general.StringsUtil;
 
 public class BrEffect extends PatCollectable{
 	/**
@@ -35,99 +37,147 @@ public class BrEffect extends PatCollectable{
 	/**
 	 * **********************************************************
 	 */
-	private final Modifier modifier;
-	private final Trigger trigger;
-	private final Integer radius;
-	// NEED TO ADD: if radius is 0, projectile must HIT an entity to damage/affect it and only it.
-	private final Filter filter;
-	private final List<PotionEffect> potionEffects;
-	private final BrParticleEffect particleEffect;
-	private final BrSoundEffect soundEffect;
-	private final BrTag tag;
+	protected Modifier modifier;
+	protected Trigger trigger;
+	protected Float radius;
+	protected Filter filter;
+	protected BrParticleEffect particles;
+	protected BrSoundEffect sounds;
+	protected List<PotionEffect> potion_effects;// *** Change to set OR standard Array
+	protected BrTag tag;
+	protected boolean ignore_user;
+//	protected boolean stack;
 
-	private List<String> incomplete = new ArrayList<String>();
+	protected List<String> incomplete = new ArrayList<String>();
 	
-	public BrEffect(boolean incompleteAllowed, String name, Modifier modifier, Trigger trigger, Integer radius, 
-			Filter filter, BrParticleEffect particleEffect, BrSoundEffect soundEffect, List<PotionEffect> potionEffects, 
-			BrTag tag) {
+	public BrEffect(String name, Modifier modifier, Trigger trigger, Float radius, 
+			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potion_effects, 
+			BrTag tag, Boolean ignore_user) {
 		// Setting the name
 		super(name);
 		
 		// ESSENTIAL VALUES.
 		// modifier, trigger and radius are required, thus will NullPointerException if they are null.
-		this.modifier = (incompleteAllowed ? modifier : Check.nulled(modifier, "BrEffect needs more data: '"+name+"' has no modifiers set anywhere. Please check YML files."));
+		this.modifier = modifier;
 		if(modifier == null) incomplete.add("modifier");
 		
-		this.trigger = (incompleteAllowed ? trigger : Check.nulled(trigger, "BrEffect needs more data: '"+name+"' has no triggers set anywhere. Please check YML files."));
+		this.trigger = trigger;
 		if(trigger == null)	incomplete.add("trigger");
-		// PROBLEM!
-		// Maybe make radius non-essential?
-		// If radius isnt set, then it only applies to any entities hit?
-		this.radius = (incompleteAllowed ? radius : Check.nulled(radius, "BrEffect needs more data: '"+name+"' has no radius set anywhere. Please check YML files."));
-		if(radius == null) incomplete.add("radius");
 		
-		// NON-ESSENTIAL VALUES.
+		// NULLABLE VALUES.
 		// These values can be null. However if some objects are null, they are converted to empty objects.
-		this.filter = (filter == null ? new Filter() : filter);
-		this.particleEffect = particleEffect;
-		this.soundEffect = soundEffect;
-		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
+		// If radius isnt set, then it only applies to any entities hit?
+		this.radius = radius;
+		this.particles = particles;
+		this.sounds = sounds;
 		this.tag = tag;
+		
+		// DEFAULTED VALUES.
+		// These values will always have a setting. If the given value is null, then the default is set.
+		this.filter = (filter == null ? new Filter() : filter);
+		this.potion_effects = (potion_effects == null ? new ArrayList<PotionEffect>() : potion_effects);
+		this.ignore_user = (ignore_user == null ? true : ignore_user);
+//		this.stack = false;
+		if(!isComplete())
+			Messenger.info(name+" effect is incomplete. Missing: "+StringsUtil.stringJoiner(incomplete, ", "));
 	}
 	
 	// Getters for essential values.
 	public Modifier getModifier() {
 		return modifier;
 	}
+	public void setModifier(Modifier modifier) {
+		this.modifier = modifier;
+		if(incomplete.contains("modifier") && this.modifier != null)
+			incomplete.remove("modifier");
+	}
 	public Trigger getTrigger() {
 		return trigger;
 	}
-	public Integer getRadius() {
-		return radius;
+	public void setTrigger(Trigger trigger) {
+		this.trigger = trigger;
+		if(incomplete.contains("trigger") && this.trigger != null)
+			incomplete.remove("trigger");
+		
 	}
 	
 	// Has & Getters for non-essential values.
 	
+	// Radius
+	public boolean hasRadius() {
+		return(radius == null ? false : true);
+	}
+	public Float getRadius() {
+		return radius;
+	}
+	public void setRadius(Float radius) {
+		this.radius = radius;
+	}
 	// Filter
 	public boolean hasFilter() {
-		return (filter == null ? false : true);
+		return !filter.noFilters();
 	}
 	public Filter getFilter() {
 		return filter;
 	}
-	
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+	}
 	// Particle
 	public boolean hasParticle() {
-		return (particleEffect == null ? false : true);
+		return (particles == null ? false : true);
 	}
 	public BrParticleEffect getParticleEffect() {
-		return particleEffect;
+		return particles;
 	}
-
+	public void setParticle(BrParticleEffect particles) {
+		this.particles = particles;
+	}
+	
+	
 	// Sound
 	public boolean hasSound() {
-		return (soundEffect == null ? false : true);
+		return (sounds == null ? false : true);
 	}
 	public BrSoundEffect getSoundEffect() {
-		return soundEffect;
+		return sounds;
+	}
+	public void setSound(BrSoundEffect sounds) {
+		this.sounds = sounds;
 	}
 
 	// Potion Effects
 	public boolean hasPotions() {
-		return (potionEffects.isEmpty() ? false : true);
+		return (potion_effects.isEmpty() ? false : true);
 	}
 	public List<PotionEffect> getPotions(){
-		return potionEffects;
+		return potion_effects;
 	}
-	public PotionEffect[] getPotionsArray(){
-		return potionEffects.toArray(new PotionEffect[potionEffects.size()]);
+	public void setPotions(List<PotionEffect> potionEffects) {
+		this.potion_effects = potionEffects;
 	}
-	
-	public void execute(LivingEntity executor, Location impact){
-		trigger.execute(this, impact, executor);
+	public void addPotion(PotionEffect potionEffect) {
+		potion_effects.add(potionEffect);
+	}
+	public void removePotions(PotionEffectType potionEffectType) {
+		List<PotionEffect> newPotionEffects = new ArrayList<PotionEffect>();
+		for(PotionEffect potionEffect : potion_effects) {
+			if(!potionEffect.getType().getName().equals(potionEffectType.getName()))
+				newPotionEffects.add(potionEffect);
+		}
+		setPotions(newPotionEffects);
 	}
 	
 	// Tags
+	public boolean hasTag() {
+		return (tag == null ? false : true);
+	}
+	public BrTag getTag() {
+		return tag;
+	}
+	public void setTag(String tag) {
+		this.tag = new BrTag(tag);
+	}
 	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
 		if(tag != null)
 			tag.apply(run, entities);
@@ -145,11 +195,70 @@ public class BrEffect extends PatCollectable{
 		return incomplete;
 	}
 
+	// Getters for Defaulted values.
+	
+	// Ignore_User
+	public boolean ignoreUser() {
+		return ignore_user;
+	}
+
+	public void setIgnoreUser(boolean ignore_user) {
+		this.ignore_user = ignore_user;		
+	}
+	// Stacks
+//	public boolean stack() {
+//		return stack;
+//	}
+	/**
+	 * Executes the effect on an impact location using the effects radius.
+	 * @param executor LivingEntity who is executing the effect.
+	 * @param impact Location to trigger effect (with effects radius).
+	 */
+	public boolean execute(Location impact, LivingEntity executor){
+		try {
+			trigger.execute(this, impact, executor);
+			return true;
+		} catch(Exception e) {
+			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Location:");
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * Executes the effect on a single LivingEntity target.
+	 * The radius can still apply here.
+	 * On the event of a lingering effect, the lingering location should be updated with the targets location at the time.
+	 * @param executor LivingEntity who is executing the effect.
+	 * @param target LivingEntity who is hit by the effect.
+	 */
+	public boolean execute(LivingEntity executor, LivingEntity target){
+		try {
+			trigger.execute(this, executor, target);
+			return true;
+		} catch(Exception e) {
+			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Living Entity:");
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public String hoverDetails() {
+		return Chat.translate("&7"+getName()
+		+"\n&2Modifier: &a"+(getModifier() != null ? getModifier().name() : "&cUndefined")
+		+"\n&2Trigger: &a"+(getTrigger() != null ? getTrigger().name() : "&cUndefined")
+		+(hasRadius() ? "\n&2Radius: &a"+getRadius() : "")
+		+(hasTag() ? "\n&2Tag: &a"+getTag().name : "")
+		+(hasParticle() ? "\n&2Particles: &aApplied" : "")
+		+(hasSound() ? "\n&2Sounds: &aApplied" : "")
+		+(hasPotions() ? "\n&2Potion Effects: &a"+getPotions().size() : "")
+		+(hasFilter() ? "\n&2Filters: &aApplied" : ""));
+	}
 /*
  *  PARTICLE EFFECTS
  */
 	@Namer(name = "Particle Effect")
-	public static class BrParticleEffect extends YMLParsable{
+	public static class BrParticleEffect extends MapParsable{
 		final public Particle type;
 		final public Formation formation;
 		final public int intensity;
@@ -157,7 +266,7 @@ public class BrEffect extends PatCollectable{
 
 		public BrParticleEffect(Map<String, String> fields){
 			this.type = getEnumValue(Particle.class, fields, "type");
-			this.formation = Check.nulled(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
+			this.formation = Check.notNull(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
 			try{ 
 				this.intensity = getInt(fields, "intensity");
 				this.velocity = getDouble(fields, "velocity");
@@ -172,15 +281,17 @@ public class BrEffect extends PatCollectable{
 			this.intensity = intensity;
 			this.velocity = velocity;
 		}
-		public void spawn(Location location, int radius){
+		public void spawn(Location location, float radius){
 			spawn(location, radius, intensity, velocity);
 		}
-		public void spawn(Location location, int radius, int intensity){
+		public void spawn(Location location, float radius, int intensity){
 			spawn(location, radius, intensity, velocity);
 		}
-		public void spawn(Location location, int radius, int intensity, double velocity){
+		public void spawn(Location location, float radius, int intensity, double velocity){
+//			if(radius == null)
+//				radius = 0.5f;
 			double offset = radius/2;
-			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(radius, 3)*intensity), offset,offset,offset, velocity);
+			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(Math.max(radius, 1), 3)*intensity), offset,offset,offset, velocity);
 		}
 		public Formation getFormation(){
 			return formation;
@@ -191,7 +302,7 @@ public class BrEffect extends PatCollectable{
  *  SOUND EFFECTS
  */
 	@Namer(name = "Sound Effect")
-	public static class BrSoundEffect extends YMLParsable{
+	public static class BrSoundEffect extends MapParsable{
 		final public Sound type;
 //		final public Formation formation;
 		final public float volume;
@@ -218,23 +329,23 @@ public class BrEffect extends PatCollectable{
  *  TAGS
  */
 	@Namer(name = "Tag")
-	public static class BrTag extends YMLParsable{
+	public static class BrTag extends MapParsable{
 		final public String name;
-
+		
 		public BrTag(Map<String, String> fields){
 			this.name = getString(fields, "name");
 		}
-		public BrTag(Particle type, String name, float duration){
+		public BrTag(String name){
 			this.name = name;
 		}
 		
 
 		public void apply(PatRunnable task, List<LivingEntity> entities){
-			BrMetaDataHandler.addClean(task, entities, MetaDataHandler.id("tag", name), null);
+			BrMetaDataHandler.addClean(task, entities, "TAG", name);
 		}
 		
 		public void clear(PatRunnable task){
-			BrMetaDataHandler.remove(task, MetaDataHandler.id("tag", name));
+			BrMetaDataHandler.remove(task, "TAG");
 		}
 	}
 }

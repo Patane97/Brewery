@@ -11,27 +11,6 @@ import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.general.StringsUtil;
 
 public class BrMetaDataHandler extends MetaDataHandler{
-	
-//	public static boolean add(BrEffect effect, LivingEntity entity, String metaName, Object value){
-//		String newMetaName = StringsUtil.normalize(effect.getID()+"-"+metaName);
-//		return add(entity, newMetaName, value);
-//	}
-//	public static void addTimed(BrEffect effect, LivingEntity entity, String metaName, Object value, float duration){
-//		String newMetaName = StringsUtil.normalize(effect.getID()+"-"+metaName);
-//		addTimed(entity, newMetaName, value, duration);
-//	}
-//	public static boolean remove(BrEffect effect, LivingEntity entity, String metaName){
-//		String newMetaName = StringsUtil.normalize(effect.getID()+"-"+metaName);
-//		return remove(entity, newMetaName);
-//	}
-//	public static boolean remove(BrEffect effect, String metaName){
-//		String newMetaName = StringsUtil.normalize(effect.getID()+"-"+metaName);
-//		return remove(newMetaName);
-//	}
-//	public static Object getValue(BrEffect effect, LivingEntity entity, String metaName){
-//		String newMetaName = StringsUtil.normalize(effect.getID()+"-"+metaName);
-//		return getValue(entity, newMetaName);
-//	}
 
 	public static boolean add(PatRunnable task, LivingEntity entity, String metaName, Object value){
 		return MetaDataHandler.add(entity, packMetaName(task, metaName), value);
@@ -92,7 +71,7 @@ public class BrMetaDataHandler extends MetaDataHandler{
 		for(LivingEntity entity : new ArrayList<LivingEntity>(entities)){
 			
 			// If the entity is in within metadata collection found from using the given regex.
-			if(BrMetaDataHandler.check(entity, "\\[\\d+\\]"+metaName)){
+			if(BrMetaDataHandler.check(entity, metaName)){
 				try{
 					// Grab the first metadata value (in this case, a PatTimedRunnable) stored within the entity from using the given regex.
 					PatTimedRunnable storedTask = (PatTimedRunnable) BrMetaDataHandler.grabFirst(entity, "\\[\\d+\\]"+metaName);
