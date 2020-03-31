@@ -51,7 +51,7 @@ public class GlobalListener extends BaseListener{
 	 */
 	@EventHandler
 	public void onItemSwingBlock(PlayerInteractEvent e){
-		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
+		if(e.getAction() != Action.PHYSICAL && !(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
@@ -120,7 +120,7 @@ public class GlobalListener extends BaseListener{
 	 */
 	@EventHandler
 	public void onItemRightClick(PlayerInteractEvent e){
-		if(!(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
+		if(e.getAction() != Action.PHYSICAL && !(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
