@@ -1,13 +1,13 @@
-package com.Patane.Brewery.Commands.secondary;
+package com.Patane.Brewery.commands.secondary;
 
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Commands.primary.editSessionCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.Editing.EditSession;
+import com.Patane.Brewery.commands.primary.editSessionCommand;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;

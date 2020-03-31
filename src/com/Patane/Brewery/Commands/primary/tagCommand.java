@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.primary;
+package com.Patane.Brewery.commands.primary;
 
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;

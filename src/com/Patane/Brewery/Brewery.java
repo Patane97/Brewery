@@ -4,7 +4,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.Collections.BrItemCollection;
-import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Brewery.Cooldowns.CooldownHandler;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
@@ -15,6 +14,7 @@ import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.Listeners.GlobalListener;
+import com.Patane.Brewery.commands.BrCommandHandler;
 import com.Patane.Commands.CommandSuggester;
 import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;

@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.secondary.editing;
+package com.Patane.Brewery.commands.secondary.editing;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

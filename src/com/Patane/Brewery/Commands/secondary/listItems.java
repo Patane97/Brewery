@@ -1,10 +1,10 @@
-package com.Patane.Brewery.Commands.secondary;
+package com.Patane.Brewery.commands.secondary;
 
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Commands.primary.listCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
+import com.Patane.Brewery.commands.primary.listCommand;
 import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;

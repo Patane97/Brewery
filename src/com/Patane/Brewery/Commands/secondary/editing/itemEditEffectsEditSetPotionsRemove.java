@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.secondary.editing;
+package com.Patane.Brewery.commands.secondary.editing;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;

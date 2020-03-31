@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.primary;
+package com.Patane.Brewery.commands.primary;
 
 import java.util.Arrays;
 import java.util.List;

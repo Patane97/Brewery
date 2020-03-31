@@ -1,11 +1,11 @@
-package com.Patane.Brewery.Commands.secondary.editing;
+package com.Patane.Brewery.commands.secondary.editing;
 
 import org.bukkit.command.CommandSender;
 
-import com.Patane.Brewery.Commands.BrCommandHandler;
-import com.Patane.Brewery.Commands.primary.editCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditingInfo;
+import com.Patane.Brewery.commands.BrCommandHandler;
+import com.Patane.Brewery.commands.primary.editCommand;
 import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
