@@ -345,7 +345,7 @@ public class BrItemYML extends BreweryYAML{
 					for(String flagString : flagStrings) {
 						// Try to add each flag. If it is not a valid ItemFlag name then it will NullPointerException.
 						try {
-							ItemsUtil.addFlags(itemStack, getEnumFromString(flagString, ItemFlag.class));
+							itemStack = ItemsUtil.addFlags(itemStack, getEnumFromString(flagString, ItemFlag.class));
 						} catch (NullPointerException e) {
 							Messenger.warning("'"+flagString+"' is not a valid ItemFlag");
 							e.printStackTrace();
@@ -415,13 +415,16 @@ public class BrItemYML extends BreweryYAML{
 									// Checks/grabs each Operation(enum), amount(int) and slot(enum) and ensures it is not null for construction.
 									Operation operation = Check.notNull(getEnumFromString(getString("operation", getSelect()), Operation.class));
 									Integer modAmount = Check.notNull(getInteger("amount", getSelect()));
-									EquipmentSlot slot = Check.notNull(getEnumFromString(getString("slot", getSelect()), EquipmentSlot.class));
+									EquipmentSlot slot = null;
+									try{
+										slot = getEnumFromString(getString("slot", getSelect()), EquipmentSlot.class);
+									} catch (NullPointerException e) {}
 									
 									// Constructs the new AttributeModifier with a random UUID and non-null values.
 									attributeModifier = new AttributeModifier(UUID.randomUUID(), modifierName, modAmount, operation, slot);
 									
 									// Adding attribute modifier to the item
-									ItemsUtil.addAttributeModifier(itemStack, attribute, attributeModifier);
+									itemStack = ItemsUtil.addAttributeModifier(itemStack, attribute, attributeModifier);
 								} catch (Exception e) {
 									Messenger.warning("Failed to load '"+modifierName+"' for '"+attributeName+"' attribute for '"+itemName+"' Item");
 									e.printStackTrace();

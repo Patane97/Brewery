@@ -15,7 +15,7 @@ import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.Listeners.GlobalListener;
 import com.Patane.Brewery.commands.BrCommandHandler;
-import com.Patane.Commands.CommandSuggester;
+import com.Patane.Commands.TabCompleteHandler;
 import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.main.PataneUtil;
@@ -33,10 +33,10 @@ public class Brewery extends JavaPlugin{
 	
 	public void onEnable() {
 		brewery = this;
-		PataneUtil.setup(brewery, true, "&2[&aBrewery&2]&r ", "&2[&aBR&2]&r ");
+		PataneUtil.setup(brewery, "Brewery", "&2[&aBrewery&2]", "&2[&aBR&2]", true);
 		
 		this.getCommand("brewery").setExecutor(new BrCommandHandler());
-		this.getCommand("brewery").setTabCompleter(new CommandSuggester());
+		this.getCommand("brewery").setTabCompleter(new TabCompleteHandler());
 		
 		globalListener = new GlobalListener();
 		

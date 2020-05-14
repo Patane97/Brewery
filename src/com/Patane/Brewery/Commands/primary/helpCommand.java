@@ -28,15 +28,17 @@ public class helpCommand extends PatCommand {
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		Messenger.send(sender, StringsUtil.generateChatTitle("Brewery Commands"));
-		for(CommandPackage cmp : BrCommandHandler.grabInstance().parentPackages()) {			
-			if(cmp.info().hideCommand())
+		CommandPackage parentPackage;
+		for(String parentName : BrCommandHandler.grabInstance().getParentCommandNames()) {
+			parentPackage = BrCommandHandler.getPackage(parentName);	
+			if(parentPackage.info().hideCommand())
 				continue;
 			
-			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+cmp.info().usage()));
+			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+parentPackage.info().usage()));
 			
-			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Commands.hoverFormat(cmp.info())).create()));
+			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Commands.hoverFormat(parentPackage.info())).create()));
 			
-			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmp.info().usage()));
+			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, parentPackage.info().usage()));
 			
 			Messenger.sendRaw(sender, commandText);
 			
