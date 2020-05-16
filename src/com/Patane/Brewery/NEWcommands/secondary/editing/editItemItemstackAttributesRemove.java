@@ -65,7 +65,7 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 			// Sending the user a 'no found modifier' message whilst providing all other modifiers attached to asked attribute onHover
 			Messenger.send(sender, StringsUtil.hoverText(
 					"&eThere is no modifier named &7"+modifierName+" &efor that attribute for &7"+brItem.getName()+"&e. Hover to see others!",
-					StringsUtil.attribModCollectionToString(attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute))));
+					StringsUtil.toHoverString(attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute), s -> "&2"+s[0]+": &7"+s[1])));
 			return true;
 		}
 		
@@ -74,7 +74,8 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		AttributeModifier modifier = ItemsUtil.getAttributeModifier(currentItem, attribute, modifierName);
 		
-		String successHoverText = StringsUtil.attribModRemovingToString(attribute, modifier);
+//		String successHoverText = StringsUtil.attribModRemovingToString(attribute, modifier);
+		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s ->"&c"+s[0]+": &8&m"+s[1]+"&r");
 
 		// Allows the user to view the details of the attribute they just modified!
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);

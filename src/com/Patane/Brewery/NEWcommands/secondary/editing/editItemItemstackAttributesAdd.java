@@ -111,7 +111,8 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		String successMsg = "&aAdded attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
 		
-		String successHoverText = StringsUtil.attribModToString(attribute, modifier);
+//		String successHoverText = StringsUtil.attribModToString(attribute, modifier);
+		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s -> "&2"+s[0]+": &7"+s[1]);
 				
 		// If there is a modifier with same name, remove and replace it.
 		// Change successMsg to reflect so
@@ -126,7 +127,8 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 				return true;
 			}
 			// If the new modifier value is different to the old, show the changed dynamically on hover
-			successHoverText = StringsUtil.attribModDifferenceToString(attribute, oldModifier, modifier);
+//			successHoverText = StringsUtil.attribModDifferenceToString(attribute, oldModifier, modifier);
+			successHoverText = StringsUtil.toHoverString(attribute, oldModifier, modifier, s -> "&2"+s[0]+": &7"+s[1], s -> "&2"+s[0]+": &8"+s[1]+" &7-> "+s[2]);
 			
 			// Remove the old Modifier
 			currentItem = ItemsUtil.removeAttributeModifier(currentItem, attribute, modifierName);
