@@ -35,8 +35,8 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Checks for attribute
 		if(args.length < 1) {
-			Messenger.send(sender, "&cPlease provide a valid item attribute.");
-			return false;
+			Messenger.send(sender, "&ePlease provide an item attribute.");
+			return true;
 		}
 		Attribute attribute = null;
 
@@ -50,8 +50,8 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Check for attribute name
 		if(args.length < 2) {
-			Messenger.send(sender, "&cPlease provide a name for this modifier. Any name will do!");
-			return false;
+			Messenger.send(sender, "&ePlease provide a name for this modifier. Any name will do!");
+			return true;
 		}
 		
 		// Find/Save attribute name 
@@ -59,8 +59,8 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Check for amount
 		if(args.length < 3) {
-			Messenger.send(sender, "&cPlease provide an amount for this modifier.");
-			return false;
+			Messenger.send(sender, "&ePlease provide an amount for this modifier.");
+			return true;
 		}
 		
 		Double amount = null;
@@ -108,14 +108,11 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Grabbing ItemStack to add attribute to
 		ItemStack currentItem = brItem.getItemStack();
-		
+
 		String successMsg = "&aAdded attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
-		
-//		String successHoverText = StringsUtil.attribModToString(attribute, modifier);
 		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s -> "&2"+s[0]+": &7"+s[1]);
-				
-		// If there is a modifier with same name, remove and replace it.
-		// Change successMsg to reflect so
+
+		// If modifier already existed, either check/say its the same values or show it updating values
 		if(ItemsUtil.hasAttributeModifier(currentItem, attribute, modifierName)) {
 			AttributeModifier oldModifier = ItemsUtil.getAttributeModifier(currentItem, attribute, modifierName);
 			
@@ -126,13 +123,12 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 				Messenger.send(sender, StringsUtil.hoverText("&eThat attribute modifier for &7"+brItem.getName()+"&e already has those values. Hover for details!", successHoverText));
 				return true;
 			}
+			successMsg = "&aUpdated existing attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
 			// If the new modifier value is different to the old, show the changed dynamically on hover
-//			successHoverText = StringsUtil.attribModDifferenceToString(attribute, oldModifier, modifier);
 			successHoverText = StringsUtil.toHoverString(attribute, oldModifier, modifier, s -> "&2"+s[0]+": &7"+s[1], s -> "&2"+s[0]+": &8"+s[1]+" &7-> "+s[2]);
 			
 			// Remove the old Modifier
 			currentItem = ItemsUtil.removeAttributeModifier(currentItem, attribute, modifierName);
-			successMsg = "&aUpdated existing attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
 		}
 		
 		// Allows the user to view the details of the attribute they just modified!
@@ -162,8 +158,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 				equipSlots = new ArrayList<String>(equipSlots);
 				equipSlots.add("ALL");
 				return equipSlots;
-			default:
-				return new ArrayList<String>();
-	}
+		}
+		return Arrays.asList();
 	}
 }

@@ -22,7 +22,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "edit item item attributes remove",
 	aliases = {"rem", "delete", "del"},
-	description = "Removed an Attribute Modifier from a physical Minecraft Item for a Brewery Item.",
+	description = "Removes an Attribute Modifier from a physical Minecraft Item for a Brewery Item.",
 	usage = "/brewery edit item <item name> item attributes remove [attribute] <modifier name>",
 	maxArgs = 2,
 	hideCommand = true
@@ -34,8 +34,8 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		// Checks for attribute
 		if(args.length < 1) {
-			Messenger.send(sender, "&cPlease provide a valid item attribute.");
-			return false;
+			Messenger.send(sender, "&ePlease provide an item attribute.");
+			return true;
 		}
 		Attribute attribute = null;
 		
@@ -49,8 +49,8 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		// Check for attribute name
 		if(args.length < 2) {
-			Messenger.send(sender, "&cPlease provide a name of the modifier to be removed.");
-			return false;
+			Messenger.send(sender, "&ePlease provide a name of the modifier to be removed.");
+			return true;
 		}
 		String modifierName = args[1];
 		
@@ -74,7 +74,6 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		AttributeModifier modifier = ItemsUtil.getAttributeModifier(currentItem, attribute, modifierName);
 		
-//		String successHoverText = StringsUtil.attribModRemovingToString(attribute, modifier);
 		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s ->"&c"+s[0]+": &8&m"+s[1]+"&r");
 
 		// Allows the user to view the details of the attribute they just modified!
@@ -95,7 +94,7 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		BrItem brItem = (BrItem) objects[0];
 		if(brItem == null)
-			return new ArrayList<String>();
+			return Arrays.asList();
 		
 		Multimap<Attribute, AttributeModifier> attributes;
 		switch(args.length) {
@@ -134,7 +133,7 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 				// Return the available attribute modifier names
 				return modifierNames;
 		}
-		return new ArrayList<String>();
+		return Arrays.asList();
 		
 	}
 }

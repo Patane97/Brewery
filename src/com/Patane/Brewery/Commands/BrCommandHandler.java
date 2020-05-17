@@ -15,6 +15,9 @@ import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstack;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributes;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributesAdd;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributesRemove;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackEnchantments;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackEnchantmentsAdd;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackEnchantmentsRemove;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemType;
 import com.Patane.Brewery.commands.secondary.createEffect;
 import com.Patane.Brewery.commands.secondary.createItem;
@@ -64,6 +67,9 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemItemstackAttributes.class);
 		register(editItemItemstackAttributesAdd.class);
 		register(editItemItemstackAttributesRemove.class);
+		register(editItemItemstackEnchantments.class);
+		register(editItemItemstackEnchantmentsAdd.class);
+		register(editItemItemstackEnchantmentsRemove.class);
 		// Edit Item commands
 		/*
 		register(itemEditItem.class);

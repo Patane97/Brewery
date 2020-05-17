@@ -7,12 +7,12 @@ import org.bukkit.command.CommandSender;
 import com.Patane.Commands.CommandInfo;
 
 @CommandInfo(
-	name = "edit item item attributes",
-	aliases = {"attribute", "attrib"},
-	description = "Edits the Attributes of a physical Minecraft Item for a Brewery Item.",
-	usage = "/brewery edit item <item name> item attributes [add|remove]"
+	name = "edit item item enchantments",
+	aliases = {"enchant", "ench"},
+	description = "Edits the Enchantments of a physical Minecraft Item for a Brewery Item.",
+	usage = "/brewery edit item <item name> item enchantments [add|remove]"
 )
-public class editItemItemstackAttributes extends editItemItemstack {
+public class editItemItemstackEnchantments extends editItemItemstack {
 	
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

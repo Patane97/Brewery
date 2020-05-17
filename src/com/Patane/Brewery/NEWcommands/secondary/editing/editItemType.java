@@ -24,6 +24,11 @@ public class editItemType extends editItem {
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		
+		// Checking for type
+		if(args.length < 1) {
+			Messenger.send(sender, "&ePlease specify a type.");
+			return true;
+		}
 		// Find Type
 		CustomType type = null;
 		try {
@@ -39,7 +44,7 @@ public class editItemType extends editItem {
 
 		// If type did not change, say so and do nothing
 		if(brItem.getType() == type) {
-			Messenger.send(sender, "&7"+brItem.getName()+" &ais already &7"+type+"&a.");
+			Messenger.send(sender, "&7"+brItem.getName()+" &eis already &7"+type+"&a.");
 			return true;
 		}
 		

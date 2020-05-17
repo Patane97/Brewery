@@ -21,6 +21,12 @@ public class editItemCooldown extends editItem {
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		
+		// Checking amount is given
+		if(args.length < 1) {
+			Messenger.send(sender, "&ePlease specify a cooldown amount.");
+			return true;
+		}
+		
 		// Find cooldown
 		Float cooldown = null;
 		try {
@@ -33,7 +39,7 @@ public class editItemCooldown extends editItem {
 		
 		// Check if cooldown is positive
 		if(cooldown < 0) {
-			Messenger.send(sender, "&cCooldown must be a positive number.");
+			Messenger.send(sender, "&eCooldown must be a positive number.");
 			return true;
 		}
 		
