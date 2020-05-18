@@ -1,4 +1,4 @@
-package com.Patane.Brewery.commands.secondary;
+package com.Patane.Brewery.Commands.secondary;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Commands.primary.createCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Brewery.commands.primary.createCommand;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;

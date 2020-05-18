@@ -1,5 +1,16 @@
-package com.Patane.Brewery.commands;
+package com.Patane.Brewery.Commands;
 
+import com.Patane.Brewery.Commands.secondary.createEffect;
+import com.Patane.Brewery.Commands.secondary.createItem;
+import com.Patane.Brewery.Commands.secondary.editSessionEffect;
+import com.Patane.Brewery.Commands.secondary.editSessionEnd;
+import com.Patane.Brewery.Commands.secondary.editSessionItem;
+import com.Patane.Brewery.Commands.secondary.infoEffect;
+import com.Patane.Brewery.Commands.secondary.infoItem;
+import com.Patane.Brewery.Commands.secondary.listEffects;
+import com.Patane.Brewery.Commands.secondary.listItems;
+import com.Patane.Brewery.Commands.secondary.removeEffect;
+import com.Patane.Brewery.Commands.secondary.removeItem;
 import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Brewery.NEWcommands.primary.editCommand;
 import com.Patane.Brewery.NEWcommands.primary.editSessionCommand;
@@ -25,17 +36,6 @@ import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLore;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLoreDelete;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLoreSet;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemType;
-import com.Patane.Brewery.commands.secondary.createEffect;
-import com.Patane.Brewery.commands.secondary.createItem;
-import com.Patane.Brewery.commands.secondary.editSessionEffect;
-import com.Patane.Brewery.commands.secondary.editSessionEnd;
-import com.Patane.Brewery.commands.secondary.editSessionItem;
-import com.Patane.Brewery.commands.secondary.infoEffect;
-import com.Patane.Brewery.commands.secondary.infoItem;
-import com.Patane.Brewery.commands.secondary.listEffects;
-import com.Patane.Brewery.commands.secondary.listItems;
-import com.Patane.Brewery.commands.secondary.removeEffect;
-import com.Patane.Brewery.commands.secondary.removeItem;
 import com.Patane.Commands.CommandHandler;
 
 public class BrCommandHandler extends CommandHandler{

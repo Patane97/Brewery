@@ -1,4 +1,4 @@
-package com.Patane.Brewery.commands.secondary;
+package com.Patane.Brewery.Commands.secondary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
 import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
-import com.Patane.Brewery.commands.primary.infoCommand;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;

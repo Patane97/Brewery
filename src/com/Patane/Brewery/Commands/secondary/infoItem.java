@@ -1,4 +1,4 @@
-package com.Patane.Brewery.commands.secondary;
+package com.Patane.Brewery.Commands.secondary;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Commands.primary.giveCommand;
+import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Brewery.commands.primary.giveCommand;
-import com.Patane.Brewery.commands.primary.infoCommand;
 import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;

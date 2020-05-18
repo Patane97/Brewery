@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.bukkit.command.CommandSender;
 
-import com.Patane.Brewery.commands.BrCommandHandler;
+import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Commands.CommandHandler;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;

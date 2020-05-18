@@ -1,9 +1,9 @@
-package com.Patane.Brewery.commands.primary;
+package com.Patane.Brewery.Commands.primary;
 
 import org.bukkit.command.CommandSender;
 
-import com.Patane.Brewery.commands.BrCommandHandler;
 import com.Patane.Commands.CommandHandler.CommandPackage;
+import com.Patane.Brewery.Commands.BrCommandHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.general.Chat;
