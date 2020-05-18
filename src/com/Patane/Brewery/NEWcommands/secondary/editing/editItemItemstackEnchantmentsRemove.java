@@ -65,7 +65,7 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 			return true;
 		}
 		String successMsg = "&aRemoved enchantment from &7"+brItem.getName()+"&a. Hover for details!";
-		String successHoverText = StringsUtil.toHoverString(enchantment, currentItem.getEnchantmentLevel(enchantment), s ->"&c"+s[0]+": &8&m"+s[1]+"&r");
+		String successHoverText = "&cEnchantment: &8&m"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s ->"\n&r &c"+s[0]+": &8&m"+s[1], "Level", Integer.toString(currentItem.getEnchantmentLevel(enchantment)));
 		
 		// Allows the user to view the details onhover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);

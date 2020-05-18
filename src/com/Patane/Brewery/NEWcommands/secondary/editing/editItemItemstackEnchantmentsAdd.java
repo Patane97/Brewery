@@ -77,18 +77,20 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 		ItemStack currentItem = brItem.getItemStack();
 
 		String successMsg = "&aAdded enchantment to &7"+brItem.getName()+"&a. Hover for details!";
-		String successHoverText = StringsUtil.toHoverString(enchantment, level, s -> "&2"+s[0]+": &7"+s[1]);
+		String successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], "Level", level.toString());
 		
 		if(currentItem.containsEnchantment(enchantment)) {
-			int oldLevel = currentItem.getEnchantmentLevel(enchantment);
+			Integer oldLevel = currentItem.getEnchantmentLevel(enchantment);
 			// If the enchantment was previously the same level, do nothing and message appropriately
-			if(oldLevel == level) {
+			if(oldLevel.equals(level)) {
 				Messenger.send(sender, StringsUtil.hoverText("&eThat enchantment and level for &7"+brItem.getName()+"&e already exist. Hover for details!", successHoverText));
 				return true;
 			}
 			successMsg = "&eUpdated existing enchantment for &7"+brItem.getName()+"&a. Hover for details!";
 			// If the level has changed, show it changing on hover
-			successHoverText = StringsUtil.toHoverString(enchantment, oldLevel, level, s -> "&2"+s[0]+": &7"+s[1], s -> "&2"+s[0]+": &8"+s[1]+" &7-> "+s[2]);
+			successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.compareSingleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], 
+																												s -> "\n &2"+s[0]+": &8"+s[1]+" &7-> "+s[2]
+																												, "Level", oldLevel.toString(), level.toString());
 		}
 		
 		// Allows the user to view the details onhover
