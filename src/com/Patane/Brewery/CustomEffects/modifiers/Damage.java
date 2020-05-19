@@ -8,7 +8,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
-@Namer(name="DAMAGE")
+@Namer(name="damage")
 public class Damage extends Modifier{
 	final public DamageCause cause;
 	final public double amount;

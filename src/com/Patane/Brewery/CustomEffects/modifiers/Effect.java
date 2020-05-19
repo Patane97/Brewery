@@ -14,7 +14,7 @@ import com.Patane.util.YAML.types.YAMLFile;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.StringsUtil;
 
-@Namer(name="EFFECT")
+@Namer(name="effect")
 public class Effect extends Modifier{
 	final public BrEffect effect;
 	

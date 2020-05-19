@@ -34,6 +34,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 			section.set("icon", effect.hasParticles());
 	}
 	/**
+	 *  *** Need to allow users to supply different values, such as giving an 'icon' value, but NOT a 'particles' value
 	 * Retireves a potion effect from a YML and creates it based on the values given.
 	 * @param section ConfigurationSection to grab potion effect from.
 	 * @return New PotionEffect with given values. If there is an error, returns null and prints error message.

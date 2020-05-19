@@ -9,9 +9,11 @@ import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YAML.TypeParsable;
+import com.Patane.util.YAML.Typer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.Focusable.Focus;
 
+@Typer(type="Trigger")
 public abstract class Trigger extends TypeParsable{
 
 	protected Trigger(){};
@@ -32,6 +34,7 @@ public abstract class Trigger extends TypeParsable{
 	 * @param target LivingEntity to target with the effect.
 	 */
 	public abstract void execute(BrEffect effect, LivingEntity executor, LivingEntity target);
+	
 	/**
 	 * Executes an effect on either each entity around a target entity or if the radius is null, just the target entity.
 	 * @param effect Effect to execute.

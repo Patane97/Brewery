@@ -8,7 +8,7 @@ import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.ingame.Focusable.Focus;
 
-@Namer(name="INSTANT")
+@Namer(name="instant")
 public class Instant extends Trigger{
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {

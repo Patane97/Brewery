@@ -269,7 +269,7 @@ public class BrItem extends PatCollectable{
 		private String description;
 		
 		CustomType(Material material, String description){
-			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.wordSplitter(description, 5, "&7")));
+			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.stringSplitter(description, 5, "&7")));
 			this.guiItem = ItemsUtil.addFlavourText(ItemsUtil.setItemNameLore(icon,"&6Item Type: &2"+ItemsUtil.getDisplayName(icon)), "Click to change");
 			this.description = description;
 		}

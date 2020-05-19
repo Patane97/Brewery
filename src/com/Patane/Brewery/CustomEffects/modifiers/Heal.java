@@ -6,7 +6,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
-@Namer(name="HEAL")
+@Namer(name="heal")
 public class Heal extends Modifier{
 	final public double amount;
 	

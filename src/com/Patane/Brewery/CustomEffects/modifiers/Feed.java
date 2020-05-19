@@ -8,7 +8,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
-@Namer(name="FEED")
+@Namer(name="feed")
 public class Feed extends Modifier{
 	final public double amount;
 

@@ -60,8 +60,8 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 		ItemStack currentItem = brItem.getItemStack();
 				
 		if(!currentItem.containsEnchantment(enchantment)) {
-			// Doesnt REALLY need hover text here.
-			Messenger.send(sender, "&eThat enchantment is not present on &7"+brItem.getName()+"&e.");
+			// *** ADD HOVER TEXT TO SHOW ALL ENCHANTMENTS ITEM HAS
+			Messenger.send(sender, "&7"+brItem.getName()+"&e does not have that Enchantment.");
 			return true;
 		}
 		String successMsg = "&aRemoved enchantment from &7"+brItem.getName()+"&a. Hover for details!";

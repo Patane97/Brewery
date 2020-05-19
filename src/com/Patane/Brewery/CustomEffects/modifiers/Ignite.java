@@ -6,7 +6,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
-@Namer(name="IGNITE")
+@Namer(name="ignite")
 public class Ignite extends Modifier{
 	final public int duration;
 	

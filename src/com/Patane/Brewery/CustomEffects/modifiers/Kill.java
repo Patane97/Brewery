@@ -3,7 +3,7 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 
-@Namer(name="KILL")
+@Namer(name="kill")
 public class Kill extends Modifier{
 	
 	@Override

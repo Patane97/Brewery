@@ -8,7 +8,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.util.YAML.TypeParsable;
+import com.Patane.util.YAML.Typer;
 
+@Typer(type="Modifier")
 public abstract class Modifier extends TypeParsable{
 	
 	protected Modifier(){};

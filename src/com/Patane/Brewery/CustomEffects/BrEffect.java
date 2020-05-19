@@ -14,13 +14,15 @@ import org.bukkit.potion.PotionEffectType;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.runnables.PatRunnable;
-import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.YAML.Namer;
+import com.Patane.util.YAML.TypeParsable;
+import com.Patane.util.YAML.Typer;
 import com.Patane.util.collections.PatCollectable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.general.StringsUtil.LambdaStrings;
 
 public class BrEffect extends PatCollectable{
 	/**
@@ -209,6 +211,72 @@ public class BrEffect extends PatCollectable{
 //	public boolean stack() {
 //		return stack;
 //	}
+	
+	/**
+	 * Returns this effect in a formatted state appropriate for Chat or HoverText (using \n for new lines)
+	 * @param layout Layout to stick to. If the string needs to be indented outside of the usual, add indentation to the layout.
+	 * @param deep True to include all details of each value. False for just a simple overview of the effect
+	 * @return Single string containing all information of this Effect
+	 */
+	public String toChatString(LambdaStrings title, LambdaStrings layout, boolean deep) {
+		// Starting with the effect name as a bolded title
+		String effectInfo = title.build(getName());
+		
+		// Saving the modifier and trigger strings now as they can be null
+		String modifier = StringsUtil.typeParsToChatString(layout, getModifier(), deep);
+		String trigger = StringsUtil.typeParsToChatString(layout, getTrigger(), deep);
+		
+		// Adding the modifier and trigger strings. If they are null, show as "undefined"
+		effectInfo += "\n" + (modifier == null ? layout.build("Modifier", "&8Undefined") : modifier);
+		effectInfo += "\n" + (trigger == null ? layout.build("Trigger", "&8Undefined") : trigger);
+		
+		// If radius is present, show it
+		if(hasRadius())
+			effectInfo += "\n" + layout.build("Radius", getRadius().toString());
+		
+		// If tag is present, show it
+		if(hasTag())
+			effectInfo += "\n" + layout.build("Tag", getTag().name);
+
+		// If ignore_user is present, show it
+		if(ignoreUser() == false)
+			effectInfo += "\n" + layout.build("Ignore User", "false");
+		
+		// If potions are present, show them
+		if(hasPotions()) {
+			// If not deep, then simply print potion count
+			if(!deep)
+				effectInfo += "\n" + layout.build("Potion Effects", Integer.toString(getPotions().size()));
+			// Otherwise grab all potion effect infos from the string builder
+			else
+				effectInfo += "\n" + layout.build("Potion Effects", "") 
+				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], getPotions().toArray(new PotionEffect[0]));
+		}
+		
+		// If particles are present, show them. Does not need null check as we know we have them
+		if(hasParticle())
+			effectInfo += "\n" + StringsUtil.typeParsToChatString(layout, getParticleEffect(), deep);
+
+		// If sounds are present, show them. Does not need null check as we know we have them
+		if(hasSound())
+			effectInfo += "\n" + StringsUtil.typeParsToChatString(layout, getSoundEffect(), deep);
+		
+		// If filters are present, show them.
+		if(hasFilter()) {
+			// If not deep, print Filter followed by Target (white TICK) count and Ignore (dark grey CROSS) count
+			if(!deep)
+				//\u2714 = BOLD TICK
+				//\u2718 = BOLD CROSS
+				effectInfo += "\n" + layout.build("Filter", "Active (&f\u2714&7"+getFilter().getTarget().getSize()+" &8\u2718&7"+getFilter().getIgnore().getSize()+")");
+			// Otherwise grab filters in groups (Entities, Players, Permissions, Tags) and show if they are Target or Ignore through Tick or Cross
+			else
+				effectInfo += "\n" + layout.build("Filter", "") 
+				+ getFilter().toChatString(layout);
+	
+		}
+		return effectInfo;
+	}
+	
 	/**
 	 * Executes the effect on an impact location using the effects radius.
 	 * @param executor LivingEntity who is executing the effect.
@@ -258,7 +326,8 @@ public class BrEffect extends PatCollectable{
  *  PARTICLE EFFECTS
  */
 	@Namer(name = "Particle Effect")
-	public static class BrParticleEffect extends MapParsable{
+	@Typer(type = "Particles")
+	public static class BrParticleEffect extends TypeParsable{
 		final public Particle type;
 		final public Formation formation;
 		final public int intensity;
@@ -302,7 +371,8 @@ public class BrEffect extends PatCollectable{
  *  SOUND EFFECTS
  */
 	@Namer(name = "Sound Effect")
-	public static class BrSoundEffect extends MapParsable{
+	@Typer(type = "Sounds")
+	public static class BrSoundEffect extends TypeParsable{
 		final public Sound type;
 //		final public Formation formation;
 		final public float volume;
@@ -329,7 +399,8 @@ public class BrEffect extends PatCollectable{
  *  TAGS
  */
 	@Namer(name = "Tag")
-	public static class BrTag extends MapParsable{
+	@Typer(type = "Tag")
+	public static class BrTag extends TypeParsable{
 		final public String name;
 		
 		public BrTag(Map<String, String> fields){
@@ -347,5 +418,17 @@ public class BrEffect extends PatCollectable{
 		public void clear(PatRunnable task){
 			BrMetaDataHandler.remove(task, "TAG");
 		}
+	}
+
+	public static String manyToChatString(LambdaStrings title, LambdaStrings layout, boolean deep, BrEffect... effects) {
+		String effectsString = "";
+		if(effects.length == 0)
+			return "&8Nothing here!";
+		for(BrEffect effect : effects) {
+			if(effect != effects[0])
+				effectsString += "\n\n";
+			effectsString += effect.toChatString(title, layout, deep);
+		}
+		return effectsString;
 	}
 }

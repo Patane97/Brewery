@@ -22,6 +22,9 @@ import com.Patane.Brewery.NEWcommands.primary.reloadCommand;
 import com.Patane.Brewery.NEWcommands.primary.removeCommand;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItem;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemCooldown;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffects;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsAdd;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsRemove;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstack;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributes;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributesAdd;
@@ -35,6 +38,7 @@ import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackFlagsRe
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLore;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLoreDelete;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackLoreSet;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackName;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemType;
 import com.Patane.Commands.CommandHandler;
 
@@ -82,6 +86,11 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemItemstackLore.class);
 		register(editItemItemstackLoreSet.class);
 		register(editItemItemstackLoreDelete.class);
+		register(editItemItemstackName.class);
+		
+		register(editItemEffects.class);
+		register(editItemEffectsAdd.class);
+		register(editItemEffectsRemove.class);
 		// Edit Item commands
 		/*
 		register(itemEditItem.class);

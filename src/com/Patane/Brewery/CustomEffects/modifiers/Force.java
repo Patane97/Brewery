@@ -9,7 +9,7 @@ import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 
-@Namer(name="FORCE")
+@Namer(name="force")
 public class Force extends Modifier{
 	final public Direction direction;
 	final public double intensity;

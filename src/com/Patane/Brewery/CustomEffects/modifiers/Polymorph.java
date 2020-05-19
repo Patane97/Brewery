@@ -25,7 +25,7 @@ import com.Patane.util.general.Messenger;
  * @author Stephen
  *
  */
-@Namer(name="POLYMORPH")
+@Namer(name="polymorph")
 public class Polymorph extends Modifier{
 	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
 	

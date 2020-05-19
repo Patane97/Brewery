@@ -14,7 +14,7 @@ import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focusable.Focus;
 
-@Namer(name="STICKY")
+@Namer(name="sticky")
 public class Sticky extends Trigger{
 	public final float rate;
 	public final float duration;
