@@ -63,14 +63,14 @@ public class editItemEffectsAdd extends editItemEffects {
 			// Create a new empty one and save to brEffect and collection
 			brEffect = new BrEffect(effectName, new None(), new Instant(), null, null, null, null, null, null, null);
 			Brewery.getEffectCollection().add(brEffect);
-			// *** Created and added incomplete effect to item. Hover to view effect details
-
+			// Sending appropriate message
 			successMsg = "&aEffect created and added to &7"+brItem.getName()+"&a. Hover to view details!";
 		}
 		else {
 			brEffect = Brewery.getEffectCollection().getItem(effectName);
 		}
 		
+		// Saving all remaining effects PLUS the removed effect with appropriate formatting
 		successHoverText = (brItem.hasEffects() ? successHoverText+"\n\n" : "") 
 				+ brEffect.toChatString(s -> "&a&l+ &f&l"+s[0], s -> "&2&l"+Chat.add(s[0], "&l")+"&2&l: &7&l"+Chat.add(s[1], "&l"), false);
 		

@@ -23,16 +23,16 @@ public class editItem extends editCommand {
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		
-		// Checking itemname is given
+		// Checking item name is given
 		if(args.length < 1) {
 			Messenger.send(sender, "&ePlease specify an item name.");
 			return true;
 		}
 		// Find Item
-		BrItem brItem = Brewery.getItemCollection().getItem(args[0]);
+		BrItem item = Brewery.getItemCollection().getItem(args[0]);
 		
 		// Check if Item exists
-		if(brItem == null) {
+		if(item == null) {
 			Messenger.send(sender, "&cThere is no item with the name &7"+args[0]+"&c.");
 			return true;
 		}
@@ -43,7 +43,7 @@ public class editItem extends editCommand {
 			return true;
 		}
 		
-		return this.gotoChild(1, s -> "&7"+s+" &cis not a valid property to edit.", sender, args, brItem);
+		return this.gotoChild(1, s -> "&7"+s+" &cis not a valid property to edit.", sender, args, item);
 	}
 	
 	@Override
