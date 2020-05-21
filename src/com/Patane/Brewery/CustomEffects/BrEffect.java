@@ -22,6 +22,7 @@ import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.general.StringsUtil.LambdaString;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 
 public class BrEffect extends PatCollectable{
@@ -213,7 +214,17 @@ public class BrEffect extends PatCollectable{
 //	}
 	
 	/**
+	 * Returns this effect's name in a formatted state appropriate for chat or HoverText.
+	 * @param title Layout for the title/effect name.
+	 * @return Single string containing the effects name in specific layout.
+	 */
+	public String toChatString(LambdaString title) {
+		return title.build(getName());
+	}
+	
+	/**
 	 * Returns this effect in a formatted state appropriate for Chat or HoverText (using \n for new lines)
+	 * @param title Layout for the title.
 	 * @param layout Layout to stick to. If the string needs to be indented outside of the usual, add indentation to the layout.
 	 * @param deep True to include all details of each value. False for just a simple overview of the effect
 	 * @return Single string containing all information of this Effect
@@ -428,6 +439,17 @@ public class BrEffect extends PatCollectable{
 			if(effect != effects[0])
 				effectsString += "\n\n";
 			effectsString += effect.toChatString(title, layout, deep);
+		}
+		return effectsString;
+	}
+	public static String manytoChatString(LambdaString title, BrEffect... effects) {
+		String effectsString = "";
+		if(effects.length == 0)
+			return "&8Nothing here!";
+		for(BrEffect effect : effects) {
+			if(effect != effects[0])
+				effectsString += "\n";
+			effectsString += effect.toChatString(title);
 		}
 		return effectsString;
 	}

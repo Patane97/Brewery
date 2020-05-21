@@ -49,12 +49,12 @@ public class editItem extends editCommand {
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects){
 		switch(args.length){
-		case 1:
-			return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
+			case 1:
+				return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
 		}
-		//
-		BrItem brItem = Brewery.getItemCollection().getItem(args[0]);
+		// Grabbing the item
+		BrItem item = Brewery.getItemCollection().getItem(args[0]);
 		
-		return tabCompleteCore(sender, args, brItem);
+		return tabCompleteCore(sender, args, item);
 	}
 }

@@ -9,10 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
-import com.Patane.Brewery.Commands.primary.createCommand;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
-import com.Patane.Commands.CommandHandler.CommandPackage;
+import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
@@ -84,6 +83,8 @@ public class createItem extends createCommand {
 			// Save new effect onto hover text
 			// *** Not implemented yet
 //			successHoverText = BrItem.manyToChatString(title, layout, false, item);
+			successHoverText = "&8Not implemented yet";
+			
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
 			successMsg = "&cThere was an error with creating this item. Hover for error details!";
@@ -98,9 +99,12 @@ public class createItem extends createCommand {
 		Messenger.send(sender, successMsgComponent);
 		return true;
 	}
-	
+
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
-		return Arrays.asList("<item name>");
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		switch(args.length) {
+			case 1: return Arrays.asList("<item name>");
+		}
+		return Arrays.asList();
 	}
 }
