@@ -9,7 +9,7 @@ import com.Patane.Commands.CommandInfo;
 @CommandInfo(
 	name = "edit item effects",
 	description = "Edits the Effects of a Brewery Item. Editing these Effects does not change the original Effect if there is any.",
-	usage = "/brewery edit item <item name> effects [add|remove|edit]"
+	usage = "/brewery edit item <item name> effects [add|remove|set]"
 )
 public class editItemEffects extends editItem {
 	

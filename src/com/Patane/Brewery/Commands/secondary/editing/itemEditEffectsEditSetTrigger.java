@@ -52,15 +52,15 @@ public class itemEditEffectsEditSetTrigger extends itemEditEffectsEditSet {
 		BrItem brItem = (BrItem) EditSession.get(sender.getName());
 
 		BrEffect effect2 = Brewery.getItemCollection().getItem(brItem.getName()).getEffect(brEffect.getName());
-		Messenger.debug("BEFORE EFFECT TRIGGER: "+(effect2.getTrigger() == null ? "NULL": effect2.getTrigger().name()));
+		Messenger.debug("BEFORE EFFECT TRIGGER: "+(effect2.getTrigger() == null ? "NULL": effect2.getTrigger().className()));
 		brEffect.setTrigger(trigger);
 //		brItem.updateEffect(brEffect);
 		
 		BrItem.YML().save(brItem);
 		
 		effect2 = Brewery.getItemCollection().getItem(brItem.getName()).getEffect(brEffect.getName());
-		Messenger.debug("AFTER EFFECT TRIGGER: "+effect2.getTrigger().name());
-		Messenger.send(sender, "&aSet Trigger for this items &7"+brEffect.getName()+"&a effect to &7"+trigger.name()+"&a.");
+		Messenger.debug("AFTER EFFECT TRIGGER: "+effect2.getTrigger().className());
+		Messenger.send(sender, "&aSet Trigger for this items &7"+brEffect.getName()+"&a effect to &7"+trigger.className()+"&a.");
 		return true;
 	}
 	@Override

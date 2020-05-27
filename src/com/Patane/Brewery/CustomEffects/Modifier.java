@@ -9,19 +9,36 @@ import org.bukkit.metadata.FixedMetadataValue;
 import com.Patane.Brewery.Brewery;
 import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.YAML.Typer;
+import com.Patane.util.general.StringsUtil.LambdaStrings;
 
 @Typer(type="Modifier")
 public abstract class Modifier extends TypeParsable{
 	
-	protected Modifier(){};
-	public Modifier(Map<String, String> fields){}
-	
+	public Modifier() {
+		super();
+	}
+	public Modifier(Map<String, String> fields) {
+		super(fields);
+	}
+
 	public abstract void modify(ModifierInfo info);
 	
 	public void damage(LivingEntity damagee, LivingEntity damager, double amount){
 		damagee.setMetadata("Brewery_DAMAGE", new FixedMetadataValue(Brewery.getInstance(), null));
 		damagee.damage(amount, damager);
 	}
+	
+	/* ================================================================================
+	 * ChatStringable Methods
+	 * ================================================================================
+	 */
+	@Override
+	public LambdaStrings layout(){
+		// Example: &2Type: &7Name
+		return s -> "&2"+s[0]+"&2: &7"+s[1];
+	}
+	
+	
 	public static class ModifierInfo {
 		private final Location impact;
 		private final LivingEntity targeter;

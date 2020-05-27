@@ -1,5 +1,7 @@
 package com.Patane.Brewery.CustomEffects.formations;
 
+import java.util.Map;
+
 import org.bukkit.Location;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
@@ -11,6 +13,10 @@ public class Entity extends Formation{
 	
 	public Entity() {
 		super(Focus.ENTITY);
+	}
+	
+	public Entity(Map<String, String> fields) {
+		super(fields);
 	}
 	
 	@Override

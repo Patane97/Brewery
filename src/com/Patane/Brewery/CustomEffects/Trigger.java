@@ -11,14 +11,33 @@ import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.YAML.Typer;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Focusable.Focus;
 
 @Typer(type="Trigger")
 public abstract class Trigger extends TypeParsable{
 
-	protected Trigger(){};
-	public Trigger(Map<String, String> fields){}
+	public Trigger() {
+		super();
+	}
+	public Trigger(Map<String, String> fields) {
+		super(fields);
+	}
 	
+	/* ================================================================================
+	 * ChatStringable Methods
+	 * ================================================================================
+	 */
+	@Override
+	public LambdaStrings layout() {
+		// Example: &2Type: &7Name
+		return s -> "&2"+s[0]+"&2: &7"+s[1];
+	}
+	
+	/* ================================================================================
+	 * Executors
+	 * ================================================================================
+	 */
 	/**
 	 * Executes the effect on a specific location.
 	 * @param effect Effect to execute.
@@ -109,6 +128,10 @@ public abstract class Trigger extends TypeParsable{
 		}
 		return null;
 	}
+	/* ================================================================================
+	 * Appliers
+	 * ================================================================================
+	 */
 	/**
 	 * Applies an effect's modifier onto a specific LivingEntity.
 	 * @param effect Effect to execute.

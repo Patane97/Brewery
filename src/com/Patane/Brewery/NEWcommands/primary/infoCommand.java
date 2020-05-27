@@ -60,13 +60,13 @@ public class infoCommand extends PatCommand{
 			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&7No Information")).create()));
 		} else {
 			// Add the name to the string and construct a TextComponent from it (now looks like "&2Type: &7Name")
-			infoText = new TextComponent(Chat.translate(type+"&7"+mapParsable.name()));
+			infoText = new TextComponent(Chat.translate(type+"&7"+mapParsable.className()));
 			
 			// Hovertext constructed to display the name of the MapParsable before anything else.
-			String hoverText = "&2Name: &7"+mapParsable.name();
+			String hoverText = "&2Name: &7"+mapParsable.className();
 			
 			// Grabbing the fields and values of the MapParsable and saving as a Map<String, Object>.
-			Map<String, Object> fieldMap = mapParsable.mapFields();
+			Map<String, Object> fieldMap = mapParsable.getFieldMap();
 
 			// If there were no fields to loop through, then "&7No fields" is added under the MapParsable's name.
 			if(fieldMap.isEmpty())

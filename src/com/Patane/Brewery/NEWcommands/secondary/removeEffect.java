@@ -9,7 +9,6 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.NEWcommands.primary.removeCommand;
 import com.Patane.Commands.CommandInfo;
-import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -40,7 +39,7 @@ public class removeEffect extends removeCommand {
 		// If no effect with that name exists, do nothing and message appropriately
 		if(!Brewery.getEffectCollection().hasItem(effectName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is no Brewery Effect named &7"+effectName+"&e. Hover to view all Effects!"
-														, BrEffect.manytoChatString(s -> "&e> &f&l"+s, Brewery.getEffectCollection().getAllItems().toArray(new BrEffect[0]))));
+														, StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), "\n&e> &f&l", "&e> &f&l", "")));
 			return true;
 		}
 
@@ -58,7 +57,7 @@ public class removeEffect extends removeCommand {
 			Brewery.getEffectCollection().remove(effect.getName());
 			
 			// Save removed effect onto hover text with removed layout/title layouts
-			successHoverText = BrEffect.manyToChatString(s -> "&c&l- &8&l&m"+s[0], s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8"+Chat.replace(s[1], "&8"), false, effect);
+			successHoverText = effect.toChatString(0, false);
 		
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)

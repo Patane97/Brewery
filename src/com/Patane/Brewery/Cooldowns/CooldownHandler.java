@@ -102,7 +102,8 @@ public class CooldownHandler {
 		// If the cooldown is not meant to be over yet, it starts a new cooldown and subtracts the remaining time from it.
 		if(difference > 0) {
 			start(entity, item, brItem);
-			cooldowns.get(uuid).subtract((cooldowns.get(uuid).duration()/20)-(difference/1000));
+			// duration remaining minus difference in ticks (seconds * 20)
+			cooldowns.get(uuid).subtract((cooldowns.get(uuid).duration())-((difference/1000)*20));
 			return true;
 		}
 		else

@@ -11,7 +11,8 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Commands.primary.infoCommand;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
-import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Brewery.CustomEffects.Filter.FilterType;
+import com.Patane.Brewery.CustomEffects.Filter.FilterTypes;
 import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
@@ -92,43 +93,43 @@ public class infoEffect extends infoCommand{
 	}
 	
 	private void filterInfo(CommandSender sender, Filter filter) {
-		if(!filter.getTarget().noFilter()) {
+		if(!filter.getType(FilterTypes.TARGET).noFilter()) {
 			Messenger.sendRaw(sender, " &2Target: &7");
-			filterGroupInfo(sender, filter.getTarget());
+			filterTypeInfo(sender, filter.getType(FilterTypes.TARGET));
 		}
-		if(!filter.getIgnore().noFilter()) {
+		if(!filter.getType(FilterTypes.IGNORE).noFilter()) {
 			Messenger.sendRaw(sender, " &2Ignore: &7");
-			filterGroupInfo(sender, filter.getIgnore());
+			filterTypeInfo(sender, filter.getType(FilterTypes.IGNORE));
 		}
 	}
 	
-	private void filterGroupInfo(CommandSender sender, FilterGroup filterGroup) {
+	private void filterTypeInfo(CommandSender sender, FilterType filterType) {
 		TextComponent infoText;
 		String hoverText;
-		if(!filterGroup.getEntities().isEmpty()) {
-			infoText = new TextComponent(Chat.translate("  &aEntities: &7"+filterGroup.getEntities().size()));
+		if(!filterType.getEntities().isEmpty()) {
+			infoText = new TextComponent(Chat.translate("  &aEntities: &7"+filterType.getEntities().size()));
 			List<String> entityTypeStrings = new ArrayList<String>();
-			for(EntityType entityType : filterGroup.getEntities())
+			for(EntityType entityType : filterType.getEntities())
 				entityTypeStrings.add(entityType.toString());
 			hoverText = StringsUtil.stringJoiner(entityTypeStrings, "\n&a> &7", "&a> &7", "");
 			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(hoverText)).create()));
 			Messenger.sendRaw(sender, infoText);
 		}
-		if(!filterGroup.getPlayers().isEmpty()) {
-			infoText = new TextComponent(Chat.translate("  &aPlayers: &7"+filterGroup.getPlayers().size()));
-			hoverText = StringsUtil.stringJoiner(filterGroup.getPlayers(), "\n&a> &7", "&a> &7", "");
+		if(!filterType.getPlayers().isEmpty()) {
+			infoText = new TextComponent(Chat.translate("  &aPlayers: &7"+filterType.getPlayers().size()));
+			hoverText = StringsUtil.stringJoiner(filterType.getPlayers(), "\n&a> &7", "&a> &7", "");
 			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(hoverText)).create()));
 			Messenger.sendRaw(sender, infoText);
 		}
-		if(!filterGroup.getPermissions().isEmpty()) {
-			infoText = new TextComponent(Chat.translate("  &aPermissions: &7"+filterGroup.getPermissions().size()));
-			hoverText = StringsUtil.stringJoiner(filterGroup.getPermissions(), "\n&a> &7", "&a> &7", "");
+		if(!filterType.getPermissions().isEmpty()) {
+			infoText = new TextComponent(Chat.translate("  &aPermissions: &7"+filterType.getPermissions().size()));
+			hoverText = StringsUtil.stringJoiner(filterType.getPermissions(), "\n&a> &7", "&a> &7", "");
 			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(hoverText)).create()));
 			Messenger.sendRaw(sender, infoText);
 		}
-		if(!filterGroup.getTags().isEmpty()) {
-			infoText = new TextComponent(Chat.translate("  &aTags: &7"+filterGroup.getTags().size()));
-			hoverText = StringsUtil.stringJoiner(filterGroup.getTags(), "\n&a> &7", "&a> &7", "");
+		if(!filterType.getTags().isEmpty()) {
+			infoText = new TextComponent(Chat.translate("  &aTags: &7"+filterType.getTags().size()));
+			hoverText = StringsUtil.stringJoiner(filterType.getTags(), "\n&a> &7", "&a> &7", "");
 			infoText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(hoverText)).create()));
 			Messenger.sendRaw(sender, infoText);
 		}

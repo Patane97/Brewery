@@ -17,17 +17,18 @@ import com.Patane.GUI.GUIAction;
 import com.Patane.GUI.GUIClick;
 import com.Patane.GUI.GUIIcon;
 import com.Patane.GUI.GUIPage;
-import com.Patane.util.collections.PatCollectable;
+import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.ItemsUtil;
 
 
-public class BrItem extends PatCollectable{
+public class BrItem extends ChatCollectable{
 	/**
 	 * ******************* STATIC YML SECTION *******************
 	 */
@@ -46,7 +47,11 @@ public class BrItem extends PatCollectable{
 	protected CustomType type;
 	protected List<BrEffect> effects;
 	protected Float cooldown; // Measured in seconds
-	
+
+	/* ================================================================================
+	 * Constructors
+	 * ================================================================================
+	 */
 	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown){
 		super(name);
 		if(Brewery.getItemCollection().hasItem(getName())){
@@ -59,19 +64,10 @@ public class BrItem extends PatCollectable{
 		constructGUI();
 	}
 	
-	protected GUIPage guiPage;
-	
-	public GUIPage guiPage() {
-		return guiPage;
-	}
-	
-	
-	/**
-	 * Generates an ItemStack appropriate to give to a player for use.
+	/* ================================================================================
+	 * Setters, Getters and Has...ers
+	 * ================================================================================
 	 */
-	public ItemStack generateItem() {
-		return ItemEncoder.addTag(item.clone(), "UUID", UUID.randomUUID().toString());
-	}
 	/**
 	 * <b>Do not use this method to give this BrItem to a player. Use {@link #generateItem()} instead!</b>
 	 */
@@ -142,6 +138,37 @@ public class BrItem extends PatCollectable{
 	public void setCooldown(Float cooldown) {
 		this.cooldown = cooldown;
 	}
+	/* ================================================================================
+	 * Other useful methods
+	 * ================================================================================
+	 */
+	/**
+	 * Generates an ItemStack appropriate to give to a player for use.
+	 */
+	public ItemStack generateItem() {
+		return ItemEncoder.addTag(item.clone(), "UUID", UUID.randomUUID().toString());
+	}
+
+	/* ================================================================================
+	 * ChatStringable Methods
+	 * ================================================================================
+	 */
+	
+	@Override
+	public LambdaStrings layout() {
+		// Example: &2Type: &7Name
+		return s -> "&2"+s[0]+"&2: &7"+s[1];
+	}
+	/**
+	 * *** NOT IMPLEMENTED YET
+	 */
+	public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+		return "&8Not implemented yet";
+	}
+	/* ================================================================================
+	 * Item Executors
+	 * ================================================================================
+	 */
 	/**
 	 * Executes the item's effects in a specific location (Generally the location of impact).
 	 * @param location Location to trigger the effects.
@@ -196,6 +223,11 @@ public class BrItem extends PatCollectable{
 			return false;
 		}
 	}
+
+	/* ================================================================================
+	 * *** OLD, TO BE REPLACED COMPLETELY BY TOCHATSTRING
+	 * ================================================================================
+	 */
 	public String hoverDetails() {
 		List<String> effectNames = new ArrayList<String>();
 		for(BrEffect effect : getEffects())
@@ -215,9 +247,17 @@ public class BrItem extends PatCollectable{
 		return Brewery.getItemCollection().getItem(brItemName);
 	}
 
-	/**
-	 * ********************** GUI SECTION ***********************
+
+	/* ================================================================================
+	 * GUI Section. Still in very early development, likely rework needed
+	 * ================================================================================
 	 */
+	
+	protected GUIPage guiPage;
+	
+	public GUIPage guiPage() {
+		return guiPage;
+	}
 	public void constructGUI() {
 		GUIPage mainPage = new GUIPage(this.getName(), 1, false);
 		guiPage = mainPage;
@@ -256,8 +296,14 @@ public class BrItem extends PatCollectable{
 		mainPage.addIcon(2, effectIcon);
 		//
 	}
-	/**
-	 * **********************************************************
+
+/* ================================================================================
+ * Item Specific Classes
+ * ================================================================================
+ */
+	/* ================================================================================
+	 * CustomType Enum
+	 * ================================================================================
 	 */
 	public static enum CustomType {
 		THROWABLE(Material.SPLASH_POTION, "Right click whilst holding to throw this item. Effects apply on impacted location or target."),

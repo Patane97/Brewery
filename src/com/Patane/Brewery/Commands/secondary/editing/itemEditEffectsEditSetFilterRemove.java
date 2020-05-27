@@ -9,7 +9,8 @@ import org.bukkit.entity.EntityType;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
-import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Brewery.CustomEffects.Filter.FilterType;
+import com.Patane.Brewery.CustomEffects.Filter.FilterTypes;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
 import com.Patane.Commands.CommandHandler.CommandPackage;
@@ -34,11 +35,11 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 			return false;
 		}
 		
-		String filterGroup = (String) objects[1];
+		String filterType = (String) objects[1];
 		
-		String filterType = args[0].toLowerCase();
+		String filterGroup = args[0].toLowerCase();
 		
-		if(!Arrays.asList(FilterGroup.types).contains(filterType)){
+		if(!Arrays.asList(FilterTypes.values()).contains(filterGroup)){
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid Filter Type.");
 			return true;
 		}
@@ -51,27 +52,27 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 
 		Filter filter = brEffect.getFilter();
 		
-		try {
-			brEffect.getFilter().remove(filterGroup, filterType, args[1]);
-		} catch (IllegalArgumentException e) {
-			Messenger.send(sender, e.getMessage());
-			return true;
-		}
+//		try {
+//			brEffect.getFilter().remove(filterType, filterGroup, args[1]);
+//		} catch (IllegalArgumentException e) {
+//			Messenger.send(sender, e.getMessage());
+//			return true;
+//		}
 		
 		String successMsg = "";
 		
-		switch(filterType) {
+		switch(filterGroup) {
 			case "entities":
-				successMsg = "&aRemoved &7"+args[1].toUpperCase()+"&a Entity Type from the effects &7"+filterGroup+"&a filter list.";
+				successMsg = "&aRemoved &7"+args[1].toUpperCase()+"&a Entity Type from the effects &7"+filterType+"&a filter list.";
 				break;
 			case "players":
-				successMsg = "&aRemoved Player &7"+args[1]+"&a from the effects &7"+filterGroup+"&a filter list.";
+				successMsg = "&aRemoved Player &7"+args[1]+"&a from the effects &7"+filterType+"&a filter list.";
 				break;
 			case "permissions":
-				successMsg = "&aRemoved &7"+args[1]+"&a Permission from the effects &7"+filterGroup+"&a filter list.";
+				successMsg = "&aRemoved &7"+args[1]+"&a Permission from the effects &7"+filterType+"&a filter list.";
 				break;
 			case "tags":
-				successMsg = "&aRemoved &7"+args[1]+"&a Tag from the effects &7"+filterGroup+"&a filter list.";
+				successMsg = "&aRemoved &7"+args[1]+"&a Tag from the effects &7"+filterType+"&a filter list.";
 				break;
 		}		
 
@@ -85,7 +86,7 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 		return true;
 	}
 	
-	// *** This needs to be more efficient! Possibly saving some of these values within FilterGroups? << They could update each time a method is run to add/remove elements to each filter type.
+	// *** This needs to be more efficient! Possibly saving some of these values within FilterTypes? << They could update each time a method is run to add/remove elements to each filter type.
 	// *** Additionally, could rework the entire tab complete system to be similar to execute where it run's code for the command then, if satisfied, moves onto the child 'tabComplete' and so on...
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
@@ -95,22 +96,22 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 		BrEffect brEffect = ((BrItem) collectable).getEffect(args[3]);
 		if(brEffect == null)
 			return Arrays.asList();
-		FilterGroup filterGroup = null;
+		FilterType filterType = null;
 		if(args[6].toLowerCase().equals("target"))
-			filterGroup = brEffect.getFilter().getTarget();
+			filterType = brEffect.getFilter().getType(FilterTypes.TARGET);
 		else if(args[6].toLowerCase().equals("ignore"))
-			filterGroup = brEffect.getFilter().getIgnore();
+			filterType = brEffect.getFilter().getType(FilterTypes.IGNORE);
 		
 		switch(args.length) {
 		case 9:
 			List<String> nonEmptyFilters = new ArrayList<String>();
-			if(!filterGroup.getEntities().isEmpty())
+			if(!filterType.getEntities().isEmpty())
 				nonEmptyFilters.add("entities");
-			if(!filterGroup.getPlayers().isEmpty())
+			if(!filterType.getPlayers().isEmpty())
 				nonEmptyFilters.add("players");
-			if(!filterGroup.getPermissions().isEmpty())
+			if(!filterType.getPermissions().isEmpty())
 				nonEmptyFilters.add("permissions");
-			if(!filterGroup.getTags().isEmpty())
+			if(!filterType.getTags().isEmpty())
 				nonEmptyFilters.add("tags");
 			
 			if(nonEmptyFilters.isEmpty())
@@ -119,13 +120,13 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 		default:
 			switch(args[8].toLowerCase()) {
 			case "entities":
-				return Arrays.asList(StringsUtil.enumValueStrings(filterGroup.getEntities().toArray(new EntityType[0])));
+				return Arrays.asList(StringsUtil.enumValueStrings(filterType.getEntities().toArray(new EntityType[0])));
 			case "players":
-				return filterGroup.getPlayers();
+				return filterType.getPlayers();
 			case "permissions":
-				return filterGroup.getPermissions();
+				return filterType.getPermissions();
 			case "tags":
-				return filterGroup.getTags();
+				return filterType.getTags();
 			default:
 				return Arrays.asList();
 			}

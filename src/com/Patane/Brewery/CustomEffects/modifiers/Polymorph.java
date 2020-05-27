@@ -29,18 +29,42 @@ import com.Patane.util.general.Messenger;
 public class Polymorph extends Modifier{
 	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
 	
-	final public EntityType entity;
-	final public double duration;
+	public EntityType entity;
+	public int duration;
 	
-	public Polymorph(Map<String, String> fields){
-		entity = getEnumValue(EntityType.class, fields, "entity");
-		duration = Check.greaterThan(getDouble(fields, "duration"), 0, "Duration must be greater than 0.");
+	public Polymorph() {
+		super();
 	}
 	
-	public Polymorph(EntityType entity, double duration){
+	public Polymorph(Map<String, String> fields) {
+		super(fields);
+	}
+	
+
+	@Override
+	protected void populateFields(Map<String, String> fields) {
+		entity = getEnumValue(EntityType.class, fields, "entity");
+		duration = Math.round(Check.greaterThan((float) getDouble(fields, "duration")*20, 0, "Duration must be greater than 0."));
+	}
+	
+	public Polymorph(EntityType entity, int duration){
 		this.entity = entity;
 		this.duration = duration;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+	@Override
+	protected void valueConverts() {
+		// duration is converted from MC ticks to seconds (20 ticks = 1 second)
+		customValueConverter.put("duration", i -> (int)i/20+"s");
+	}
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void modify(ModifierInfo info) {
 		if(currentlyMorphed.containsKey(info.getTarget()) || currentlyMorphed.containsValue(info.getTarget()))
@@ -94,7 +118,7 @@ public class Polymorph extends Modifier{
 					}, (long) 5);
 					morphed.remove();
 				}
-			}, (long) (duration*20)-5);
+			}, (long) duration-5);
 			
 		} catch (IllegalArgumentException e) {
 			Messenger.severe("Failed to polymorph '"+targetEntity.getName()+"' entity into '"+entity.name()+"' entity.");

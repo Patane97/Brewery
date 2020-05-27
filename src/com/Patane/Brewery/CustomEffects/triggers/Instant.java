@@ -1,5 +1,7 @@
 package com.Patane.Brewery.CustomEffects.triggers;
 
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
@@ -10,6 +12,18 @@ import com.Patane.util.ingame.Focusable.Focus;
 
 @Namer(name="instant")
 public class Instant extends Trigger{
+	
+	public Instant() {
+		super();
+	}
+	
+	@Override
+	protected void populateFields(Map<String, String> fields) {}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		applyByFocus(effect, impact, Focus.BLOCK);

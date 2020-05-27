@@ -3,6 +3,7 @@ package com.Patane.Brewery.Handlers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.Brewery.CustomEffects.modifiers.Damage;
@@ -21,7 +22,7 @@ import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
 public class ModifierHandler implements PatHandler{
-	private static HashMap<String, Class< ? extends Modifier>> modifiers;
+	private static Map<String, Class< ? extends Modifier>> modifiers;
 	
 	public static Class< ? extends Modifier> get(String modifier){
 		for(String modifierName : modifiers.keySet()){

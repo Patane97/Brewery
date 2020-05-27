@@ -53,7 +53,7 @@ public class itemEditEffectsEditSetModifier extends itemEditEffectsEditSet {
 		
 		BrItem.YML().save(brItem);
 		
-		Messenger.send(sender, "&aSet Modifier for this items &7"+brEffect.getName()+"&a effect to &7"+modifier.name()+"&a.");
+		Messenger.send(sender, "&aSet Modifier for this items &7"+brEffect.getName()+"&a effect to &7"+modifier.className()+"&a.");
 		return true;
 	}
 	

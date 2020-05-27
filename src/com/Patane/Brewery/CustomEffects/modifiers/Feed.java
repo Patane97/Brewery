@@ -10,15 +10,31 @@ import com.Patane.util.general.Check;
 
 @Namer(name="feed")
 public class Feed extends Modifier{
-	final public double amount;
+	public double amount;
+	
+	public Feed() {
+		super();
+	}
+	
+	public Feed(Map<String, String> fields) {
+		super(fields);
+	}
+	
 
-	public Feed(Map<String, String> fields){
+	@Override
+	protected void populateFields(Map<String, String> fields) {
 		amount = Check.greaterThan(getDouble(fields, "amount"), 0, "Amount must be greater than 0.");
 	}
 	
 	public Feed(double amount){
 		this.amount = amount;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void modify(ModifierInfo info) {
 		if(info.getTarget() instanceof Player){
@@ -26,4 +42,5 @@ public class Feed extends Modifier{
 			player.setFoodLevel((int) Math.min(20, (player.getFoodLevel() + amount)));
 		}
 	}
+
 }

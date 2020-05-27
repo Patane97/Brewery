@@ -8,7 +8,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Brewery.CustomEffects.Filter.FilterType;
 import com.Patane.util.YAML.types.YAMLEditable;
 import com.Patane.util.general.Messenger;
 
@@ -80,29 +80,29 @@ public abstract class BreweryYAML extends YAMLEditable{
 		return string;
 	}
 	
-	public static void setFilterGroup(ConfigurationSection section, FilterGroup filterGroup) {
+	public static void setFilterType(ConfigurationSection section, FilterType filterType) {
 		
-		if(!filterGroup.getEntities().isEmpty()) {
+		if(!filterType.getEntities().isEmpty()) {
 			
 			// Converting EntityType's into String that are safe for YML
 			List<String> entityNames = new ArrayList<String>();
-			for(EntityType entityType : filterGroup.getEntities()) {
+			for(EntityType entityType : filterType.getEntities()) {
 				entityNames.add(entityType.toString());
 			}
 			
 			section.set("entities", entityNames);
 		}
-		if(!filterGroup.getPlayers().isEmpty())
-			section.set("players", filterGroup.getPlayers());
+		if(!filterType.getPlayers().isEmpty())
+			section.set("players", filterType.getPlayers());
 		
-		if(!filterGroup.getPermissions().isEmpty())
-			section.set("permissions", filterGroup.getPermissions());
+		if(!filterType.getPermissions().isEmpty())
+			section.set("permissions", filterType.getPermissions());
 		
-		if(!filterGroup.getTags().isEmpty())
-			section.set("tags", filterGroup.getTags());
+		if(!filterType.getTags().isEmpty())
+			section.set("tags", filterType.getTags());
 	}
 	
-	public static FilterGroup getFilterGroup(ConfigurationSection section, boolean defaultReturn) throws ClassNotFoundException, NullPointerException{
+	public static FilterType getFilterType(ConfigurationSection section, boolean defaultReturn) throws ClassNotFoundException, NullPointerException{
 		if(section != null){
 			List<EntityType> entities = new ArrayList<EntityType>();
 			for(String entityName : section.getStringList("entities")){
@@ -114,8 +114,8 @@ public abstract class BreweryYAML extends YAMLEditable{
 			List<String> player = section.getStringList("players");
 			List<String> permissions = section.getStringList("permissions");
 			List<String> tags = section.getStringList("tags");
-			return new FilterGroup(entities, player, permissions, tags, defaultReturn);
+			return new FilterType(entities, player, permissions, tags, defaultReturn);
 		}
-		return new FilterGroup(null, null, null, null, defaultReturn);
+		return new FilterType(null, null, null, null, defaultReturn);
 	}
 }

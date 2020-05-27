@@ -12,7 +12,6 @@ import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
@@ -21,7 +20,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 	name = "edit item effects remove",
 	aliases = {"rem", "delete", "del"},
 	description = "Removes an Effect from a Brewery Item. This will not remove the effect from the plugin, only from the Item.",
-	usage = "/brewery edit effects remove <effect name>",
+	usage = "/brewery edit item <item name> effects remove <effect name>",
 	maxArgs = 1
 )
 public class editItemEffectsRemove extends editItemEffects {
@@ -44,39 +43,35 @@ public class editItemEffectsRemove extends editItemEffects {
 			return true;
 		}
 		// Grabbing the brItem
-		BrItem brItem = (BrItem) objects[0];
-
-		// Storing these as its used multiple times and looks messy :3
-		LambdaStrings title = s -> "&f&l"+s[0];
-		LambdaStrings layout = s -> "&2"+s[0]+": &7"+s[1];
+		BrItem item = (BrItem) objects[0];
 		
 		// If the item does not contain the effect, do nothing and message appropriately
-		if(!brItem.hasEffect(effectName)) {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+brItem.getName()+"&a does not have this Effect. Hover to view which ones it does has!"
-					, BrEffect.manyToChatString(title, layout, false, brItem.getEffects().toArray(new BrEffect[0]))));
+		if(!item.hasEffect(effectName)) {
+			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&a does not have this Effect. Hover to view which ones it does has!"
+					, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
 		// Grabbing effect for later use
-		BrEffect effect = brItem.getEffect(effectName);
+		BrEffect effect = item.getEffect(effectName);
 		
 		// Remove the effect from brItem
-		brItem.removeEffect(effectName);
+		item.removeEffect(effectName);
 		
-		String successMsg = "&aEffect removed from &7"+brItem.getName()+"&a. Hover to view details!";
+		String successMsg = "&aEffect removed from &7"+item.getName()+"&a. Hover to view details!";
 		
 		// Success hover text is all effects remaining on item PLUS the removed effect with 'slashed out' formatting
-		String successHoverText = BrEffect.manyToChatString(title, layout, false, brItem.getEffects().toArray(new BrEffect[0]));
+		String successHoverText = BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]));
 		
 		// Adding the removed effect.
 		// If there are effects, add them and new lines dividers
 		// If there arent effects, ignore the 'Nothing to see here!' from successHoverText and only show the effect being removed
 		// Follows by adding removed effect with slash through the title, type AND value. the Chat. 
 		// Chat.replace is there to ensure all formatting is slashed and appropriate colour
-		successHoverText = (brItem.hasEffects() ? successHoverText+"\n\n" : "")
-				+ effect.toChatString(s -> "&c&l- &8&l&m"+s[0], s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8"+Chat.replace(s[1], "&8"), false);
+		successHoverText = (item.hasEffects() ? successHoverText+"\n\n" : "")
+				+ "&c&l- &8&l&m" + effect.toChatString(0, false, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8"+Chat.replace(s[1], "&8"));
 		
 		// Save to YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Allows the user to view the details on hover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);

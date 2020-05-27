@@ -8,15 +8,31 @@ import com.Patane.util.general.Check;
 
 @Namer(name="heal")
 public class Heal extends Modifier{
-	final public double amount;
+	public double amount;
 	
-	public Heal(Map<String, String> fields){
+	public Heal() {
+		super();
+	}
+	
+	public Heal(Map<String, String> fields) {
+		super(fields);
+	}
+	
+	
+	@Override
+	protected void populateFields(Map<String, String> fields) {
 		amount = Check.greaterThan(getDouble(fields, "amount"), 0, "Amount must be greater than 0.");
 	}
 	
 	public Heal(double amount){
 		this.amount = amount;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void modify(ModifierInfo info) {
 		if(amount > 0)

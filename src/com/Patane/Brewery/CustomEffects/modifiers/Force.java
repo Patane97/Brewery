@@ -11,17 +11,33 @@ import com.Patane.util.general.Check;
 
 @Namer(name="force")
 public class Force extends Modifier{
-	final public Direction direction;
-	final public double intensity;
+	public Direction direction;
+	public double intensity;
+	
+	public Force() {
+		super();
+	}
+	
+	public Force(Map<String, String> fields) {
+		super(fields);
+	}
+	
 
-	public Force(Map<String, String> fields){
+	@Override
+	protected void populateFields(Map<String, String> fields) {
 		direction = getEnumValue(Direction.class, fields, "direction");
 		intensity = Check.greaterThan(getDouble(fields, "intensity"), 0, "Intensity must be greater than 0.");
 	}
 	public Force(Direction direction, double intensity){
 		this.direction = direction;
 		this.intensity = intensity;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void modify(ModifierInfo info) {
 		// If the target IS the location, do nothing.
@@ -31,6 +47,10 @@ public class Force extends Modifier{
         Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
         info.getTarget().setVelocity(velocity);
 	}
+
+	/* 
+	 * ================================================================================
+	 */
 	
 	public enum Direction {
 		TOWARDS(new ForceAction(){

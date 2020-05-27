@@ -3,6 +3,7 @@ package com.Patane.Brewery.NEWcommands.secondary.editing;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
@@ -14,7 +15,6 @@ import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,7 +22,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "edit item effects add",
 	description = "Adds and/or Creates an Effect for a Brewery Item.",
-	usage = "/brewery edit effects add <effect name>",
+	usage = "/brewery edit item <item name> effects add <effect name>",
 	maxArgs = 1
 )
 public class editItemEffectsAdd extends editItemEffects {
@@ -43,18 +43,14 @@ public class editItemEffectsAdd extends editItemEffects {
 		// Grabbing the brItem
 		BrItem brItem = (BrItem) objects[0];
 		
-		// Storing these as its used multiple times and looks messy :3
-		LambdaStrings title = s -> "&f&l"+s[0];
-		LambdaStrings layout = s -> "&2"+s[0]+": &7"+s[1];
-		
 		// If effect is already on this item, do nothing and send appropriate message
 		if(brItem.hasEffect(effectName)) {
-			Messenger.send(sender, StringsUtil.hoverText("&eThis Effect is already present on &7"+brItem.getName()+"&a. Hover to view all effects for this item!"
-					, BrEffect.manyToChatString(title, layout, false, brItem.getEffects().toArray(new BrEffect[0]))));
+			Messenger.send(sender, StringsUtil.hoverText("&eThis Effect is already present on &7"+brItem.getName()+"&e. Hover to view all effects for this item!"
+					, BrEffect.manyToChatString(0, false, brItem.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
 		String successMsg = "&aEffect added to &7"+brItem.getName()+"&a. Hover to view details!";
-		String successHoverText = BrEffect.manyToChatString(title, layout, false, brItem.getEffects().toArray(new BrEffect[0]));
+		String successHoverText = BrEffect.manyToChatString(0, false, brItem.getEffects().toArray(new BrEffect[0]));
 		
 		BrEffect brEffect = null;
 		
@@ -72,7 +68,8 @@ public class editItemEffectsAdd extends editItemEffects {
 		
 		// Saving all remaining effects PLUS the removed effect with appropriate formatting
 		successHoverText = (brItem.hasEffects() ? successHoverText+"\n\n" : "") 
-				+ brEffect.toChatString(s -> "&a&l+ &f&l"+s[0], s -> "&2&l"+Chat.add(s[0], "&l")+"&2&l: &7&l"+Chat.add(s[1], "&l"), false);
+//				+ brEffect.toChatString(s -> "&a&l+ &f&l"+s[0], , false);) 
+				+ "&a&l+ &f&l" + brEffect.toChatString(0, false, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
 		
 		// Add effect to brItem
 		brItem.addEffect(brEffect);

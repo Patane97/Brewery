@@ -16,17 +16,42 @@ import com.Patane.util.ingame.Focusable.Focus;
 
 @Namer(name="lingering")
 public class Lingering extends Trigger{
-	public final float rate;
-	public final float duration;
+	public float rate;
+	public float duration;
 	
-	public Lingering(Map<String, String> fields){
+	public Lingering() {
+		super();
+	}
+	
+	public Lingering(Map<String, String> fields) {
+		super(fields);
+	}
+
+	@Override
+	protected void populateFields(Map<String, String> fields) {
 		rate = Check.greaterThan((float) getDouble(fields, "rate"), 0, "Rate must be greater than 0.");
 		duration = Check.greaterThanEqual((float) getDouble(fields, "duration"), rate, "Duration must be greater than or equal to the rate ("+rate+").");
 	}
 	public Lingering(float rate, float duration){
 		this.rate = rate;
 		this.duration = duration;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+
+	@Override
+	protected void valueConverts() {
+		// converted from MC ticks to seconds (20 ticks = 1 second)
+		customValueConverter.put("rate", i -> (float)i+"s");
+		customValueConverter.put("duration", i -> (float)i+"s");
+	}
+
+	/* 
+	 * ================================================================================
+	 */
 	
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
@@ -36,6 +61,10 @@ public class Lingering extends Trigger{
 	public void execute(BrEffect effect, LivingEntity executor, LivingEntity target) {
 		new LingeringTask(effect, executor, target);
 	}
+
+	/* 
+	 * ================================================================================
+	 */
 
 	protected class LingeringTask extends PatTimedRunnable{
 		private final BrEffect effect;

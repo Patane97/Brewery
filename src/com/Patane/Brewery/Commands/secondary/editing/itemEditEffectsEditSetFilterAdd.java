@@ -8,7 +8,7 @@ import org.bukkit.entity.EntityType;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Filter;
-import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Brewery.CustomEffects.Filter.FilterGroups;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
 import com.Patane.Commands.CommandHandler.CommandPackage;
@@ -35,7 +35,7 @@ public class itemEditEffectsEditSetFilterAdd extends itemEditEffectsEditSetFilte
 		
 		String filterType = args[0].toLowerCase();
 		
-		if(!Arrays.asList(FilterGroup.types).contains(filterType)){
+		if(!Arrays.asList(FilterGroups.values()).contains(filterType)){
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid Filter Type.");
 			return true;
 		}
@@ -48,12 +48,12 @@ public class itemEditEffectsEditSetFilterAdd extends itemEditEffectsEditSetFilte
 		
 		Filter filter = brEffect.getFilter();
 		
-		try {
-			filter.add(filterGroup, filterType, args[1]);
-		} catch (IllegalArgumentException e) {
-			Messenger.send(sender, e.getMessage());
-			return true;
-		}
+//		try {
+//			filter.add(filterGroup, filterType, args[1]);
+//		} catch (IllegalArgumentException e) {
+//			Messenger.send(sender, e.getMessage());
+//			return true;
+//		}
 		
 		String successMsg = "";
 		

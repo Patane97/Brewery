@@ -8,15 +8,40 @@ import com.Patane.util.general.Check;
 
 @Namer(name="ignite")
 public class Ignite extends Modifier{
-	final public int duration;
+	public int duration;
 	
-	public Ignite(Map<String, String> fields){
-		duration = (Math.round(Check.greaterThan((float) getDouble(fields, "duration")*20, 0, "Duration must be greater than 0.")));
+	public Ignite() {
+		super();
+	}
+	
+	public Ignite(Map<String, String> fields) {
+		super(fields);
+	}
+	
+
+	@Override
+	protected void populateFields(Map<String, String> fields) {
+		duration = Math.round(Check.greaterThan((float) getDouble(fields, "duration"), 0, "Duration must be greater than 0."));
 	}
 	
 	public Ignite(int duration){
 		this.duration = duration;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+
+	@Override
+	protected void valueConverts() {
+		customValueConverter.put("duration", i -> (int)i+" ticks");
+	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void modify(ModifierInfo info) {
 		info.getTarget().setFireTicks(duration);

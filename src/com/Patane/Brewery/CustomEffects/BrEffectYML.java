@@ -12,7 +12,8 @@ import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrSoundEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
-import com.Patane.Brewery.CustomEffects.Filter.FilterGroup;
+import com.Patane.Brewery.CustomEffects.Filter.FilterType;
+import com.Patane.Brewery.CustomEffects.Filter.FilterTypes;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.YAML.BreweryYAML;
@@ -187,12 +188,12 @@ public class BrEffectYML extends BreweryYAML{
 				else 
 					currentHeader = baseHeader.createSection("filter");
 				// >>> Target
-				if(!effect.getFilter().getTarget().noFilter()) {
-					setFilterGroup(currentHeader.createSection("target"), effect.getFilter().getTarget());
+				if(!effect.getFilter().getType(FilterTypes.TARGET).noFilter()) {
+					setFilterType(currentHeader.createSection("target"), effect.getFilter().getType(FilterTypes.TARGET));
 				}
 				// >>> Ignore
-				if(!effect.getFilter().getIgnore().noFilter()) {
-					setFilterGroup(currentHeader.createSection("ignore"), effect.getFilter().getIgnore());
+				if(!effect.getFilter().getType(FilterTypes.IGNORE).noFilter()) {
+					setFilterType(currentHeader.createSection("ignore"), effect.getFilter().getType(FilterTypes.IGNORE));
 				}
 			}
 			else 
@@ -343,8 +344,8 @@ public class BrEffectYML extends BreweryYAML{
 					// This is within a try/catch because it is optional.
 					// If it failed, we dont want to halt the entire retrieval process.
 					try{
-						FilterGroup target = getFilterGroup(getSection(currentHeader, "target"), true);
-						FilterGroup ignore = getFilterGroup(getSection(currentHeader, "ignore"), false);
+						FilterType target = getFilterType(getSection(currentHeader, "target"), true);
+						FilterType ignore = getFilterType(getSection(currentHeader, "ignore"), false);
 						
 						filter = new Filter(target, ignore);
 					} 

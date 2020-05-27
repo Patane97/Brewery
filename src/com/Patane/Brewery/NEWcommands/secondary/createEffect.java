@@ -13,7 +13,6 @@ import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
@@ -36,10 +35,6 @@ public class createEffect extends createCommand {
 		
 		// Setting name
 		String effectName = Commands.combineArgs(args);
-
-		// Storing these as its used multiple times and looks messy :3
-		LambdaStrings title = s -> "&f&l"+s[0];
-		LambdaStrings layout = s -> "&2"+s[0]+": &7"+s[1];
 		
 		BrEffect effect = null;
 		
@@ -47,7 +42,7 @@ public class createEffect extends createCommand {
 		if(Brewery.getEffectCollection().hasItem(effectName)) {
 			effect = Brewery.getEffectCollection().getItem(effectName);
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is already a Brewery Effect named &7"+effectName+"&e. Hover to view its details!"
-														, effect.toChatString(title, layout, false)));
+														, effect.toChatString(0, false)));
 			return true;
 		}
 		String successMsg = "&aCreated a new Effect. Hover to view its details!";
@@ -64,7 +59,7 @@ public class createEffect extends createCommand {
 			Brewery.getEffectCollection().add(effect);
 			
 			// Save new effect onto hover text
-			successHoverText = BrEffect.manyToChatString(title, layout, false, effect);
+			successHoverText = BrEffect.manyToChatString(0, false, effect);
 			
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)

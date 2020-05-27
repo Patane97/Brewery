@@ -16,17 +16,43 @@ import com.Patane.util.ingame.Focusable.Focus;
 
 @Namer(name="sticky")
 public class Sticky extends Trigger{
-	public final float rate;
-	public final float duration;
+	public float rate;
+	public float duration;
 	
-	public Sticky(Map<String, String> fields){
+	public Sticky() {
+		super();
+	}
+	
+	public Sticky(Map<String, String> fields) {
+		super(fields);
+	}
+	
+	@Override
+	protected void populateFields(Map<String, String> fields) {
 		rate = Check.greaterThan((float) getDouble(fields, "rate"), 0, "Rate must be greater than 0.");
 		duration = Check.greaterThanEqual((float) getDouble(fields, "duration"), rate, "Duration must be greater than or equal to the rate ("+rate+").");
 	}
 	public Sticky(float rate, float duration){
 		this.rate = rate;
 		this.duration = duration;
+		construct();
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+
+	@Override
+	protected void valueConverts() {
+		// converted from MC ticks to seconds (20 ticks = 1 second)
+		customValueConverter.put("rate", i -> (float)i+"s");
+		customValueConverter.put("duration", i -> (float)i+"s");
+	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	@Override
 	public void execute(BrEffect effect, Location impact, LivingEntity executor) {
 		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
@@ -42,6 +68,11 @@ public class Sticky extends Trigger{
 		List<LivingEntity> hitEntities = (effect.hasRadius() ? effect.getFilter().filter(target.getLocation(), effect.getRadius()) : effect.getFilter().filter(target));
 		new StickyTask(effect, executor, target, hitEntities);
 	}
+
+	/* 
+	 * ================================================================================
+	 */
+	
 	protected class StickyTask extends PatTimedRunnable{
 		private final BrEffect effect;
 		private final Location impact;

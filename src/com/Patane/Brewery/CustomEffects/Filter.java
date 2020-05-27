@@ -1,6 +1,7 @@
 package com.Patane.Brewery.CustomEffects;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -9,33 +10,46 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
+import com.Patane.util.general.Chat;
+import com.Patane.util.general.ChatStringable;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.LocationsUtil;
 
-public class Filter {
-	private FilterGroup target;
-	private FilterGroup ignore;
-
+public class Filter implements ChatStringable{
+	private FilterType target;
+	private FilterType ignore;
+	
+	/* ================================================================================
+	 * Constructors
+	 * ================================================================================
+	 */
 	public Filter() {
-		target = new FilterGroup(null, null, null, null, true);
-		ignore = new FilterGroup(null, null, null, null, false);
+		target = new FilterType(null, null, null, null, true);
+		ignore = new FilterType(null, null, null, null, false);
 	}
-	public Filter(FilterGroup target, FilterGroup ignore) {
+	public Filter(FilterType target, FilterType ignore) {
 		this.target = target;
 		this.ignore = ignore;
 	}
-	
-	public FilterGroup getTarget() {
-		return target;
-	}
-	public FilterGroup getIgnore() {
-		return ignore;
+	/* ================================================================================
+	 * Getters, Checkers and Has...ers
+	 * ================================================================================
+	 */
+	public FilterType getType(FilterTypes type) {
+		switch(type) {
+		case TARGET:
+			return target;
+		case IGNORE:
+			return ignore;
+		}
+		return null;
 	}
 	
 	public int getSize() {
 		return target.getSize() + ignore.getSize();
 	}
+	
 	public boolean hasEntities() {
 		return (target.getEntities().isEmpty() && target.getEntities().isEmpty() ? false : true);
 	}
@@ -48,187 +62,240 @@ public class Filter {
 	public boolean hasTags() {
 		return (target.getTags().isEmpty() && target.getTags().isEmpty() ? false : true);
 	}
-	
-	public void add(String group, String type, String value) throws IllegalArgumentException {
-		 FilterGroup filterGroup = null;
-		 switch(group.toLowerCase()) {
-		 case "target":
-			 filterGroup = target;
-			 break;
-		 case "ignore":
-			 filterGroup = ignore;
-			 break;
-		 }
-		 switch(type.toLowerCase()) {
-		 case "entities":
-			 try {
-				 filterGroup.addEntity(StringsUtil.constructEnum(value, EntityType.class));
-				 break;
-			 } catch(IllegalArgumentException e) {
-				 throw new IllegalArgumentException("&7"+value+"&c is not a valid Entity Type.");
-			 }
-		 case "players":
-			 filterGroup.addPlayer(value);
-			 break;
-		 case "permissions":
-			 filterGroup.addPermission(value);
-			 break;
-		 case "tags":
-			 filterGroup.addTag(value);
-			 break;
-		 }
+	public boolean isActive() {
+		return (target.noFilter() && ignore.noFilter() ? false : true);
 	}
-	public void remove(String group, String type, String value) throws IllegalArgumentException {
-		 FilterGroup filterGroup = null;
-		 switch(group.toLowerCase()) {
-		 case "target":
-			 filterGroup = target;
-			 break;
-		 case "ignore":
-			 filterGroup = ignore;
-			 break;
-		 }
-		 switch(type.toLowerCase()) {
-		 case "entities":
-			 try {
-				 filterGroup.removeEntity(StringsUtil.constructEnum(value, EntityType.class));
-				 break;
-			 } catch(IllegalArgumentException e) {
-				 throw new IllegalArgumentException("&7"+value+"&c is not a valid Entity Type.");
-			 }
-		 case "players":
-			 filterGroup.removePlayer(value);
-			 break;
-		 case "permissions":
-			 filterGroup.removePermission(value);
-			 break;
-		 case "tags":
-			 filterGroup.removeTag(value);
-			 break;
-		 }
-	}
-	public boolean noFilters() {
-		return (target.noFilter() && ignore.noFilter() ? true : false);
-	}
-	
 	public boolean equals(Filter other) {
-		if(getTarget().equals(other.getTarget()) && getIgnore().equals(other.getIgnore()))
+		if(target.equals(other.getType(FilterTypes.TARGET)) && ignore.equals(other.getType(FilterTypes.IGNORE)))
 			return true;
 		return false;
 	}
-	
-	/**
-	 * Returns the filter in a formatted state appropriate for Chat or HoverText (using \n for new lines)
-	 * @param layout Layout to stick to
-	 * @return Single string containing all information of this Filter
+
+	/* ================================================================================
+	 * Contains, Add & Remove
+	 * ================================================================================
 	 */
-	public String toChatString(LambdaStrings layout) {
-		String filterString = "";
-		// Uses Unicode symbols for a BOLD TICK and a BOLD CROSS for Targets and Ignores.
-		LambdaStrings targetLayout = s -> "&f\u2714 &7"+s[0];
-		LambdaStrings ignoreLayout = s -> "&8\u2718 &7"+s[0];
+	public boolean contains(FilterTypes type, FilterGroups group, String value) {
+		FilterType filterType = getType(type);
+		switch(group) {
+			case ENTITIES:
+			try {
+				return filterType.getEntities().contains(StringsUtil.constructEnum(value, EntityType.class));
+			} catch(IllegalArgumentException e) {
+				return false;
+			}
+			case PLAYERS:
+				return filterType.getPlayers().contains(value);
+			case PERMISSIONS:
+				return filterType.getPermissions().contains(value);
+			case TAGS:
+				return filterType.getTags().contains(value);
+			}
+		return false;
+	}
+	
+	
+	public boolean add(FilterTypes type, FilterGroups group, String value) {
+		FilterType filterType = getType(type);
+		switch(group) {
+			case ENTITIES:
+				try {
+					filterType.addEntity(StringsUtil.constructEnum(value, EntityType.class));
+					break;
+				} catch(IllegalArgumentException e) {
+					return false;
+				}
+			case PLAYERS:
+				filterType.addPlayer(value);
+				break;
+			case PERMISSIONS:
+				filterType.addPermission(value);
+				break;
+			case TAGS:
+				filterType.addTag(value);
+				break;
+		}
+		return true;
+	}
+	public boolean remove(FilterTypes type, FilterGroups group, String value) {
+		FilterType filterType = getType(type);
+		switch(group) {
+			case ENTITIES:
+				try {
+					filterType.removeEntity(StringsUtil.constructEnum(value, EntityType.class));
+					break;
+				} catch(IllegalArgumentException e) {
+					return false;
+				}
+			case PLAYERS:
+				filterType.removePlayer(value);
+				break;
+			case PERMISSIONS:
+				filterType.removePermission(value);
+				break;
+			case TAGS:
+				filterType.removeTag(value);
+				break;
+		}
+		return true;
+	}
+	
+	/* ================================================================================
+	 * ChatStringable Methods
+	 * ================================================================================
+	 */
+	
+	@Override
+	public LambdaStrings layout() {
+		// Example: &2Type: &7Name
+		return s -> "&2"+s[0]+"&2: &7"+s[1];
+	}
+	
+	@Override
+	public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+		// USEFUL SECTION TO COPY TO OTHER TOCHATSTRINGS!
+		// If the alternateLayout is null, we want to use the default layout for itself
+		alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+		// //////////////////////////////////////////////
+
+		// If it is inactive, show it
+		if(!isActive())
+			return Chat.indent(indentCount) + alternateLayout.build("Filter", "&8Inactive");
 		
-		// ENTITIES
-		if(hasEntities()) {
-			// Starts with Entities title
-			filterString += "\n  " + layout.build("Entities","");
-			// Adds all targets with target layout
-			for(EntityType entityType : getTarget().getEntities())
-				filterString += "\n    " + targetLayout.build(entityType.name());
-			// Adds all ignores with ignore layout
-			for(EntityType entityType : getIgnore().getEntities())
-				filterString += "\n    " + ignoreLayout.build(entityType.name());
-		}
-		// PLAYERS
-		if(hasPlayers()) {
-			// Starts with Players title
-			filterString += "\n  " + layout.build("Players","");
-			// Adds all targets with target layout
-			for(String player : getTarget().getPlayers())
-				filterString += "\n    " + targetLayout.build(player);
-			// Adds all ignores with ignore layout
-			for(String player : getIgnore().getPlayers())
-				filterString += "\n    " + ignoreLayout.build(player);
-		}
-		// PERMISSIONS
-		if(hasPermissions()) {
-			// Starts with Permissions title
-			filterString += "\n  " + layout.build("Permissions","");
-			// Adds all targets with target layout
-			for(String permission : getTarget().getPermissions())
-				filterString += "\n    " + targetLayout.build(permission);
-			// Adds all ignores with ignore layout
-			for(String permission : getIgnore().getPermissions())
-				filterString += "\n    " + ignoreLayout.build(permission);
-		}
-		// TAGS
-		if(hasTags()) {
-			// Starts with Tags title
-			filterString += "\n  " + layout.build("Tags","");
-			// Adds all targets with target layout
-			for(String tag : getTarget().getTags())
-				filterString += "\n    " + targetLayout.build(tag);
-			// Adds all ignores with ignore layout
-			for(String tag : getIgnore().getTags())
-				filterString += "\n    " + ignoreLayout.build(tag);
-		}
+		// If its not deep, we just want to show the filter and how many elements it is targetting and ignoring
+		// Current format: Active (TICK5 CROSS3)
+		if(!deep)
+			return Chat.indent(indentCount) + alternateLayout.build("Filter", 
+					"Active ("+FilterTypes.TARGET.symbol+"&7"+target.getSize()+" "+FilterTypes.IGNORE.symbol+"&7"+ignore.getSize()+")");
 		
-		// Return filter string
+		// Adding all filters to string
+		// Each method checks if the filter contains its element in target or ignore. If not, gives nothing
+		String filterString = Chat.indent(indentCount) + alternateLayout.build("Filter", "")
+							+ entitiesToChatString(indentCount+1, false, alternateLayout)
+							+ playersToChatString(indentCount+1, false, alternateLayout)
+							+ permissionsToChatString(indentCount+1, false, alternateLayout)
+							+ tagsToChatString(indentCount+1, false, alternateLayout);
+		// Returns the filter string OR empty if theres no filter
 		return filterString;
 	}
-	/**
-	 * OLD METHOD OF LAYING OUT FILTER INFO (now toChatString)
+	
+	@Override
+	public String toChatString(int indentCount, boolean deep) {
+		return toChatString(indentCount, deep, null);
+	}
+	public String toChatStringInsert(int indentCount, FilterTypes type, FilterGroups group, String value, LambdaStrings alternateLayout, LambdaStrings insert) {
+		
+		// If the alternateLayout is null, use default layout
+		alternateLayout = (alternateLayout == null ? layout() : null);
+		
+		String selectedSymbol = (type == FilterTypes.TARGET ? FilterTypes.TARGET.symbol : FilterTypes.IGNORE.symbol);
+		
+		String filterString = Chat.indent(indentCount) + alternateLayout.build("Filter", "");
+		
+		filterString += entitiesToChatString(indentCount+1, (group == FilterGroups.ENTITIES), alternateLayout);
+		if(group == FilterGroups.ENTITIES)
+			filterString += "\n" + Chat.indent(indentCount) + insert.build(selectedSymbol, value);
+		filterString += playersToChatString(indentCount+1, (group == FilterGroups.PLAYERS), alternateLayout);
+		if(group == FilterGroups.PLAYERS)
+			filterString += "\n" + Chat.indent(indentCount) + insert.build(selectedSymbol, value);
+		filterString += permissionsToChatString(indentCount+1, (group == FilterGroups.PERMISSIONS), alternateLayout);
+		if(group == FilterGroups.PERMISSIONS)
+			filterString += "\n" + Chat.indent(indentCount) + insert.build(selectedSymbol, value);
+		filterString += tagsToChatString(indentCount+1, (group == FilterGroups.TAGS), alternateLayout);
+		if(group == FilterGroups.TAGS)
+			filterString += "\n" + Chat.indent(indentCount) + insert.build(selectedSymbol, value);
+		
+		return filterString;
+	}
+	/* ================================================================================
+	 * Private ChatStringable-related Methods
+	 * ================================================================================
 	 */
-//		public String filterInfo(LambdaStrings layout, Filter filter) {
-//		String filterString = "";
-//		LambdaStrings listLayout = s -> "&2> &7"+s[0];
-//		if(!filter.getTarget().noFilter()) {
-//			filterString += "\n  " + layout.build("Target", "") + filterGroupInfo(layout, listLayout, filter.getTarget());
-//		}
-//		if(!filter.getIgnore().noFilter()) {
-//			filterString += "\n  " + layout.build("Ignore", "") + filterGroupInfo(layout, listLayout, filter.getIgnore());
-//		}
-//		return filterString;
-//	}
+
+	private final LambdaStrings targetLayout = s -> FilterTypes.TARGET.symbol + " &7"+s[0];
+	private final LambdaStrings ignoreLayout = s -> FilterTypes.IGNORE.symbol + " &7"+s[0];
+	
+	private String entitiesToChatString(int indentCount, boolean titleIfEmpty, LambdaStrings layout) {
+		String entitiesString = "";
+		// ENTITIES
+		if(hasEntities() || (!hasEntities() && titleIfEmpty)) {
+			// Starts with Entities title
+			entitiesString += "\n" + Chat.indent(indentCount) + layout.build("Entities","");
+			// Adds all targets with target layout
+			for(EntityType entityType : target.getEntities())
+				entitiesString += "\n" + Chat.indent(indentCount+1) + targetLayout.build(entityType.name());
+			// Adds all ignores with ignore layout
+			for(EntityType entityType : ignore.getEntities())
+				entitiesString += "\n" + Chat.indent(indentCount+1) + ignoreLayout.build(entityType.name());
+		}
+		return entitiesString;
+	}
+	private String playersToChatString(int indentCount, boolean titleIfEmpty, LambdaStrings layout) {
+		String playersString = "";
+		// PLAYERS
+		if(hasPlayers() || (!hasPlayers() && titleIfEmpty)) {
+			// Starts with Players title
+			playersString += "\n" + Chat.indent(indentCount) + layout.build("Players","");
+			// Adds all targets with target layout
+			for(String player : target.getPlayers())
+				playersString += "\n" + Chat.indent(indentCount+1) + targetLayout.build(player);
+			// Adds all ignores with ignore layout
+			for(String player : ignore.getPlayers())
+				playersString += "\n" + Chat.indent(indentCount+1) + ignoreLayout.build(player);
+		}
+		return playersString;
+	}
+	private String permissionsToChatString(int indentCount, boolean titleIfEmpty, LambdaStrings layout) {
+		String permissionsString = "";
+		// PERMISSIONS
+		if(hasPermissions() || (!hasPermissions() && titleIfEmpty)) {
+			// Starts with Permissions title
+			permissionsString += "\n" + Chat.indent(indentCount) + layout.build("Permissions","");
+			// Adds all targets with target layout
+			for(String permission : target.getPermissions())
+				permissionsString += "\n" + Chat.indent(indentCount+1) + targetLayout.build(permission);
+			// Adds all ignores with ignore layout
+			for(String permission : ignore.getPermissions())
+				permissionsString += "\n" + Chat.indent(indentCount+1) + ignoreLayout.build(permission);
+		}
+		return permissionsString;
+	}
+	private String tagsToChatString(int indentCount, boolean titleIfEmpty, LambdaStrings layout) {
+		String tagsString = "";
+		// TAGS
+		if(hasTags() || (!hasTags() && titleIfEmpty)) {
+			// Starts with Tags title
+			tagsString += "\n" + Chat.indent(indentCount) + layout.build("Tags","");
+			// Adds all targets with target layout
+			for(String tag : target.getTags())
+				tagsString += "\n" + Chat.indent(indentCount+1) + targetLayout.build(tag);
+			// Adds all ignores with ignore layout
+			for(String tag : ignore.getTags())
+				tagsString += "\n" + Chat.indent(indentCount+1) + ignoreLayout.build(tag);
+		}
+		return tagsString;
+	}
+//	public String toChatString(LambdaStrings layout, FilterGroups... groups) {
+//	if(groups.length == 0)
+//		groups = FilterGroups.values();
 //	
-//	private String filterGroupInfo(LambdaStrings layout, LambdaStrings listLayout, FilterGroup filterGroup) {
-//		String filterGroupString = "";
-//		// If entities exist, add them to string
-//		if(!filterGroup.getEntities().isEmpty()) {
-//			filterGroupString += "\n    " + layout.build("Entities","");
-//			// First converting EntityType list into a String list of entity names
-//			for(String entity : StringsUtil.enumValueStrings(filterGroup.getEntities()))
-//				// Adding each to string with layout
-//				filterGroupString += "\n      " + listLayout.build(entity);
-//		}
-//		
-//		// If players exist, add them to string
-//		if(!filterGroup.getPlayers().isEmpty()) {
-//			filterGroupString += "\n    " + layout.build("Players","");
-//			for(String player : filterGroup.getPlayers())
-//				// Adding each to string with layout
-//				filterGroupString += "\n      " + listLayout.build(player);
-//		}
-//		
-//		// If permissions exist, add them to string
-//		if(!filterGroup.getPermissions().isEmpty()) {
-//			filterGroupString += "\n    " + layout.build("Permissions","");
-//			for(String permission : filterGroup.getPermissions())
-//				// Adding each to string with layout
-//				filterGroupString += "\n      " + listLayout.build(permission);
-//		}
-//		
-//		// If tags exist, add them to string
-//		if(!filterGroup.getTags().isEmpty()) {
-//			filterGroupString += "\n    " + layout.build("Tags","");
-//			for(String tag : filterGroup.getTags())
-//				// Adding each to string with layout
-//				filterGroupString += "\n      " + listLayout.build(tag);
-//		}
-//		
-//		// Return the full string
-//		return filterGroupString;
-//	}
+//	String filterString = "";
+//	List<FilterGroups> groupList = Arrays.asList(groups);
+//	if(groupList.contains(FilterGroups.ENTITIES))
+//		filterString += entitiesToChatString(layout, false);
+//	if(groupList.contains(FilterGroups.PLAYERS))
+//		filterString += playersToChatString(layout, false);
+//	if(groupList.contains(FilterGroups.PERMISSIONS))
+//		filterString += permissionsToChatString(layout, false);
+//	if(groupList.contains(FilterGroups.TAGS))
+//		filterString += tagsToChatString(layout, false);
+//	return filterString;
+//}
+
+	/* ================================================================================
+	 * Filtering Methods
+	 * ================================================================================
+	 */
 	/**
 	 * Extracts each entity that fits the filter.
 	 * If given, the entity must not be on the ignore List.
@@ -262,9 +329,32 @@ public class Filter {
 //		return filter(LocationsUtil.getEntities(impact, radius));
 		return filter(LocationsUtil.getRadius(impact, radius));
 	}
+
+/* ================================================================================
+ * Filter Specific Classes
+ * ================================================================================
+ */
+	/* ================================================================================
+	 * Filter Enums (Types and Groups)
+	 * ================================================================================
+	 */
+	public static enum FilterTypes {
+		TARGET("&f\u2714"), IGNORE("&8\u2718");
+		
+		public String symbol;
+		FilterTypes(String symbol){
+			this.symbol = symbol;
+		}
+	}
+	public static enum FilterGroups {
+		ENTITIES, PLAYERS, PERMISSIONS, TAGS;
+	}
 	
-	
-	public static class FilterGroup {
+	/* ================================================================================
+	 * Filter Type Class
+	 * ================================================================================
+	 */	
+	public static class FilterType {
 		private List<EntityType> entities;
 		private List<String> players;
 		private List<String> permissions;
@@ -272,11 +362,9 @@ public class Filter {
 		
 		private int totalSize;
 		
-		public static String[] types = {"entities", "players", "permissions", "tags"};
-		
 		private boolean defaultReturn;
 		
-		public FilterGroup(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn){
+		public FilterType(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn){
 			this.entities = (entities == null ? new ArrayList<EntityType>() : entities);
 			this.players = (players == null ? new ArrayList<String>() : players);
 			this.permissions = (permissions == null ? new ArrayList<String>() : permissions);
@@ -288,6 +376,33 @@ public class Filter {
 				  + this.permissions.size()
 				  + this.tags.size();
 			
+		}
+		
+		public List<FilterGroups> getNonEmptyGroups() {
+			List<FilterGroups> nonEmpty = new ArrayList<FilterGroups>();
+			if(!entities.isEmpty())
+				nonEmpty.add(FilterGroups.ENTITIES);
+			if(!players.isEmpty())
+				nonEmpty.add(FilterGroups.PLAYERS);
+			if(!permissions.isEmpty())
+				nonEmpty.add(FilterGroups.PERMISSIONS);
+			if(!tags.isEmpty())
+				nonEmpty.add(FilterGroups.TAGS);
+			return nonEmpty;
+		}
+		
+		public List<String> getAsString(FilterGroups group) {
+			switch(group) {
+				case ENTITIES:
+					return StringsUtil.enumValueStrings(entities);
+				case PLAYERS:
+					return players;
+				case PERMISSIONS:
+					return permissions;
+				case TAGS:
+					return tags;
+			}
+			return Arrays.asList();
 		}
 		
 		public int getSize() {
@@ -346,7 +461,7 @@ public class Filter {
 		public boolean noFilter() {
 			return this.entities.isEmpty() && this.players.isEmpty() && this.permissions.isEmpty() && this.tags.isEmpty();
 		}
-		public boolean equals(FilterGroup other) {
+		public boolean equals(FilterType other) {
 			for(String tag : getTags())
 				if(!other.getTags().contains(tag))
 					return false;
@@ -371,7 +486,7 @@ public class Filter {
 			}
 			// Looping through each EntityType in entities
 			for(EntityType entityType : entities){
-				// If the type matches, they pass.
+				// If the group matches, they pass.
 				if(entity.getType() == entityType)
 					return true;
 			}
@@ -399,4 +514,148 @@ public class Filter {
 			return false;
 		}
 	}
+
+	/* ================================================================================
+	 * *** Temporary attempt of generating FilterType using TYPEs.
+	 *     Doesnt work, probably not worth looking into but will keep here just incase
+	 * ================================================================================
+	 */
+	// This is an attempt at making filter type work as one list (filterGroups). Was not successful but could be attempted later.
+//	public static class FilterType {
+//	Map<FilterGroup, FilterGroupContainer<?>> filterGroups = new LinkedHashMap<FilterGroup, FilterGroupContainer<?>>();
+//	
+//	private boolean defaultReturn;
+//	
+//	private int totalSize;
+//	
+//	
+//	public FilterType(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn) {
+//		filterGroups.put(FilterGroup.ENTITIES, new FilterGroupContainer<EntityType>(EntityType.class, entities, 
+//				new FilterPass<EntityType>() {
+//					@Override
+//					public boolean check(List<EntityType> groupList, LivingEntity entity) {
+//						for(EntityType entityType : groupList)
+//							if(entity.getType() == entityType)
+//								return true;
+//						return false;
+//					}
+//				}));
+//		filterGroups.put(FilterGroup.PLAYERS, new FilterGroupContainer<String>(String.class, players,
+//				new FilterPass<String>() {
+//					@Override
+//					public boolean check(List<String> groupList, LivingEntity entity) {
+//						if(entity instanceof Player) {
+//							for(String player : groupList)
+//								if(entity.getName().equals(player) || entity.getUniqueId().toString().equals(player))
+//									return true;
+//							}
+//						return false;
+//					}
+//				}));
+//		filterGroups.put(FilterGroup.PERMISSIONS, new FilterGroupContainer<String>(String.class, permissions,
+//				new FilterPass<String>() {
+//					@Override
+//					public boolean check(List<String> groupList, LivingEntity entity) {
+//						if(entity instanceof Player) {
+//							for(String permission : groupList)
+//								if(entity.hasPermission(permission))
+//									return true;
+//						}
+//						return false;
+//					}
+//				}));
+//		filterGroups.put(FilterGroup.TAGS, new FilterGroupContainer<String>(String.class, tags,
+//				new FilterPass<String>() {
+//					@Override
+//					public boolean check(List<String> groupList, LivingEntity entity) {
+//						for(String tag : groupList)
+//							if(BrMetaDataHandler.check(entity, "<TAG-"+tag+">"))
+//								return true;
+//						return false;
+//					}
+//				}));			
+//		this.defaultReturn = defaultReturn;
+//		totalSize = 0;
+//		for(FilterGroupContainer<?> container : filterGroups.values())
+//			totalSize += container.getList().size();
+//		
+//	}
+//	
+//	public boolean match(LivingEntity entity) {
+//		for(FilterGroup filterGroup : filterGroups.keySet()) {
+//			if(filterGroups.get(filterGroup).check(entity))
+//				return true;
+//		}
+//		return false;
+//	}
+//	
+//	public int getSize() {
+//		
+//		boolean add = add(FilterGroup.ENTITIES);
+//		
+//		return totalSize;
+//	}
+//	
+//	public <T> boolean add(FilterGroup filterGroup, T t) {
+//		filterGroups.get(filterGroup).getList(t)
+//	}
+//	
+//	public List<EntityType> getEntities(){
+//		return filterGroups.get(FilterGroup.ENTITIES).getList(EntityType.class);
+//	}
+//	
+//	public List<String> getPlayers(){
+//		return filterGroups.get(FilterGroup.PLAYERS).getList(String.class);
+//	}
+//	
+//	public List<String> getPermissions(){
+//		return filterGroups.get(FilterGroup.PERMISSIONS).getList(String.class);
+//	}
+//	
+//	public List<String> getTags(){
+//		return filterGroups.get(FilterGroup.TAGS).getList(String.class);
+//	}
+//	
+//}
+//public static class FilterGroupContainer<T> {
+//	private List<T> groupList;
+//	private FilterPass<T> filterPass;
+//	private Class<T> clazz;
+//	private T t;
+//	
+//	FilterGroupContainer(Class<T> clazz, List<T> filterGroupList, FilterPass<T> filterPass) {
+//		this.groupList = (filterGroupList == null ? new ArrayList<T>() : filterGroupList);
+//		this.filterPass = filterPass;
+//		this.clazz = clazz;
+//	}
+//	
+//	public boolean check(LivingEntity entity) {
+//		return filterPass.check(groupList, entity);
+//	}
+//	
+//	@SuppressWarnings("unchecked")
+//	public <L> List<L> getList(T type){
+//		return (List<L>) groupList;
+//	}
+//	
+//	public List<T> getList(){
+//		return groupList;
+//	}
+//	
+//}
+//public static enum FilterGroup {
+//	ENTITIES(EntityType.class),
+//	PLAYERS(String.class),
+//	PERMISSIONS(String.class),
+//	TAGS(String.class);
+//	
+//	public final Class<?> clazz;
+//	
+//	FilterGroup(Class<?> clazz){
+//		this.clazz = clazz;
+//	}
+//}
+//protected interface FilterPass<T>{
+//	public boolean check(List<T> groupList, LivingEntity entity);
+//}
 }
