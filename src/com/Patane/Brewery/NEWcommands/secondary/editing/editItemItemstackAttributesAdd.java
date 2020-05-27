@@ -35,7 +35,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Checks for attribute
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide an item attribute.");
+			Messenger.send(sender, "&ePlease specify an item attribute.");
 			return true;
 		}
 		Attribute attribute = null;
@@ -50,7 +50,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Check for attribute name
 		if(args.length < 2) {
-			Messenger.send(sender, "&ePlease provide a name for this modifier. Any name will do!");
+			Messenger.send(sender, "&ePlease provide a name for this modifier. This can be any non-existing modifier name.");
 			return true;
 		}
 		
@@ -59,7 +59,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Check for amount
 		if(args.length < 3) {
-			Messenger.send(sender, "&ePlease provide an amount for this modifier.");
+			Messenger.send(sender, "&ePlease provide an amount for this modifier. This must be a positive number or 0.");
 			return true;
 		}
 		
@@ -69,7 +69,13 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		try {
 			amount = Double.parseDouble(args[2]);
 		} catch (NumberFormatException e) {
-			Messenger.send(sender, "&7"+args[2]+" &cis an invalid amount.");
+			Messenger.send(sender, "&7"+args[2]+" &cis not a valid amount. It must be a positive number or 0.");
+			return true;
+		}
+		
+		// Checking its positive
+		if(amount < 0) {
+			Messenger.send(sender, "&cAmount must be a positive number or 0.");
 			return true;
 		}
 		
@@ -81,7 +87,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 			try {
 				operation = StringsUtil.constructEnum(args[3], Operation.class);
 			} catch (IllegalArgumentException e) {
-				Messenger.send(sender, "&7"+args[3]+" &c is an invalid operation.");
+				Messenger.send(sender, "&7"+args[3]+" &cis not a valid operation.");
 				return true;
 			}
 		}
@@ -95,7 +101,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 				if(!args[4].equalsIgnoreCase("ALL"))
 					slot = StringsUtil.constructEnum(args[4], EquipmentSlot.class);
 			} catch (IllegalArgumentException e) {
-				Messenger.send(sender, "&7"+args[4]+" &c is an invalid equipment slot.");
+				Messenger.send(sender, "&7"+args[4]+" &cis not a valid equipment slot.");
 				return true;
 			}
 		}

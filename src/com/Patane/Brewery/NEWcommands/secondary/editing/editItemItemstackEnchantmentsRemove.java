@@ -30,7 +30,7 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 
 		// Checking if enchantment name is grabbable
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide an enchantment name.");
+			Messenger.send(sender, "&ePlease specify an enchantment.");
 			return true;
 		}
 
@@ -54,17 +54,18 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 			Messenger.send(sender, "&7" + args[0] + " &cis not a valid Enchantment.");
 			return true;
 		}// Getting BrItem from objects
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing BrItem Itemstack
-		ItemStack currentItem = brItem.getItemStack();
+		ItemStack currentItem = item.getItemStack();
 				
 		if(!currentItem.containsEnchantment(enchantment)) {
 			// *** ADD HOVER TEXT TO SHOW ALL ENCHANTMENTS ITEM HAS
-			Messenger.send(sender, "&7"+brItem.getName()+"&e does not have that Enchantment.");
+			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+" &edoes not have that Enchantment. Hover to view which it does have!"
+														, "&8Not Implemented Yet"));
 			return true;
 		}
-		String successMsg = "&aRemoved enchantment from &7"+brItem.getName()+"&a. Hover for details!";
+		String successMsg = "&aRemoved enchantment from &7"+item.getName()+"&a. Hover for details!";
 		String successHoverText = "&cEnchantment: &8&m"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s ->"\n&r &c"+s[0]+": &8&m"+s[1], "Level", Integer.toString(currentItem.getEnchantmentLevel(enchantment)));
 		
 		// Allows the user to view the details onhover
@@ -74,10 +75,10 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 		currentItem.removeEnchantment(enchantment);
 		
 		// Saving the itemstack to item
-		brItem.setItemStack(currentItem);
+		item.setItemStack(currentItem);
 		
 		// Save YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Send success message
 		Messenger.send(sender, successMsgComponent);

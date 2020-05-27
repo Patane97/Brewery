@@ -30,14 +30,14 @@ public class editItemItemstackLoreDelete extends editItemItemstackLore {
 		
 		// Checking if line number is grabbable
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide a line number.");
+			Messenger.send(sender, "&ePlease provide a line number. This must be a positive number.");
 			return true;
 		}
 		Integer line = null;
 		try {
 			line = Integer.parseInt(args[0]);
 		} catch (Exception e) {
-			Messenger.send(sender, "&7"+args[0]+" &cis not a valid line number.");
+			Messenger.send(sender, "&7"+args[0]+" &cis not a valid line number. It must be a positive number.");
 			return true;
 		}
 		if(line <= 0) {

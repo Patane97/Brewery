@@ -274,15 +274,15 @@ public class BrEffect extends ChatCollectable{
 		String effectInfo = title.build(getName());
 		
 		// Saving the modifier and trigger strings. If they are null, show as "&8Undefined"
-		String modifier = (getModifier() != null ? getModifier().toChatString(indentCount, deep, deepLayout) : alternateLayout.build("Modifier", "&8Undefined"));
-		String trigger = (getTrigger() != null ? getTrigger().toChatString(indentCount, deep, deepLayout) : alternateLayout.build("Trigger", "&8Undefined"));
+		String modifier = (this.modifier != null ? this.modifier.toChatString(indentCount, deep, deepLayout) : alternateLayout.build("Modifier", "&8Undefined"));
+		String trigger = (this.trigger != null ? this.trigger.toChatString(indentCount, deep, deepLayout) : alternateLayout.build("Trigger", "&8Undefined"));
 		
 		// Adding the modifier and trigger strings. 
 		effectInfo += "\n" + modifier;
 		effectInfo += "\n" + trigger;
 		// If radius is present, show it
 		if(hasRadius())
-			effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Radius", getRadius().toString());
+			effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Radius", radius.toString());
 		
 		// If tag is present, show it
 		if(hasTag())
@@ -296,25 +296,25 @@ public class BrEffect extends ChatCollectable{
 		if(hasPotions()) {
 			// If not deep, then simply print potion count
 			if(!deep)
-				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(getPotions().size()));
+				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potion_effects.size()));
 			// Otherwise grab all potion effect infos from the string builder
 			else
 				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")
 				// *** CHANGE THIS?
-				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], getPotions().toArray(new PotionEffect[0]));
+				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], potion_effects.toArray(new PotionEffect[0]));
 		}
 		
 		// If particles are present, show them. Does not need null check as we know we have them
 		if(hasParticle())
-			effectInfo += "\n" + getParticleEffect().toChatString(indentCount, deep, deepLayout);
+			effectInfo += "\n" + particles.toChatString(indentCount, deep, deepLayout);
 
 		// If sounds are present, show them. Does not need null check as we know we have them
 		if(hasSound())
-			effectInfo += "\n" + getSoundEffect().toChatString(indentCount, deep, deepLayout);
+			effectInfo += "\n" + sounds.toChatString(indentCount, deep, deepLayout);
 		
 		// If filters are present, show them.
 		if(hasFilter())
-			effectInfo += "\n" + getFilter().toChatString(indentCount, deep, deepLayout);
+			effectInfo += "\n" + filter.toChatString(indentCount, deep, deepLayout);
 		
 		return effectInfo;
 	}
@@ -420,6 +420,14 @@ public class BrEffect extends ChatCollectable{
 			// Example: &2Type: &7Name
 			return s -> "&2"+s[0]+"&2: &7"+s[1];
 		}
+		@Override
+		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+			if(!deep)
+				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
+			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
+					+ super.toChatString(indentCount, deep, alternateLayout);
+		}
 		public Formation getFormation(){
 			return formation;
 		}
@@ -481,6 +489,15 @@ public class BrEffect extends ChatCollectable{
 			// Example: &2Type: &7Name
 			return s -> "&2"+s[0]+"&2: &7"+s[1];
 		}
+		@Override
+		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+
+			if(!deep)
+				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
+			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
+					+ super.toChatString(indentCount, deep, alternateLayout);
+		}
 
 		/* 
 		 * ================================================================================
@@ -518,6 +535,15 @@ public class BrEffect extends ChatCollectable{
 		public LambdaStrings layout(){
 			// Example: &2Type: &7Name
 			return s -> "&2"+s[0]+"&2: &7"+s[1];
+		}
+		@Override
+		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+
+			if(!deep)
+				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
+			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
+					+ super.toChatString(indentCount, deep, alternateLayout);
 		}
 
 		/* 

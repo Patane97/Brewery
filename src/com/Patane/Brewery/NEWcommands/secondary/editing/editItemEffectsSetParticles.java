@@ -27,7 +27,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		
-		//Checking particle type is given
+		// Checking particle type is given
 		if(args.length < 1) {
 			Messenger.send(sender, "&ePlease specify a particle type.");
 			return true;
@@ -41,7 +41,8 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid Particle Type.");
 			return true;
 		}
-
+		
+		// Checking sound type is given
 		if(args.length < 2) {
 			Messenger.send(sender, "&ePlease specify a formation.");
 			return true;
@@ -57,7 +58,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		
 		// Checking intensity is given
 		if(args.length < 3) {
-			Messenger.send(sender, "&ePlease provide an intensity.");
+			Messenger.send(sender, "&ePlease provide an intensity. This must be a positive number or 0.");
 			return false;
 		}
 		
@@ -66,13 +67,19 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		try {
 			intensity = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			Messenger.send(sender, "&7"+args[2]+" &cis not a valid intensity. It must be a positive number.");
+			Messenger.send(sender, "&7"+args[2]+" &cis not a valid intensity. It must be a positive number or 0.");
+			return true;
+		}
+		
+		// Checking its positive
+		if(intensity < 0) {
+			Messenger.send(sender, "&cIntensity must be a positive number or 0.");
 			return true;
 		}
 		
 		// Checking velocity is given
 		if(args.length < 4) {
-			Messenger.send(sender, "&ePlease provide a velocity.");
+			Messenger.send(sender, "&ePlease provide a velocity. This must be a positive number or 0.");
 			return true;
 		}
 		
@@ -81,7 +88,13 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		try {
 			velocity = Double.parseDouble(args[3]);
 		} catch (NumberFormatException e) {
-			Messenger.send(sender, "&7"+args[3]+" &cis not a valid velocity. It must be a positive number.");
+			Messenger.send(sender, "&7"+args[3]+" &cis not a valid velocity. It must be a positive number or 0.");
+			return true;
+		}
+		
+		// Checking its positive
+		if(velocity < 0) {
+			Messenger.send(sender, "&cVelocity must be a positive number or 0.");
 			return true;
 		}
 		
@@ -96,20 +109,13 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 
 		String successMsg = "&aAdded new Particle Effect to &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 		
-		// This is a little more complicated than it needs to be, however it ensures the hover text doesnt get too long horizontally
-		// It starts with item name limited at 15 characters (will add '...' if it gets too long)
-		// It then either adds an arrow to a new line if both item and effect combined exceed 25 characters, or same line if under
-		// Finally it prints the effect name limited at 15 characters
-		String successHoverText = "&f&l"
-								+ item.getNameLimited(15)
-								+ ((item.getNameLimited(15)+effect.getNameLimited(15)).length() > 25 ? "\n" : "") + " &7&l\u2192 &f&l"
-								+ effect.getNameLimited(15)+"\n";
+		String successHoverText = generateEditingTitle(item, effect);
 		
 		BrParticleEffect previousParticleEffect = effect.getParticleEffect();
 
 		// If the particle effect values are the same, do nothing and message appropriately
 		if(particleEffect.equals(previousParticleEffect)) {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Particle Effect with those values. Hover to it!"
+			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Particle Effect with those values. Hover to view it!"
 														, successHoverText + effect.getParticleEffect().toChatString(0, true)));
 			return true;
 		}
@@ -122,6 +128,8 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 							  , s -> "\n&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
 							  , StringsUtil.getFieldNames(BrParticleEffect.class) , StringsUtil.prepValueStrings(previousParticleEffect) , StringsUtil.prepValueStrings(particleEffect));
 		}
+		else
+			successHoverText += particleEffect.toChatString(0, true);
 		
 		// Sets the particle effect to effect
 		effect.setParticle(particleEffect);

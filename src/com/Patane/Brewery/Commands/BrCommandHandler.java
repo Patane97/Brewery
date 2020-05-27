@@ -32,6 +32,7 @@ import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetFilter
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetModifier;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetParticles;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetRadius;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetSounds;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetTrigger;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstack;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributes;
@@ -107,6 +108,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemEffectsSetFilterAdd.class);
 		register(editItemEffectsSetFilterRemove.class);
 		register(editItemEffectsSetParticles.class);
+		register(editItemEffectsSetSounds.class);
 		// Edit Item commands
 		/*
 		register(itemEditItem.class);

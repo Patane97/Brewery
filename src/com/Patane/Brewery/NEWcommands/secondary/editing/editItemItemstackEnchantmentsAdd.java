@@ -30,7 +30,7 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 		
 		// Checking if enchantment name is grabbable
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide an enchantment name.");
+			Messenger.send(sender, "&ePlease specify an enchantment.");
 			return true;
 		}
 		
@@ -65,28 +65,28 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 			try {
 				level = Integer.parseInt(args[1]);
 			} catch (Exception e) {
-				Messenger.send(sender, "&7"+args[1]+" &cis not a valid Enchantment Level. This must be a number.");
+				Messenger.send(sender, "&7"+args[1]+" &cis not a valid Enchantment Level. It must be a positive number.");
 				return true;
 			}
 		}
 		
 		// Getting BrItem from objects
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing BrItem Itemstack
-		ItemStack currentItem = brItem.getItemStack();
+		ItemStack currentItem = item.getItemStack();
 
-		String successMsg = "&aAdded enchantment to &7"+brItem.getName()+"&a. Hover for details!";
+		String successMsg = "&aAdded enchantment to &7"+item.getName()+"&a. Hover for details!";
 		String successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], "Level", level.toString());
 		
 		if(currentItem.containsEnchantment(enchantment)) {
 			Integer oldLevel = currentItem.getEnchantmentLevel(enchantment);
 			// If the enchantment was previously the same level, do nothing and message appropriately
 			if(oldLevel.equals(level)) {
-				Messenger.send(sender, StringsUtil.hoverText("&eThat enchantment and level for &7"+brItem.getName()+"&e already exist. Hover for details!", successHoverText));
+				Messenger.send(sender, StringsUtil.hoverText("&eThat enchantment and level for &7"+item.getName()+"&e already exist. Hover for details!", successHoverText));
 				return true;
 			}
-			successMsg = "&eUpdated existing enchantment for &7"+brItem.getName()+"&a. Hover for details!";
+			successMsg = "&eUpdated existing enchantment for &7"+item.getName()+"&a. Hover for details!";
 			// If the level has changed, show it changing on hover
 			successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.compareSingleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], 
 																												s -> "\n &2"+s[0]+": &8"+s[1]+" &7-> "+s[2]
@@ -99,10 +99,10 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 		// Adding the enchantment to itemstack. We use unsafe as it does not limit us on levels.
 		currentItem.addUnsafeEnchantment(enchantment, level);
 		// Save itemstack to item
-		brItem.setItemStack(currentItem);
+		item.setItemStack(currentItem);
 		
 		// Save the YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Send the success message
 		Messenger.send(sender, successMsgComponent);

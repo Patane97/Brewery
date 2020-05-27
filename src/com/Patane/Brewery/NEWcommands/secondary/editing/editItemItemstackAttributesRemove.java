@@ -34,7 +34,7 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		// Checks for attribute
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide an item attribute.");
+			Messenger.send(sender, "&ePlease specify an item attribute.");
 			return true;
 		}
 		Attribute attribute = null;
@@ -49,7 +49,7 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		// Check for attribute name
 		if(args.length < 2) {
-			Messenger.send(sender, "&ePlease provide a name of the modifier to be removed.");
+			Messenger.send(sender, "&ePlease provide a pre-existing modifier name to remove.");
 			return true;
 		}
 		String modifierName = args[1];

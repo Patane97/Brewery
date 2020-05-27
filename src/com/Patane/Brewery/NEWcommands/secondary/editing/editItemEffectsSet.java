@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 @CommandInfo(
@@ -64,5 +65,16 @@ public class editItemEffectsSet extends editItemEffects {
 		BrEffect effect = item.getEffect(args[0]);
 		
 		return this.tabCompleteCore(sender, args, item, effect);
+	}
+	
+	protected String generateEditingTitle(ChatCollectable item, ChatCollectable effect) {
+		// This is a little more complicated than it needs to be, however it ensures the hover text doesnt get too long horizontally
+		// It starts with item name limited at 15 characters (will add '...' if it gets too long)
+		// It then either adds an arrow to a new line if both item and effect combined exceed 25 characters, or same line if under
+		// Finally it prints the effect name limited at 15 characters
+		return "&f&l"
+				+ item.getNameLimited(15)
+				+ ((item.getNameLimited(15)+effect.getNameLimited(15)).length() > 25 ? "\n" : "") + " &7&l\u2192 &f&l"
+				+ effect.getNameLimited(15)+"\n";
 	}
 }

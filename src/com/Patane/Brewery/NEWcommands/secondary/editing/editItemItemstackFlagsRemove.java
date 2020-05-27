@@ -31,7 +31,7 @@ public class editItemItemstackFlagsRemove extends editItemItemstackFlags {
 		
 		// Checking if flag name is grabbable
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease provide an item flag.");
+			Messenger.send(sender, "&ePlease specify an item flag.");
 			return true;
 		}
 		

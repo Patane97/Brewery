@@ -59,14 +59,7 @@ public class editItemEffectsSetModifier extends editItemEffectsSet {
 		// Default message assumes there is no previous modifier, thus 'set' message is given
 		String successMsg = "&aSet the Modifier of &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 		
-		// This is a little more complicated than it needs to be, however it ensures the hover text doesnt get too long horizontally
-		// It starts with item name limited at 15 characters (will add '...' if it gets too long)
-		// It then either adds an arrow to a new line if both item and effect combined exceed 25 characters, or same line if under
-		// Finally it prints the effect name limited at 15 characters
-		String successHoverText = "&f&l"
-								+ item.getNameLimited(15)
-								+ ((item.getNameLimited(15)+effect.getNameLimited(15)).length() > 25 ? "\n" : "") + " &7&l\u2192 &f&l"
-								+ effect.getNameLimited(15)+"\n";
+		String successHoverText = generateEditingTitle(item, effect);
 		
 		try {
 			// Attempting to create the modifier using the found Class
