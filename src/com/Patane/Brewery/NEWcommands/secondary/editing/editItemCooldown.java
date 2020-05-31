@@ -9,6 +9,9 @@ import org.bukkit.command.CommandSender;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.general.StringsUtil;
+
+import net.md_5.bungee.api.chat.TextComponent;
 
 @CommandInfo(
 	name = "edit item cooldown",
@@ -23,7 +26,7 @@ public class editItemCooldown extends editItem {
 		
 		// Checking amount is given
 		if(args.length < 1) {
-			Messenger.send(sender, "&ePlease specify a cooldown amount.");
+			Messenger.send(sender, "&ePlease provide a cooldown amount. This must be a positive number or 0.");
 			return true;
 		}
 		
@@ -33,36 +36,48 @@ public class editItemCooldown extends editItem {
 			cooldown = Float.parseFloat(args[0]);
 		} catch (NumberFormatException e) {
 			// Check if cooldown is a float
-			Messenger.send(sender, "&7"+args[0]+" &cis an invalid amount.");
+			Messenger.send(sender, "&7"+args[0]+" &cis not a valid amount. It must be a positive number or 0.");
 			return true;
 		}
 		
-		// Check if cooldown is positive
+		// Check if cooldown is positive or 0
 		if(cooldown < 0) {
-			Messenger.send(sender, "&eCooldown must be a positive number.");
+			Messenger.send(sender, "&cCooldown must be a positive number or 0.");
 			return true;
 		}
 		
 		// Find Item
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
+	
+		String successMsg = "&aChanged &7"+item.getName()+"&a's cooldown. Hover to view the details!";
 		
-		// Construct success message (as second or seconds depending on amount > 1)
-		String successMsg = "&aSet &7"+brItem.getName()+" &aCooldown to &7"+cooldown+"&a second"+(cooldown==1?"":"s")+".";
-
+		String successHoverText = generateEditingTitle(item);
+		
+		if(item.getCooldown() == cooldown) {
+			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's cooldown is already that. Hover to view!"
+					, successHoverText + "&2Cooldown: &7"+(item.getCooldown() == 0 ? "&8None" : item.getCooldown())));
+			return true;
+		}
+		
 		// If cooldown is 0, remove the cooldown instead
 		if(cooldown == 0) {
 			cooldown = null;
-			successMsg = "&aRemoved &7"+brItem.getName()+" &aCooldown.";
+			successHoverText += "&2Cooldown: &8"+item.getCooldown()+" &7-> None";
 		}
+		else
+			successHoverText += "&2Cooldown: &8"+item.getCooldown()+" &7-> "+cooldown;
 		
 		// Setting cooldown
-		brItem.setCooldown(cooldown);
+		item.setCooldown(cooldown);
 		
 		// Saving the item to YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
+
+		// Allows the user to view the details on hover
+		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
 		// Sending the success message
-		Messenger.send(sender, successMsg);
+		Messenger.send(sender, successMsgComponent);
 		return true;
 	}
 	

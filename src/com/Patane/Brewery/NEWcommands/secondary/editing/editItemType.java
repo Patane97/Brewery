@@ -12,6 +12,8 @@ import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
+import net.md_5.bungee.api.chat.TextComponent;
+
 @CommandInfo(
 	name = "edit item type",
 	description = "Sets the Type for a Brewery Item.",
@@ -40,22 +42,32 @@ public class editItemType extends editItem {
 		}
 		
 		// Find Item
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 
+		String successMsg = "&aChanged &7"+item.getName()+"&a's type. Hover to view the details!";
+		
+		String successHoverText = generateEditingTitle(item);
+		
 		// If type did not change, say so and do nothing
-		if(brItem.getType() == type) {
-			Messenger.send(sender, "&7"+brItem.getName()+" &eis already &7"+type+"&a.");
+		if(item.getType() == type) {
+			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+" &eis already of that type. Hover to view!"
+					, successHoverText + "&2Type: &7"+item.getType()));
 			return true;
 		}
 		
+		successHoverText += "&2Type: &8"+item.getType()+" &7-> "+type;
+		
 		// Setting type
-		brItem.setType(type);
+		item.setType(type);
 		
 		// Saving the item to YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
+
+		// Allows the user to view the details on hover
+		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
 		// Sending the success message
-		Messenger.send(sender, "&aSet &7"+brItem.getName()+" &aType to &7"+type+"&a.");
+		Messenger.send(sender, successMsgComponent);
 		return true;
 	}
 	

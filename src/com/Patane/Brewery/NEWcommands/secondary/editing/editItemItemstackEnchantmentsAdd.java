@@ -3,6 +3,7 @@ package com.Patane.Brewery.NEWcommands.secondary.editing;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -77,7 +79,8 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 		ItemStack currentItem = item.getItemStack();
 
 		String successMsg = "&aAdded enchantment to &7"+item.getName()+"&a. Hover for details!";
-		String successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], "Level", level.toString());
+		String successHoverText = "&f&l"+item.getNameLimited(15)+"&f&l's enchantments\n"
+								+ StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], currentItem.getEnchantments());
 		
 		if(currentItem.containsEnchantment(enchantment)) {
 			Integer oldLevel = currentItem.getEnchantmentLevel(enchantment);
@@ -86,12 +89,15 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 				Messenger.send(sender, StringsUtil.hoverText("&eThat enchantment and level for &7"+item.getName()+"&e already exist. Hover for details!", successHoverText));
 				return true;
 			}
-			successMsg = "&eUpdated existing enchantment for &7"+item.getName()+"&a. Hover for details!";
+			successMsg = "&aUpdated existing enchantment for &7"+item.getName()+"&a. Hover for details!";
 			// If the level has changed, show it changing on hover
-			successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() + StringsUtil.compareSingleFormatter(s -> "\n &2"+s[0]+": &7"+s[1], 
-																												s -> "\n &2"+s[0]+": &8"+s[1]+" &7-> "+s[2]
-																												, "Level", oldLevel.toString(), level.toString());
+			successHoverText = "&2Enchantment: &7"+enchantment.getKey().getKey() 
+							+"\n" + StringsUtil.singleRowCompareFormatter(1, s -> "&2"+s[0]+": &7"+s[1]
+																		, s -> "&2"+s[0]+": &8"+s[1]+" &7-> "+s[2]
+																		, "Level", oldLevel.toString(), level.toString());
 		}
+		else
+			successHoverText += "\n"+Chat.add(StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], enchantment, level), ChatColor.BOLD);
 		
 		// Allows the user to view the details onhover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);

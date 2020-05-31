@@ -35,31 +35,31 @@ public class editItemItemstackFlagsAdd extends editItemItemstackFlags {
 		}
 		
 		// Grabbing the brItem from objects
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing the itemstack from brItem
-		ItemStack currentItem = brItem.getItemStack();
+		ItemStack currentItem = item.getItemStack();
 		
-		String successMsg = "&aAdded Item Flag to &7"+brItem.getName()+"&a. Hover for details!";
+		String successMsg = "&aAdded Item Flag to &7"+item.getName()+"&a. Hover for details!";
 		// Saves all current flags onto hover text
-		String successHoverText = "&2Item Flags:" + StringsUtil.formatter(s -> "\n&e> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])));
+		String successHoverText = "&f&l"+item.getNameLimited(15)+"&f&l's item flags";
 		
 		ItemFlag itemFlag = null;
 		// If all itemflags are already present, send appropriate message and do nothing
 		if(ItemsUtil.getFlags(currentItem).size() == ItemFlag.values().length){
-			Messenger.send(sender, StringsUtil.hoverText("&eAll item flags are already present on &7"+brItem.getName()+"&e. Hover to see!"
-					, successHoverText));
+			Messenger.send(sender, StringsUtil.hoverText("&eAll item flags are already present on &7"+item.getName()+"&e. Hover to see!"
+					, successHoverText + StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])))));
 			return true;
 		}
 		
 		// Checking if all flags need to be added
 		if(args[0].equalsIgnoreCase("all")) {
 			// If so, add all flags and change successmsg to it
-			brItem.setItemStack(ItemsUtil.addFlags(currentItem));
-			successMsg = "&aAdded all Item Flags to &7"+brItem.getName()+"&a. Hover for details!";
+			item.setItemStack(ItemsUtil.addFlags(currentItem));
+			successMsg = "&aAdded all Item Flags to &7"+item.getName()+"&a. Hover for details!";
 			
 			// Printing all item flags in 'added' format
-			successHoverText = "&2Item Flags:" + StringsUtil.formatter(s -> "\n&a> &f&l"+s[0], StringsUtil.enumValueStrings(ItemFlag.values()));
+			successHoverText += StringsUtil.singleColumnFormatter(0, s -> "\n&2&l> &f&l"+s[0], StringsUtil.enumValueStrings(ItemFlag.values()));
 		} 
 		// If specific flag has been provided
 		else {
@@ -76,22 +76,24 @@ public class editItemItemstackFlagsAdd extends editItemItemstackFlags {
 			// If the specified itemflag is already present, send appropriate message and do nothing
 			if(ItemsUtil.getFlags(currentItem).contains(itemFlag)){
 				// Sends hover message showing all current flags
-				Messenger.send(sender, StringsUtil.hoverText("&eThat Item Flagflag is already present on &7"+brItem.getName()+"&e. Hover to see them all!", successHoverText));
+				Messenger.send(sender, StringsUtil.hoverText("&eThat item flag is already present on &7"+item.getName()+"&e. Hover to see them all!"
+						, successHoverText + StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])))));
 				return true;
 			}
 			
 			// Hover text at this point has all of the items current flags.
 			// This adds the new one on the end with an 'adding' format of green dial, white & bolded text!
-			successHoverText += "\n&a> &f&l"+itemFlag;
+			successHoverText += StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])))
+							  + "\n&2&l> &f&l"+itemFlag;
 			
 			// Sasve the itemstack to item
-			brItem.setItemStack(ItemsUtil.addFlags(currentItem, itemFlag));
+			item.setItemStack(ItemsUtil.addFlags(currentItem, itemFlag));
 		}
 		// Allows the user to view the details onhover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
 		// Save YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Send successmsg
 		Messenger.send(sender, successMsgComponent);

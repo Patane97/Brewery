@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YAML.TypeParsable;
@@ -117,7 +118,11 @@ public abstract class Trigger extends TypeParsable{
 			applyByFocus(effect, hitEntity.getEyeLocation(), Focus.ENTITY);
 			
 			// Applies potion effects to given entity.
-			hitEntity.addPotionEffects(effect.getPotions());
+//			hitEntity.addPotionEffects(effect.getPotions());
+			for(PotionEffect potionEffect : effect.getPotions()) {
+				if(!hitEntity.addPotionEffect(potionEffect))
+					Messenger.debug("failed to apply "+potionEffect.getType()+"("+potionEffect.getDuration()+", "+potionEffect.getAmplifier()+")");
+			}
 			
 			// Applies modifiers (These ONLY target entities, so a focus check is not needed)
 			applyModifiers(effect, impact, executor, hitEntity);

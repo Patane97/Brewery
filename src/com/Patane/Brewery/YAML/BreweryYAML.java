@@ -2,6 +2,8 @@ package com.Patane.Brewery.YAML;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -17,13 +19,24 @@ public abstract class BreweryYAML extends YAMLEditable{
 	public BreweryYAML(String fileName, String prefix, String... filePath) {
 		super(fileName, prefix, filePath);
 	}
+	
+	public static void postPotionEffect(ConfigurationSection section, PotionEffect effect) {
+		postPotionEffect(section, 0, effect);
+	}
 	/**
 	 * Posts a potion effect to a YML.
 	 * @param section Base header section to post to.
 	 * @param effect PotionEffect to post.
 	 */
-	public static void postPotionEffect(ConfigurationSection section, PotionEffect effect) {
-		section = section.createSection(effect.getType().getName());
+	public static void postPotionEffect(ConfigurationSection section, int a, PotionEffect effect) {
+		String effectName = effect.getType().getName();
+		
+		if(a == 0)
+			effectName = effect.getType().getName();
+		else
+			effectName = effect.getType().getName()+"("+a+")";
+		
+		section = section.createSection(effectName);
 		section.set("duration", effect.getDuration());
 		section.set("amplifier", effect.getAmplifier());
 		if(!effect.isAmbient())
@@ -41,27 +54,41 @@ public abstract class BreweryYAML extends YAMLEditable{
 	 */
 	public static PotionEffect retrievePotionEffect(ConfigurationSection section){
 		String effectName = null;
+		String effectNameRaw = null;
+		Pattern namePattern = Pattern.compile("(\\w+)(?=\\(\\d\\))");
+		Matcher nameMatch;
 		try{
-			effectName = extractLast(section);
+			// Grabbing the raw effect name before removing any "(/d)"s
+			effectNameRaw = extractLast(section);
+			// Generating the matcher from pattern
+			nameMatch = namePattern.matcher(effectNameRaw);
+			
+			// If it has a match
+			if(nameMatch.find())
+				// Save the name as the group
+				effectName = nameMatch.group();
+			// Otherwise, save the whole thing as the name
+			else
+				effectName = effectNameRaw;
+			
 			PotionEffectType type = PotionEffectType.getByName(effectName);
 			int duration = parseInt(section.getString("duration"));
 			int amplifier = parseInt(section.getString("amplifier"));
-			try{
-				boolean ambient = parseBoolean(section.getString("ambient"));
-				try{
-					boolean particles = parseBoolean(section.getString("particles"));
-					try {
-						boolean icon = parseBoolean(section.getString("icon"));
-						return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
-					} catch (Exception e) {
-						return new PotionEffect(type, duration, amplifier, ambient, particles);
-					}
-				} catch (Exception e){
-					return new PotionEffect(type, duration, amplifier, ambient);
-				}
-			} catch(Exception e){
-				return new PotionEffect(type, duration, amplifier);
-			}
+			
+			boolean ambient = true;
+			if(section.contains("ambient"))
+				ambient = parseBoolean(section.getString("ambient"));
+
+			boolean particles = true;
+			if(section.contains("particles"))
+				ambient = parseBoolean(section.getString("particles"));
+
+			boolean icon = true;
+			if(section.contains("icon"))
+				ambient = parseBoolean(section.getString("icon"));
+			
+			
+			return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
 		} catch (Exception e){
 			Messenger.warning("Potion Effect '"+effectName+"' retrieval has failed. Check all YML values are set correctly.");
 			e.printStackTrace();

@@ -29,10 +29,15 @@ import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSet;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetFilter;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetFilterAdd;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetFilterRemove;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetIgnoreuser;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetModifier;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetParticles;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetPotions;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetPotionsAdd;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetPotionsRemove;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetRadius;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetSounds;
+import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetTag;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemEffectsSetTrigger;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstack;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItemItemstackAttributes;
@@ -109,6 +114,11 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemEffectsSetFilterRemove.class);
 		register(editItemEffectsSetParticles.class);
 		register(editItemEffectsSetSounds.class);
+		register(editItemEffectsSetIgnoreuser.class);
+		register(editItemEffectsSetTag.class);
+		register(editItemEffectsSetPotions.class);
+		register(editItemEffectsSetPotionsAdd.class);
+		register(editItemEffectsSetPotionsRemove.class);
 		// Edit Item commands
 		/*
 		register(itemEditItem.class);

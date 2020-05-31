@@ -66,7 +66,7 @@ public class BrEffect extends ChatCollectable{
 	protected Filter filter;
 	protected BrParticleEffect particles;
 	protected BrSoundEffect sounds;
-	protected List<PotionEffect> potion_effects;// *** Change to set OR standard Array
+	protected List<PotionEffect> potion_effects;
 	protected BrTag tag;
 	protected boolean ignore_user;
 //	protected boolean stack;
@@ -184,9 +184,26 @@ public class BrEffect extends ChatCollectable{
 	}
 	public void setPotions(List<PotionEffect> potionEffects) {
 		this.potion_effects = potionEffects;
+		sortPotionsByAmplifier();
 	}
 	public void addPotion(PotionEffect potionEffect) {
 		potion_effects.add(potionEffect);
+		sortPotionsByAmplifier();
+		
+	}
+	/**
+	 * Sorting the potions by amplifier is important when layering multiple potions of the same type
+	 * For some reason, minecraft will not apply a potion of lesser amplification if a potion of greater amplification of the same TYPE is currently applied.
+	 * Applying the smaller amps first allows all potions to be applied, independant of their amplification!
+	 */
+	private void sortPotionsByAmplifier() {
+		potion_effects.sort((p1,p2) -> {
+			if(p1.getAmplifier() < p2.getAmplifier())
+				return -1;
+			if(p1.getAmplifier() == p2.getAmplifier())
+				return 0;
+			return 1;
+		});
 	}
 	public void removePotions(PotionEffectType potionEffectType) {
 		List<PotionEffect> newPotionEffects = new ArrayList<PotionEffect>();
@@ -197,6 +214,11 @@ public class BrEffect extends ChatCollectable{
 		setPotions(newPotionEffects);
 	}
 	
+	public void removePotion(PotionEffect potionEffect) {
+		potion_effects.remove(potionEffect);
+		// Dont need to sort here as its already in correct order
+	}
+	
 	// Tags
 	public boolean hasTag() {
 		return (tag == null ? false : true);
@@ -204,8 +226,8 @@ public class BrEffect extends ChatCollectable{
 	public BrTag getTag() {
 		return tag;
 	}
-	public void setTag(String tag) {
-		this.tag = new BrTag(tag);
+	public void setTag(BrTag tag) {
+		this.tag = tag;
 	}
 	public void applyTag(PatRunnable run, List<LivingEntity> entities) {
 		if(tag != null)
@@ -293,16 +315,18 @@ public class BrEffect extends ChatCollectable{
 			effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Ignore User", "false");
 		
 		// If potions are present, show them
-		if(hasPotions()) {
-			// If not deep, then simply print potion count
-			if(!deep)
-				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potion_effects.size()));
-			// Otherwise grab all potion effect infos from the string builder
-			else
-				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")
-				// *** CHANGE THIS?
-				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], potion_effects.toArray(new PotionEffect[0]));
-		}
+		if(hasPotions())
+			effectInfo += "\n" + StringsUtil.toChatString(indentCount, deep, deepLayout, potion_effects.toArray(new PotionEffect[0]));
+//		{
+//			// If not deep, then simply print potion count
+//			if(!deep)
+//				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potion_effects.size()));
+//			// Otherwise grab all potion effect infos from the string builder
+//			else
+//				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")
+//				// *** CHANGE THIS?
+//				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], potion_effects.toArray(new PotionEffect[0]));
+//		}
 		
 		// If particles are present, show them. Does not need null check as we know we have them
 		if(hasParticle())
@@ -361,6 +385,7 @@ public class BrEffect extends ChatCollectable{
 	 * *** OLD, TO BE REPLACED COMPLETELY BY TOCHATSTRING
 	 * ================================================================================
 	 */
+	@Deprecated
 	public String hoverDetails() {
 		return Chat.translate("&7"+getName()
 		+"\n&2Modifier: &a"+(getModifier() != null ? getModifier().className() : "&cUndefined")
@@ -539,11 +564,8 @@ public class BrEffect extends ChatCollectable{
 		@Override
 		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
 			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
-
-			if(!deep)
-				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
-			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
-					+ super.toChatString(indentCount, deep, alternateLayout);
+			
+			return Chat.indent(indentCount) + alternateLayout.build(className(), name);
 		}
 
 		/* 

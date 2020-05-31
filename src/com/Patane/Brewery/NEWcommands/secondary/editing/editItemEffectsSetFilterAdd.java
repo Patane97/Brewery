@@ -19,16 +19,31 @@ import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "edit item effects set filter add",
 	description = "Adds a value to the Filter of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> filter [target|ignore] add [group] <value>",
-	maxArgs = 2
+	usage = "/brewery edit item <item name> effects set <effect name> filter add [target|ignore] [group] <value>",
+	maxArgs = 3
 )
 public class editItemEffectsSetFilterAdd extends editItemEffectsSetFilter {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
 		
-		// Checking filter group is given
+		// Checking filter is given
 		if(args.length < 1) {
+			Messenger.send(sender, "&ePlease specify a filter type.");
+			return true;
+		}
+		FilterTypes filterType = null;
+		
+		// Find/Save filter type
+		try {
+			filterType = StringsUtil.constructEnum(args[0], FilterTypes.class);
+		} catch (IllegalArgumentException e) {
+			Messenger.send(sender, "&7"+args[0]+" &cis not a valid filter type.");
+			return true;
+		}
+		
+		// Checking filter group is given
+		if(args.length < 2) {
 			Messenger.send(sender, "&ePlease specify a filter group.");
 			return true;
 		}
@@ -36,29 +51,26 @@ public class editItemEffectsSetFilterAdd extends editItemEffectsSetFilter {
 		
 		// Find/Save filter group
 		try {
-			filterGroup = StringsUtil.constructEnum(args[0], FilterGroups.class);
+			filterGroup = StringsUtil.constructEnum(args[1], FilterGroups.class);
 		} catch (IllegalArgumentException e) {
-			Messenger.send(sender, "&7"+args[0]+" &cis not a valid filter group.");
+			Messenger.send(sender, "&7"+args[1]+" &cis not a valid filter group.");
 			return true;
 		}
 		
 		// Checking if value is given
-		if(args.length < 2) {
+		if(args.length < 3) {
 			Messenger.send(sender, "&ePlease specify a value to add to this filter group.");
 			return true;
 		}
 		
 		// Grabbing the value
-		String value = args[1];
+		String value = args[2];
 
 		// Grabbing the item
 		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing the effect
 		BrEffect effect = (BrEffect) objects[1];
-		
-		// Grabbing the filterTypeString
-		FilterTypes filterType = (FilterTypes) objects[2];
 		
 		// Grabbing the Filter
 		Filter filter = effect.getFilter();
@@ -102,13 +114,14 @@ public class editItemEffectsSetFilterAdd extends editItemEffectsSetFilter {
 		
 		
 		switch(args.length) {
-			case 1: return Arrays.asList(StringsUtil.enumValueStrings(FilterGroups.class));
-			case 2: 
+			case 1: return Arrays.asList(StringsUtil.enumValueStrings(FilterTypes.class));
+			case 2: return Arrays.asList(StringsUtil.enumValueStrings(FilterGroups.class));
+			case 3: 
 				FilterGroups filterGroup = null;
 				
 				// Find/Save filter group
 				try {
-					filterGroup = StringsUtil.constructEnum(args[0], FilterGroups.class);
+					filterGroup = StringsUtil.constructEnum(args[1], FilterGroups.class);
 				} catch (IllegalArgumentException e) {
 					return Arrays.asList();
 				}

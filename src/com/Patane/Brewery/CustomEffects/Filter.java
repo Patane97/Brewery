@@ -70,6 +70,14 @@ public class Filter implements ChatStringable{
 			return true;
 		return false;
 	}
+	public List<FilterTypes> getNonEmptyTypes() {
+		List<FilterTypes> nonEmpty = new ArrayList<FilterTypes>();
+		if(!target.noFilter())
+			nonEmpty.add(FilterTypes.TARGET);
+		if(!ignore.noFilter())
+			nonEmpty.add(FilterTypes.IGNORE);
+		return nonEmpty;
+	}
 
 	/* ================================================================================
 	 * Contains, Add & Remove

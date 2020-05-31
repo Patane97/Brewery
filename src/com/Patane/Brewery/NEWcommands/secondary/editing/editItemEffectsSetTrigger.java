@@ -98,10 +98,10 @@ public class editItemEffectsSetTrigger extends editItemEffectsSet {
 				successMsg = "&aUpdated the Trigger for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 				// Hover text will use the 'compare' format showing exactly which values have been changed
 				// compareFormatter doesnt easily show Trigger and its name, so we just add that before it for simplicity
-				successHoverText += "&2Trigger: &7"+trigger.className()
-								  + StringsUtil.compareFormatter(
-									s -> "\n&2  "+s[0]+": &7"+s[1]
-								  , s -> "\n&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
+				successHoverText += "&2Trigger: &7"+trigger.className()+"\n"
+								  + StringsUtil.tableCompareFormatter(0,
+									s -> "&2  "+s[0]+": &7"+s[1]
+								  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
 								  , StringsUtil.getFieldNames(triggerClass) , StringsUtil.prepValueStrings(previousTrigger) , StringsUtil.prepValueStrings(trigger));
 			}
 			// If the trigger names arent equal, a new trigger has been added

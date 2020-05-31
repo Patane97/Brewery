@@ -58,7 +58,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		
 		// Checking intensity is given
 		if(args.length < 3) {
-			Messenger.send(sender, "&ePlease provide an intensity. This must be a positive number or 0.");
+			Messenger.send(sender, "&ePlease provide an intensity. This must be a rounded, positive number or 0.");
 			return false;
 		}
 		
@@ -67,7 +67,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		try {
 			intensity = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			Messenger.send(sender, "&7"+args[2]+" &cis not a valid intensity. It must be a positive number or 0.");
+			Messenger.send(sender, "&7"+args[2]+" &cis not a valid intensity. It must be a rounded, positive number or 0.");
 			return true;
 		}
 		
@@ -122,10 +122,10 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		if(previousParticleEffect != null) {
 			// If its different, then it is changing
 			successMsg = "&aChanged the Particle Effect for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
-			successHoverText += "&2"+particleEffect.className()+":"
-							  + StringsUtil.compareFormatter(
-								s -> "\n&2  "+s[0]+": &7"+s[1]
-							  , s -> "\n&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
+			successHoverText += "&2"+particleEffect.className()+":\n"
+							  + StringsUtil.tableCompareFormatter(0,
+								s -> "&2  "+s[0]+": &7"+s[1]
+							  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
 							  , StringsUtil.getFieldNames(BrParticleEffect.class) , StringsUtil.prepValueStrings(previousParticleEffect) , StringsUtil.prepValueStrings(particleEffect));
 		}
 		else

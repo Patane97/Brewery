@@ -42,7 +42,7 @@ public class editItemEffectsSetSounds extends editItemEffectsSet {
 		
 		// Checking volume is given
 		if(args.length < 2) {
-			Messenger.send(sender, "&ePlease provide a volume. This must be a positive number or 0.");
+			Messenger.send(sender, "&ePlease provide a volume. This must be a positive number.");
 			return true;
 		}
 		
@@ -51,13 +51,13 @@ public class editItemEffectsSetSounds extends editItemEffectsSet {
 		try {
 			volume = Float.parseFloat(args[1]);
 		} catch (NumberFormatException e) {
-			Messenger.send(sender, "&7"+args[1]+" &cis not a valid volume. It must be a positive number or 0.");
+			Messenger.send(sender, "&7"+args[1]+" &cis not a valid volume. It must be a positive number.");
 			return true;
 		}
 		
 		// Checking its positive
-		if(volume < 0) {
-			Messenger.send(sender, "&cVolume must be a positive number or 0.");
+		if(volume <= 0) {
+			Messenger.send(sender, "&cVolume must be a positive number.");
 			return true;
 		}
 		
@@ -91,13 +91,13 @@ public class editItemEffectsSetSounds extends editItemEffectsSet {
 		// Grabbing effect
 		BrEffect effect = (BrEffect) objects[1];
 
-		String successMsg = "&aAdded new Particle Effect to &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
+		String successMsg = "&aAdded new Sound Effect to &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 		
 		String successHoverText = generateEditingTitle(item, effect);
 		
 		BrSoundEffect previousSoundEffect = effect.getSoundEffect();
 		
-		// If the sound effect values are the same, do nothying and message appropriately
+		// If the sound effect values are the same, do nothing and message appropriately
 		if(soundEffect.equals(previousSoundEffect)) {
 			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Sound Effect with those values. Hover to view it!"
 														, successHoverText + effect.getSoundEffect().toChatString(0, true)));
@@ -107,16 +107,16 @@ public class editItemEffectsSetSounds extends editItemEffectsSet {
 		if(previousSoundEffect != null) {
 			// If its different, then it is changing
 			successMsg = "&aChanged the Sound Effect for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
-			successHoverText += "&2"+soundEffect.className()+":"
-							  + StringsUtil.compareFormatter(
-								s -> "\n&2  "+s[0]+": &7"+s[1]
-							  , s -> "\n&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
+			successHoverText += "&2"+soundEffect.className()+":\n"
+							  + StringsUtil.tableCompareFormatter(0,
+								s -> "&2  "+s[0]+": &7"+s[1]
+							  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
 							  , StringsUtil.getFieldNames(BrSoundEffect.class) , StringsUtil.prepValueStrings(previousSoundEffect) , StringsUtil.prepValueStrings(soundEffect));
 		}
 		else
 			successHoverText += soundEffect.toChatString(0, true);
 		
-		// Sets the particle effect to effect
+		// Sets the sound effect to effect
 		effect.setSound(soundEffect);
 
 		// Save the Item to the YML. This will also save the instance of the effect to the item

@@ -31,7 +31,7 @@ public class itemEditEffectsEditSetTag extends itemEditEffectsEditSet {
 
 		BrEffect brEffect = (BrEffect) objects[0];
 		
-		brEffect.setTag(tag);
+//		brEffect.setTag(tag);
 		
 		BrItem brItem = (BrItem) EditSession.get(sender.getName());
 		

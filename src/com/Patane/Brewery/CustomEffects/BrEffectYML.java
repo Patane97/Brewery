@@ -1,10 +1,13 @@
 package com.Patane.Brewery.CustomEffects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.Patane.Brewery.Brewery;
@@ -128,14 +131,18 @@ public class BrEffectYML extends BreweryYAML{
 			 * ==================> IGNORE USER <==================
 			 */
 			
-			if(!effect.ignoreUser()) {
-				if(effect.ignoreUser() == defaultEffect.ignoreUser())
-					defaultHeader.set("ignore user", effect.ignoreUser());
-				else
-					baseHeader.set("ignore user", effect.ignoreUser());
+			// If theyre not equal, always save
+			if(effect.ignoreUser() != defaultEffect.ignoreUser())
+				baseHeader.set("ignore user", effect.ignoreUser());
+			// If ARE equal and are false, save to default
+			else if(!effect.ignoreUser()) {
+				defaultHeader.set("ignore user", effect.ignoreUser());
 			}
-			else 
+			// If they ARE equal and are true, remove both
+			else {
 				baseHeader.set("ignore user", null);
+				defaultHeader.set("ignore user", null);
+			}
 			
 			/*
 			 * ==================> TAG <==================
@@ -165,15 +172,29 @@ public class BrEffectYML extends BreweryYAML{
 			 */
 			
 			if(effect.hasPotions()) {
-				Messenger.debug("effect: "+effect.getPotions().toString());
-				Messenger.debug("default: "+defaultEffect.getPotions().toString());
 				if(effect.getPotions().equals(defaultEffect.getPotions()))
 					currentHeader = defaultHeader.createSection("potion effects");
 				else
 					currentHeader = baseHeader.createSection("potion effects");
 				
-				for(PotionEffect potionEffect : effect.getPotions())
-					BrEffectYML.postPotionEffect(currentHeader, potionEffect);
+				Map<PotionEffectType, Integer> typeCounts = new HashMap<PotionEffectType, Integer>();
+				
+				// Loops through each potion effect and counts how many of that type have been saved.
+				// If it sees that type already saved, it adds to the count and prints the effect with
+				// (peCount) at the end
+				// EG. there are 3 SLOW effects, this will ensure its printed as
+				// 'SLOW', 'SLOW(1)', 'SLOW(2)'.
+				for(PotionEffect potionEffect : effect.getPotions()) {
+					int peCount = 0;
+					if(!typeCounts.containsKey(potionEffect.getType()))
+						typeCounts.put(potionEffect.getType(), 0);
+					else {
+						peCount = typeCounts.get(potionEffect.getType())+1;
+					}
+					Messenger.debug("type: "+potionEffect.getType().getName()+" | count: "+peCount);
+					BrEffectYML.postPotionEffect(currentHeader, peCount, potionEffect);
+					typeCounts.put(potionEffect.getType(), peCount++);
+				}
 			}
 			else 
 				baseHeader.set("potion effects", null);

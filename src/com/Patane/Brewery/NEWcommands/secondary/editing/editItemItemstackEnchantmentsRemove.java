@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -58,21 +59,32 @@ public class editItemItemstackEnchantmentsRemove extends editItemItemstackEnchan
 		
 		// Grabbing BrItem Itemstack
 		ItemStack currentItem = item.getItemStack();
-				
+		
+		String successMsg = "&aRemoved enchantment from &7"+item.getName()+"&a. Hover for details!";
+		String successHoverText = "&f&l"+item.getNameLimited(15)+"&f&l's enchantments\n";
+		
 		if(!currentItem.containsEnchantment(enchantment)) {
-			// *** ADD HOVER TEXT TO SHOW ALL ENCHANTMENTS ITEM HAS
+			// Adding all enchantments and levels
+			successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], currentItem.getEnchantments());
+			
+			// Send appropriate message
 			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+" &edoes not have that Enchantment. Hover to view which it does have!"
-														, "&8Not Implemented Yet"));
+					, (currentItem.getEnchantments().isEmpty() ? successHoverText+"&8No Enchantments!" : successHoverText)));
 			return true;
 		}
-		String successMsg = "&aRemoved enchantment from &7"+item.getName()+"&a. Hover for details!";
-		String successHoverText = "&cEnchantment: &8&m"+enchantment.getKey().getKey() + StringsUtil.singleFormatter(s ->"\n&r &c"+s[0]+": &8&m"+s[1], "Level", Integer.toString(currentItem.getEnchantmentLevel(enchantment)));
 		
-		// Allows the user to view the details onhover
-		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
+		// Getting enchantment level for later use
+		int removingLevel = currentItem.getEnchantmentLevel(enchantment);
 		
 		// Removing the enchantment
 		currentItem.removeEnchantment(enchantment);
+		
+		// Adding the removed modifier with removed layout
+		successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], currentItem.getEnchantments())
+					 + "\n"+StringsUtil.toChatString(0, true, s -> "&4&m"+Chat.replace(s[0], "&4&m")+"&4: &8&m"+Chat.replace(s[1], "&8&m")+"&r", enchantment, removingLevel);
+
+		// Allows the user to view the details onhover
+		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
 		// Saving the itemstack to item
 		item.setItemStack(currentItem);

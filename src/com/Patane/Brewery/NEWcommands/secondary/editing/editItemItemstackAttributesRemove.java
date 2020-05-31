@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.ItemsUtil;
@@ -55,35 +56,44 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		String modifierName = args[1];
 		
 		// Grabbing BrItem from objects
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing ItemStack to remove attribute from
-		ItemStack currentItem = brItem.getItemStack();
+		ItemStack currentItem = item.getItemStack();
+
+		// Constructing the success message with hover events and correct wording
+		String successMsg = "&aRemoved attribute modifier from &7"+item.getName()+"&a. Hover for details!";
 		
+		String successHoverText = "&f&l"+item.getNameLimited(15)+"&f&l's attributes\n";
+				
 		// If there is no modifier for attribute
 		if(!ItemsUtil.hasAttributeModifier(currentItem, attribute, modifierName)) {
+			// Add each modifier for this attribute
+			successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute).toArray(new AttributeModifier[0]));
+			
 			// Sending the user a 'no found modifier' message whilst providing all other modifiers attached to asked attribute onHover
 			Messenger.send(sender, StringsUtil.hoverText(
-					"&eThere is no modifier named &7"+modifierName+" &efor that attribute for &7"+brItem.getName()+"&e. Hover to see others!",
-					StringsUtil.toHoverString(attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute), s -> "&2"+s[0]+": &7"+s[1])));
+					"&eThere is no modifier named &7"+modifierName+" &efor that attribute for &7"+item.getName()+"&e. Hover to see others!",
+					(ItemsUtil.getAttributeModifiers(currentItem, attribute).isEmpty() ? successHoverText+"&8No Modifiers!" : successHoverText)));
 			return true;
 		}
 		
-		// Constructing the success message with hover events and correct wording
-		String successMsg = "&aRemoved &7"+modifierName+" &aattribute modifier from &7"+brItem.getName()+"&a. Hover for details!";
+		// Saving removing modifier for later use
+		AttributeModifier removingModifier = ItemsUtil.getAttributeModifier(currentItem, attribute, modifierName);
+
+		// Removing the attribute modifier from item
+		item.setItemStack(ItemsUtil.removeAttributeModifier(currentItem, attribute, modifierName));
 		
-		AttributeModifier modifier = ItemsUtil.getAttributeModifier(currentItem, attribute, modifierName);
-		
-		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s ->"&c"+s[0]+": &8&m"+s[1]+"&r");
+		// Adding the removed modifier with removed layout
+		successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute).toArray(new AttributeModifier[0]))
+					 + "\n"+StringsUtil.toChatString(0, true, s -> "&4&m"+Chat.replace(s[0], "&4&m")+"&4: &8&m"+Chat.replace(s[1], "&8&m")+"&r", null, removingModifier);
 
 		// Allows the user to view the details of the attribute they just modified!
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
-		// Removing the attribute modifier from item
-		brItem.setItemStack(ItemsUtil.removeAttributeModifier(currentItem, attribute, modifierName));
 		
 		// Save YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Send success message
 		Messenger.send(sender, successMsgComponent);

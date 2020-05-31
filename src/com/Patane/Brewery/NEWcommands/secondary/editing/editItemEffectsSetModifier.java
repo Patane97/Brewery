@@ -99,10 +99,10 @@ public class editItemEffectsSetModifier extends editItemEffectsSet {
 				successMsg = "&aUpdated the Modifier for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 				// Hover text will use the 'compare' format showing exactly which values have been changed
 				// compareFormatter doesnt easily show Modifier and its name, so we just add that before it for simplicity
-				successHoverText += "&2Modifier: &7"+modifier.className()
-								  + StringsUtil.compareFormatter(
-									s -> "\n&2  "+s[0]+": &7"+s[1]
-								  , s -> "\n&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
+				successHoverText += "&2Modifier: &7\n"+modifier.className()
+								  + StringsUtil.tableCompareFormatter(0,
+									s -> "&2  "+s[0]+": &7"+s[1]
+								  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
 								  , StringsUtil.getFieldNames(modifierClass) , StringsUtil.prepValueStrings(previousModifier) , StringsUtil.prepValueStrings(modifier));
 			}
 			// If the modifier names arent equal, a new modifier has been added

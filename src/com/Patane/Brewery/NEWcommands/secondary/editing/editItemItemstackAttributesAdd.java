@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.ItemsUtil;
@@ -110,13 +112,14 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), modifierName, amount, operation, slot);
 		
 		// Grabbing BrItem from objects
-		BrItem brItem = (BrItem) objects[0];
+		BrItem item = (BrItem) objects[0];
 		
 		// Grabbing ItemStack to add attribute to
-		ItemStack currentItem = brItem.getItemStack();
-
-		String successMsg = "&aAdded attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
-		String successHoverText = StringsUtil.toHoverString(attribute, modifier, s -> "&2"+s[0]+": &7"+s[1]);
+		ItemStack currentItem = item.getItemStack();
+		
+		String successMsg = "&aAdded attribute modifier for &7"+item.getName()+"&a. Hover for details!";
+		String successHoverText = "&f&l"+item.getNameLimited(15)+"&f&l's attributes\n"
+								+ StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], attribute, ItemsUtil.getAttributeModifiers(currentItem, attribute).toArray(new AttributeModifier[0]));
 
 		// If modifier already existed, either check/say its the same values or show it updating values
 		if(ItemsUtil.hasAttributeModifier(currentItem, attribute, modifierName)) {
@@ -126,25 +129,29 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 			if(oldModifier.getAmount() == modifier.getAmount() 
 					&& oldModifier.getOperation() == modifier.getOperation() 
 					&& oldModifier.getSlot() == modifier.getSlot()){
-				Messenger.send(sender, StringsUtil.hoverText("&eThat attribute modifier for &7"+brItem.getName()+"&e already has those values. Hover for details!", successHoverText));
+				Messenger.send(sender, StringsUtil.hoverText("&eThat attribute modifier for &7"+item.getName()+"&e already has those values. Hover for details!", successHoverText));
 				return true;
 			}
-			successMsg = "&aUpdated existing attribute modifier for &7"+brItem.getName()+"&a. Hover for details!";
+			successMsg = "&aUpdated existing attribute modifier for &7"+item.getName()+"&a. Hover for details!";
 			// If the new modifier value is different to the old, show the changed dynamically on hover
-			successHoverText = StringsUtil.toHoverString(attribute, oldModifier, modifier, s -> "&2"+s[0]+": &7"+s[1], s -> "&2"+s[0]+": &8"+s[1]+" &7-> "+s[2]);
+			successHoverText = "&2Attribute: &7"+attribute.toString()+"\n"
+							+ StringsUtil.tableCompareFormatter(1, s -> "&2"+s[0]+"&2: &7"+s[1], s -> "&2"+s[0]+"&2: &8"+s[1]+" &7-> "+s[2]
+							, StringsUtil.getFieldNames(modifier), StringsUtil.prepValueStrings(oldModifier), StringsUtil.prepValueStrings(modifier));
 			
 			// Remove the old Modifier
 			currentItem = ItemsUtil.removeAttributeModifier(currentItem, attribute, modifierName);
 		}
+		else
+			successHoverText += "\n"+Chat.add(StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], null, modifier), ChatColor.BOLD);
 		
 		// Allows the user to view the details of the attribute they just modified!
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
 		
 		// Save modifier to itemstack
-		brItem.setItemStack(ItemsUtil.addAttributeModifier(currentItem, attribute, modifier));
+		item.setItemStack(ItemsUtil.addAttributeModifier(currentItem, attribute, modifier));
 		
 		// Save YML
-		BrItem.YML().save(brItem);
+		BrItem.YML().save(item);
 		
 		// Send user success message
 		Messenger.send(sender, successMsgComponent);

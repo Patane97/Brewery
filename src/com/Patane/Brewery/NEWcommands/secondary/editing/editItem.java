@@ -8,6 +8,7 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.NEWcommands.primary.editCommand;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -55,5 +56,11 @@ public class editItem extends editCommand {
 		BrItem item = Brewery.getItemCollection().getItem(args[0]);
 		
 		return tabCompleteCore(sender, args, item);
+	}
+	
+	protected String generateEditingTitle(ChatCollectable item) {
+		// This is a little more complicated than it needs to be, however it ensures the hover text doesnt get too long horizontally
+		// It starts with item name limited at 15 characters (will add '...' if it gets too long)
+		return "&f&l" + item.getNameLimited(15)+"\n";
 	}
 }

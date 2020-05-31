@@ -133,7 +133,7 @@ public class BrItem extends ChatCollectable{
 		return (cooldown == null ? false :  true);
 	}
 	public float getCooldown() {
-		return cooldown;
+		return (cooldown == null ? 0 : cooldown);
 	}
 	public void setCooldown(Float cooldown) {
 		this.cooldown = cooldown;

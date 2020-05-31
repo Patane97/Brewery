@@ -66,7 +66,10 @@ public class editItemEffectsSetRadius extends editItemEffectsSet {
 		}
 		
 		// Add hover text to show radius amount being compared to previous
-		successHoverText += StringsUtil.compareFormatter(s -> "&2Radius: &7"+s[0], s -> "&2Radius: &8"+s[0]+" &7-> "+s[1], Float.toString(previousAmount), Float.toString(amount));
+		successHoverText += StringsUtil.singleRowCompareFormatter(0,
+							s -> "&2"+s[0]+"&2: &7"+s[1]
+						  , s -> "&2"+s[0]+"&2: &8"+s[1]+" &7-> "+s[2]
+						  , "Radius", Float.toString(previousAmount), Float.toString(amount));
 		
 		// Set radius to effect
 		effect.setRadius(amount);
