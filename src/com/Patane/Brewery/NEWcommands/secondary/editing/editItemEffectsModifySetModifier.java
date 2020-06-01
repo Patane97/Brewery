@@ -23,12 +23,12 @@ import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set modifier",
+	name = "edit item effects modify set modifier",
 	aliases = {"mod"},
 	description = "Sets or Changes the Modifier of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> modifier [type] <values...> "
+	usage = "/brewery edit item <item name> effects modify <effect name> set modifier [type] <values...> "
 )
-public class editItemEffectsSetModifier extends editItemEffectsSet {
+public class editItemEffectsModifySetModifier extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

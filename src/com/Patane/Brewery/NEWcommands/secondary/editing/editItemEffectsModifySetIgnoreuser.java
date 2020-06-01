@@ -13,12 +13,12 @@ import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set ignoreuser",
+	name = "edit item effects modify set ignoreuser",
 	description = "Sets whether the user of the Brewery item is ignored by this Effect. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> ignoreuser <true|false>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set ignoreuser <true|false>",
 	maxArgs = 1
 )
-public class editItemEffectsSetIgnoreuser extends editItemEffectsSet {
+public class editItemEffectsModifySetIgnoreuser extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

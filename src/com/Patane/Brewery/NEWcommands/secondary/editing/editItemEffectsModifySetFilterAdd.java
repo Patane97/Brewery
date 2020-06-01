@@ -17,12 +17,12 @@ import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set filter add",
+	name = "edit item effects modify set filter add",
 	description = "Adds a value to the Filter of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> filter add [target|ignore] [group] <value>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set filter add [target|ignore] [group] <value>",
 	maxArgs = 3
 )
-public class editItemEffectsSetFilterAdd extends editItemEffectsSetFilter {
+public class editItemEffectsModifySetFilterAdd extends editItemEffectsModifySetFilter {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

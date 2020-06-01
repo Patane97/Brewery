@@ -45,7 +45,7 @@ public class infoEffect extends infoCommand{
 		if(effect.hasRadius())
 			Messenger.sendRaw(sender, "&2Radius: &7"+effect.getRadius());
 		if(effect.hasTag())
-			Messenger.sendRaw(sender, "&2Tag: &7"+effect.getTag().name);
+			Messenger.sendRaw(sender, "&2Tag: &7"+effect.getTag().getName());
 		if(effect.hasPotions()) {
 			Messenger.sendRaw(sender, "&2Potion Effects: &7");
 			potionEffectsInfo(sender, effect.getPotions());

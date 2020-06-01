@@ -352,7 +352,7 @@ public class BrEffectYML extends BreweryYAML{
 			/*
 			 * ==================> FILTER <==================
 			 */
-
+			
 			// Setting currentHeader to the baseHeader's filter.
 			// If this is unavailable, then currentHeader is set to the defaultSection's filter.
 			currentHeader = getAvailable(getSection(baseHeader, "filter"), getSection(defaultHeader, "filter"));

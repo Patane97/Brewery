@@ -8,7 +8,7 @@ import org.bukkit.entity.LivingEntity;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.util.YAML.Namer;
-import com.Patane.util.ingame.Focusable.Focus;
+import com.Patane.util.ingame.Focus;
 
 @Namer(name="instant")
 public class Instant extends Trigger{

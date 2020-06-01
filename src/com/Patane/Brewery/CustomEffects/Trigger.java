@@ -13,7 +13,7 @@ import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.YAML.Typer;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
-import com.Patane.util.ingame.Focusable.Focus;
+import com.Patane.util.ingame.Focus;
 
 @Typer(type="Trigger")
 public abstract class Trigger extends TypeParsable{

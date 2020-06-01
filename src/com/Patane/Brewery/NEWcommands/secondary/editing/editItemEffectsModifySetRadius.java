@@ -13,11 +13,11 @@ import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set radius",
+	name = "edit item effects modify set radius",
 	description = "Sets or Removes the Radius of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> radius <amount>"
+	usage = "/brewery edit item <item name> effects modify <effect name> set radius <amount>"
 )
-public class editItemEffectsSetRadius extends editItemEffectsSet {
+public class editItemEffectsModifySetRadius extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {

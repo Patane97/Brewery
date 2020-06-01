@@ -15,12 +15,12 @@ import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set tag",
+	name = "edit item effects modify set tag",
 	description = "Sets the Tag of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> tag <name>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set tag <name>",
 	maxArgs = 1
 )
-public class editItemEffectsSetTag extends editItemEffectsSet {
+public class editItemEffectsModifySetTag extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -58,7 +58,7 @@ public class editItemEffectsSetTag extends editItemEffectsSet {
 			successHoverText += StringsUtil.singleRowCompareFormatter(0,
 								s -> "&2"+s[0]+"&2: &7"+s[1]
 							  , s -> "&2"+s[0]+"&2: &8"+s[1]+" &7-> "+s[2]
-							  , tag.className() , previousTag.name , tag.name);
+							  , tag.className() , previousTag.getName() , tag.getName());
 		}
 		else
 			successHoverText += tag.toChatString(0, true);

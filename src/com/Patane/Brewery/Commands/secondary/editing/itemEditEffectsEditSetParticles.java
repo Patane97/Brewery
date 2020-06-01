@@ -1,8 +1,5 @@
 package com.Patane.Brewery.Commands.secondary.editing;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 
@@ -11,8 +8,6 @@ import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.Formation;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Editing.EditSession;
-import com.Patane.Brewery.Handlers.FormationHandler;
-import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
@@ -46,10 +41,11 @@ public class itemEditEffectsEditSetParticles extends itemEditEffectsEditSet {
 			return false;
 		}
 		
-		Formation formation = FormationHandler.get(args[1]);
-		
-		if(formation == null) {
-			Messenger.send(sender, "&7"+args[1]+" &cis not a valid Formation.");
+		Formation formation = null;
+		try {
+			formation = StringsUtil.constructEnum(args[1], Formation.class);
+		} catch (IllegalArgumentException e) {
+			Messenger.send(sender, "&7"+args[0]+" &cis not a valid formation.");
 			return true;
 		}
 
@@ -87,7 +83,7 @@ public class itemEditEffectsEditSetParticles extends itemEditEffectsEditSet {
 		if(brEffect.hasParticle())
 			successMsg = "&aChanged to &7"+particle.name()+" &aParticle Effect.";
 		
-		brEffect.setParticle(particleEffect);
+		brEffect.setParticleEffect(particleEffect);
 		
 		BrItem brItem = (BrItem) EditSession.get(sender.getName());
 		
@@ -95,16 +91,5 @@ public class itemEditEffectsEditSetParticles extends itemEditEffectsEditSet {
 		
 		Messenger.send(sender, successMsg);
 		return true;
-	}
-	
-	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
-		switch(args.length) {
-			case 7: return Arrays.asList(StringsUtil.enumValueStrings(Particle.class));
-			case 8: return FormationHandler.getKeys();
-			case 9: return Arrays.asList("<intensity>");
-			default: return Arrays.asList("<velocity>");
-			
-		}
 	}
 }

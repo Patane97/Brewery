@@ -15,12 +15,12 @@ import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set sounds",
+	name = "edit item effects modify set sounds",
 	description = "Sets or Changes the Sound Effects of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> sounds [type] <volume> <pitch>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set sounds [type] <volume> <pitch>",
 	maxArgs = 3
 )
-public class editItemEffectsSetSounds extends editItemEffectsSet {
+public class editItemEffectsModifySetSounds extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -117,7 +117,7 @@ public class editItemEffectsSetSounds extends editItemEffectsSet {
 			successHoverText += soundEffect.toChatString(0, true);
 		
 		// Sets the sound effect to effect
-		effect.setSound(soundEffect);
+		effect.setSoundEffect(soundEffect);
 
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);

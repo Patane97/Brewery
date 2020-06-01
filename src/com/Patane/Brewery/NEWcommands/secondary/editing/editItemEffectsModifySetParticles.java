@@ -10,19 +10,18 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.Formation;
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set particles",
+	name = "edit item effects modify set particles",
 	description = "Sets or Changes the Particle Effects of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> particles [type] [formation] <intensity> <velocity>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set particles [type] [formation] <intensity> <velocity>",
 	maxArgs = 4
 )
-public class editItemEffectsSetParticles extends editItemEffectsSet {
+public class editItemEffectsModifySetParticles extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -49,9 +48,16 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 		}
 		
 		// Checking/Saving formation
-		Formation formation = FormationHandler.get(args[1]);
-		// If formation is null, it is invalid
-		if(formation == null) {
+//		Formation formation = FormationHandler.get(args[1]);
+//		// If formation is null, it is invalid
+//		if(formation == null) {
+//			Messenger.send(sender, "&7"+args[1]+" &cis not a valid Formation.");
+//			return true;
+//		}
+		Formation formation = null;
+		try {
+			formation = StringsUtil.constructEnum(args[1], Formation.class);
+		} catch (IllegalArgumentException e) {
 			Messenger.send(sender, "&7"+args[1]+" &cis not a valid Formation.");
 			return true;
 		}
@@ -132,7 +138,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 			successHoverText += particleEffect.toChatString(0, true);
 		
 		// Sets the particle effect to effect
-		effect.setParticle(particleEffect);
+		effect.setParticleEffect(particleEffect);
 
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);
@@ -148,7 +154,7 @@ public class editItemEffectsSetParticles extends editItemEffectsSet {
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		switch(args.length) {
 			case 1: return Arrays.asList(StringsUtil.enumValueStrings(Particle.class));
-			case 2: return FormationHandler.getKeys();
+			case 2: return Arrays.asList(StringsUtil.enumValueStrings(Formation.class));
 			case 3: return Arrays.asList("<intensity>");
 			case 4: return Arrays.asList("<velocity>");
 		}

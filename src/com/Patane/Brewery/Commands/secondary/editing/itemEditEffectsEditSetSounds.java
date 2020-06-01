@@ -74,7 +74,7 @@ public class itemEditEffectsEditSetSounds extends itemEditEffectsEditSet {
 		if(brEffect.hasParticle())
 			successMsg = "&aChanged to &7"+sound.name()+" &aSound Effect.";
 		
-		brEffect.setSound(soundEffect);
+		brEffect.setSoundEffect(soundEffect);
 		
 		BrItem brItem = (BrItem) EditSession.get(sender.getName());
 		

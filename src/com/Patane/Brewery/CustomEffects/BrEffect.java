@@ -12,13 +12,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
-import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Chat;
-import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
@@ -66,9 +64,9 @@ public class BrEffect extends ChatCollectable{
 	protected Filter filter;
 	protected BrParticleEffect particles;
 	protected BrSoundEffect sounds;
-	protected List<PotionEffect> potion_effects;
+	protected List<PotionEffect> potionEffects;
 	protected BrTag tag;
-	protected boolean ignore_user;
+	protected boolean ignoreUser;
 //	protected boolean stack;
 
 	protected List<String> incomplete = new ArrayList<String>();
@@ -80,8 +78,8 @@ public class BrEffect extends ChatCollectable{
 	 * ================================================================================
 	 */
 	public BrEffect(String name, Modifier modifier, Trigger trigger, Float radius, 
-			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potion_effects, 
-			BrTag tag, Boolean ignore_user) {
+			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potionEffects, 
+			BrTag tag, Boolean ignoreUser) {
 		// Setting the name
 		super(name);
 		
@@ -104,8 +102,8 @@ public class BrEffect extends ChatCollectable{
 		// DEFAULTED VALUES.
 		// These values will always have a setting. If the given value is null, then the default is set.
 		this.filter = (filter == null ? new Filter() : filter);
-		this.potion_effects = (potion_effects == null ? new ArrayList<PotionEffect>() : potion_effects);
-		this.ignore_user = (ignore_user == null ? true : ignore_user);
+		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
+		this.ignoreUser = (ignoreUser == null ? true : ignoreUser);
 //		this.stack = false;
 		if(!isComplete())
 			Messenger.info(name+" effect is incomplete. Missing: "+StringsUtil.stringJoiner(incomplete, ", "));
@@ -123,6 +121,8 @@ public class BrEffect extends ChatCollectable{
 		this.modifier = modifier;
 		if(incomplete.contains("modifier") && this.modifier != null)
 			incomplete.remove("modifier");
+		else if(!incomplete.contains("modifier") && this.modifier == null)
+			incomplete.add("modifier");
 	}
 	public Trigger getTrigger() {
 		return trigger;
@@ -131,6 +131,8 @@ public class BrEffect extends ChatCollectable{
 		this.trigger = trigger;
 		if(incomplete.contains("trigger") && this.trigger != null)
 			incomplete.remove("trigger");
+		else if(!incomplete.contains("trigger") && this.trigger == null)
+			incomplete.add("trigger");
 	}
 	// Has & Getters for non-essential values.
 	
@@ -152,7 +154,7 @@ public class BrEffect extends ChatCollectable{
 		return filter;
 	}
 	public void setFilter(Filter filter) {
-		this.filter = filter;
+		this.filter = (filter == null ? new Filter() : filter);
 	}
 	// Particle
 	public boolean hasParticle() {
@@ -161,7 +163,7 @@ public class BrEffect extends ChatCollectable{
 	public BrParticleEffect getParticleEffect() {
 		return particles;
 	}
-	public void setParticle(BrParticleEffect particles) {
+	public void setParticleEffect(BrParticleEffect particles) {
 		this.particles = particles;
 	}
 	// Sound
@@ -171,23 +173,23 @@ public class BrEffect extends ChatCollectable{
 	public BrSoundEffect getSoundEffect() {
 		return sounds;
 	}
-	public void setSound(BrSoundEffect sounds) {
+	public void setSoundEffect(BrSoundEffect sounds) {
 		this.sounds = sounds;
 	}
 
 	// Potion Effects
 	public boolean hasPotions() {
-		return (potion_effects.isEmpty() ? false : true);
+		return (potionEffects.isEmpty() ? false : true);
 	}
 	public List<PotionEffect> getPotions(){
-		return potion_effects;
+		return potionEffects;
 	}
 	public void setPotions(List<PotionEffect> potionEffects) {
-		this.potion_effects = potionEffects;
+		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
 		sortPotionsByAmplifier();
 	}
 	public void addPotion(PotionEffect potionEffect) {
-		potion_effects.add(potionEffect);
+		potionEffects.add(potionEffect);
 		sortPotionsByAmplifier();
 		
 	}
@@ -197,7 +199,7 @@ public class BrEffect extends ChatCollectable{
 	 * Applying the smaller amps first allows all potions to be applied, independant of their amplification!
 	 */
 	private void sortPotionsByAmplifier() {
-		potion_effects.sort((p1,p2) -> {
+		potionEffects.sort((p1,p2) -> {
 			if(p1.getAmplifier() < p2.getAmplifier())
 				return -1;
 			if(p1.getAmplifier() == p2.getAmplifier())
@@ -205,9 +207,10 @@ public class BrEffect extends ChatCollectable{
 			return 1;
 		});
 	}
+	@Deprecated
 	public void removePotions(PotionEffectType potionEffectType) {
 		List<PotionEffect> newPotionEffects = new ArrayList<PotionEffect>();
-		for(PotionEffect potionEffect : potion_effects) {
+		for(PotionEffect potionEffect : potionEffects) {
 			if(!potionEffect.getType().getName().equals(potionEffectType.getName()))
 				newPotionEffects.add(potionEffect);
 		}
@@ -215,7 +218,7 @@ public class BrEffect extends ChatCollectable{
 	}
 	
 	public void removePotion(PotionEffect potionEffect) {
-		potion_effects.remove(potionEffect);
+		potionEffects.remove(potionEffect);
 		// Dont need to sort here as its already in correct order
 	}
 	
@@ -240,13 +243,13 @@ public class BrEffect extends ChatCollectable{
 
 	// Getters for Defaulted values.
 	
-	// Ignore_User
+	// IgnoreUser
 	public boolean ignoreUser() {
-		return ignore_user;
+		return ignoreUser;
 	}
 
-	public void setIgnoreUser(boolean ignore_user) {
-		this.ignore_user = ignore_user;		
+	public void setIgnoreUser(Boolean ignoreUser) {
+		this.ignoreUser = (ignoreUser == null ? true : ignoreUser);	
 	}
 	// Stacks
 //	public boolean stack() {
@@ -315,18 +318,16 @@ public class BrEffect extends ChatCollectable{
 			effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Ignore User", "false");
 		
 		// If potions are present, show them
-		if(hasPotions())
-			effectInfo += "\n" + StringsUtil.toChatString(indentCount, deep, deepLayout, potion_effects.toArray(new PotionEffect[0]));
-//		{
-//			// If not deep, then simply print potion count
-//			if(!deep)
-//				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potion_effects.size()));
-//			// Otherwise grab all potion effect infos from the string builder
-//			else
-//				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")
-//				// *** CHANGE THIS?
-//				+ "\n" + StringsUtil.toChatString(s -> "&2  "+s[0]+": &7"+s[1], potion_effects.toArray(new PotionEffect[0]));
-//		}
+		if(hasPotions()) {
+			// Need to manually do deep check here as the potion effect toChatString method prints each potion individually, whilst we want to look at the list as a whole
+			if(deep) {
+				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")
+							+ "\n" + StringsUtil.toChatString(indentCount, deep, alternateLayout, potionEffects.toArray(new PotionEffect[0]));
+			}
+			else
+				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potionEffects.size()));
+				
+		}
 		
 		// If particles are present, show them. Does not need null check as we know we have them
 		if(hasParticle())
@@ -424,7 +425,7 @@ public class BrEffect extends ChatCollectable{
 		@Override
 		protected void populateFields(Map<String, String> fields) {
 			this.type = getEnumValue(Particle.class, fields, "type");
-			this.formation = Check.notNull(FormationHandler.get(fields.get("formation")), "Formation '"+fields.get("formation")+"' could not be found.");
+			this.formation = getEnumValue(Formation.class, fields, "formation");
 			try{ 
 				this.intensity = getInt(fields, "intensity");
 				this.velocity = getDouble(fields, "velocity");
@@ -449,14 +450,27 @@ public class BrEffect extends ChatCollectable{
 		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
 			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
 			if(!deep)
-				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
+				return Chat.indent(indentCount)+alternateLayout.build(className(), "&7Active");
 			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
-					+ super.toChatString(indentCount, deep, alternateLayout);
+					+ super.toChatString(indentCount+1, deep, alternateLayout);
 		}
-		public Formation getFormation(){
+
+		public Particle getType() {
+			return type;
+		}
+
+		public Formation getFormation() {
 			return formation;
 		}
-		
+
+		public int getIntensity() {
+			return intensity;
+		}
+
+		public double getVelocity() {
+			return velocity;
+		}
+
 		
 		/* 
 		 * ================================================================================
@@ -519,10 +533,22 @@ public class BrEffect extends ChatCollectable{
 			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
 
 			if(!deep)
-				return Chat.indent(indentCount)+alternateLayout.build(className(), "&8Active");
+				return Chat.indent(indentCount)+alternateLayout.build(className(), "&7Active");
 			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
 					+ super.toChatString(indentCount, deep, alternateLayout);
 		}
+		public Sound getType() {
+			return type;
+		}
+
+		public float getVolume() {
+			return volume;
+		}
+
+		public float getPitch() {
+			return pitch;
+		}
+
 
 		/* 
 		 * ================================================================================
@@ -567,7 +593,15 @@ public class BrEffect extends ChatCollectable{
 			
 			return Chat.indent(indentCount) + alternateLayout.build(className(), name);
 		}
-
+		@Override
+		public String toString() {
+			return name;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
 		/* 
 		 * ================================================================================
 		 */

@@ -12,7 +12,7 @@ import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.YAML.Namer;
 import com.Patane.util.general.Check;
-import com.Patane.util.ingame.Focusable.Focus;
+import com.Patane.util.ingame.Focus;
 
 @Namer(name="lingering")
 public class Lingering extends Trigger{

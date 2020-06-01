@@ -12,13 +12,13 @@ import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 @CommandInfo(
-	name = "edit item effects set",
-	aliases = {"change", "edit"},
-	description = "Sets or Changes the property of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> [property]",
+	name = "edit item effects modify",
+	aliases = {"change", "edit", "set"},
+	description = "Modifies or changes the property of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
+	usage = "/brewery edit item <item name> effects modify <effect name> [set|remove]",
 	maxArgs = 1
 )
-public class editItemEffectsSet extends editItemEffects {
+public class editItemEffectsModify extends editItemEffects {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -41,14 +41,8 @@ public class editItemEffectsSet extends editItemEffects {
 														, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
-
-		// Check if next argument/child command is provided
-		if(args.length < 2) {
-			Messenger.send(sender, "&ePlease specify a property to edit.");
-			return true;
-		}
 		
-		return this.gotoChild(1, s -> "&7"+s+" &cis not a valid property to edit.", sender, args, item, effect);
+		return this.gotoChild(1, sender, args, item, effect);
 	}
 	
 	@Override

@@ -19,13 +19,13 @@ import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set potions remove",
+	name = "edit item effects modify set potions remove",
 	aliases = {"rem", "delete", "del"},
 	description = "Removes a Potion from an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> potions remove [type] <amplifier>",
+	usage = "/brewery edit item <item name> effects modify <effect name> set potions remove [type] <amplifier>",
 	maxArgs = 2
 )
-public class editItemEffectsSetPotionsRemove extends editItemEffectsSetPotions {
+public class editItemEffectsModifySetPotionsRemove extends editItemEffectsModifySetPotions {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -102,7 +102,7 @@ public class editItemEffectsSetPotionsRemove extends editItemEffectsSetPotions {
 		
 		// Adding the removed potion effect with removed layout
 		successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))
-					+ "\n"+StringsUtil.toChatString(0, true, s -> "&4&m"+Chat.replace(s[0], "&4&m")+"&4: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect);
+					+ "\n"+StringsUtil.toChatString(0, true, s -> "&4&m"+Chat.replace(Chat.add(s[0], "&m"), "&7", "&8")+"&4: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect);
 		
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);

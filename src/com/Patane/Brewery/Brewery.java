@@ -11,7 +11,6 @@ import com.Patane.Brewery.CustomEffects.BrEffectYML;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItemYML;
 import com.Patane.Brewery.Editing.EditSession;
-import com.Patane.Brewery.Handlers.FormationHandler;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.Listeners.GlobalListener;
@@ -42,7 +41,6 @@ public class Brewery extends JavaPlugin{
 		
 		TriggerHandler.registerAll();
 		ModifierHandler.registerAll();
-		FormationHandler.registerAll();
 		
 		loadPlugin();
 	}

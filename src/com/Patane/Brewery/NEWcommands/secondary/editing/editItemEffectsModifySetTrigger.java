@@ -22,12 +22,12 @@ import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit item effects set trigger",
+	name = "edit item effects modify set trigger",
 	aliases = {"trig"},
 	description = "Sets or Changes the Trigger of an Effect for a Brewery Item. These changes are seperate from the original Effect.",
-	usage = "/brewery edit item <item name> effects set <effect name> trigger [type] <values...> "
+	usage = "/brewery edit item <item name> effects modify <effect name> set trigger [type] <values...> "
 )
-public class editItemEffectsSetTrigger extends editItemEffectsSet {
+public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -114,6 +114,8 @@ public class editItemEffectsSetTrigger extends editItemEffectsSet {
 								  + "&a&l+ " + trigger.toChatString(1, true, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
 			}
 		}
+		else
+			successHoverText += "&a&l+ " + trigger.toChatString(1, true, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
 		// Save the new trigger to the effect
 		effect.setTrigger(trigger);
 		
