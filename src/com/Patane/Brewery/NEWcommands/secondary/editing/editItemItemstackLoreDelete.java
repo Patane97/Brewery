@@ -95,13 +95,13 @@ public class editItemItemstackLoreDelete extends editItemItemstackLore {
 			case 1:
 				// Saves current lore for later use
 				List<String> lore = ItemsUtil.getLore(brItem.getItemStack());
-				// If its empty, just suggest line 1 to start
+				
 				if(lore == null || lore.isEmpty())
 					return Arrays.asList();
 				else {
 					// Create a list showing all available line numbers
 					List<String> lines = new ArrayList<String>();
-					for(int i=1 ; i<lore.size() ; i++)
+					for(int i=1 ; i<lore.size()+1 ; i++)
 						lines.add(Integer.toString(i));
 					return lines;
 				}

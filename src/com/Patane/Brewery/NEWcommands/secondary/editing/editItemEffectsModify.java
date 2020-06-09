@@ -38,7 +38,7 @@ public class editItemEffectsModify extends editItemEffects {
 		// Check if Effect exists
 		if(effect == null) {
 			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&c has no effects with the name &7"+args[0]+"&c. Hover to view this items effects!"
-														, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
+														, StringsUtil.manyToChatString(0, 2, false, null, null, item.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
 		

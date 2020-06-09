@@ -128,7 +128,7 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 			// If the old modifier and the new one are the exact same, do nothing and message appropriately
 			if(oldModifier.getAmount() == modifier.getAmount() 
 					&& oldModifier.getOperation() == modifier.getOperation() 
-					&& oldModifier.getSlot() == modifier.getSlot()){
+					&& oldModifier.getSlot() == modifier.getSlot()) {
 				Messenger.send(sender, StringsUtil.hoverText("&eThat attribute modifier for &7"+item.getName()+"&e already has those values. Hover for details!", successHoverText));
 				return true;
 			}

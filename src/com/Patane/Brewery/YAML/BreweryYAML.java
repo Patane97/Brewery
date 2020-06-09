@@ -52,7 +52,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 	 * @param section ConfigurationSection to grab potion effect from.
 	 * @return New PotionEffect with given values. If there is an error, returns null and prints error message.
 	 */
-	public static PotionEffect retrievePotionEffect(ConfigurationSection section){
+	public static PotionEffect retrievePotionEffect(ConfigurationSection section) {
 		String effectName = null;
 		String effectNameRaw = null;
 		Pattern namePattern = Pattern.compile("(\\w+)(?=\\(\\d\\))");
@@ -89,7 +89,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 			
 			
 			return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
-		} catch (Exception e){
+		} catch (Exception e) {
 			Messenger.warning("Potion Effect '"+effectName+"' retrieval has failed. Check all YML values are set correctly.");
 			e.printStackTrace();
 			return null;
@@ -130,11 +130,11 @@ public abstract class BreweryYAML extends YAMLEditable{
 	}
 	
 	public static FilterType getFilterType(ConfigurationSection section, boolean defaultReturn) throws ClassNotFoundException, NullPointerException{
-		if(section != null){
+		if(section != null) {
 			List<EntityType> entities = new ArrayList<EntityType>();
-			for(String entityName : section.getStringList("entities")){
+			for(String entityName : section.getStringList("entities")) {
 				EntityType entityType = getEnumFromString(entityName, EntityType.class);
-				if(entityType != null){
+				if(entityType != null) {
 					entities.add(entityType);
 				}
 			}

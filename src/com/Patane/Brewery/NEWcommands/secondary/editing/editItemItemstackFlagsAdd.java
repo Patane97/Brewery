@@ -46,7 +46,7 @@ public class editItemItemstackFlagsAdd extends editItemItemstackFlags {
 		
 		ItemFlag itemFlag = null;
 		// If all itemflags are already present, send appropriate message and do nothing
-		if(ItemsUtil.getFlags(currentItem).size() == ItemFlag.values().length){
+		if(ItemsUtil.getFlags(currentItem).size() == ItemFlag.values().length) {
 			Messenger.send(sender, StringsUtil.hoverText("&eAll item flags are already present on &7"+item.getName()+"&e. Hover to see!"
 					, successHoverText + StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])))));
 			return true;
@@ -74,7 +74,7 @@ public class editItemItemstackFlagsAdd extends editItemItemstackFlags {
 			}
 			
 			// If the specified itemflag is already present, send appropriate message and do nothing
-			if(ItemsUtil.getFlags(currentItem).contains(itemFlag)){
+			if(ItemsUtil.getFlags(currentItem).contains(itemFlag)) {
 				// Sends hover message showing all current flags
 				Messenger.send(sender, StringsUtil.hoverText("&eThat item flag is already present on &7"+item.getName()+"&e. Hover to see them all!"
 						, successHoverText + StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0])))));

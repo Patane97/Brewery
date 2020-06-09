@@ -50,7 +50,7 @@ public class GlobalListener extends BaseListener{
 	 * @param e
 	 */
 	@EventHandler
-	public void onItemSwingBlock(PlayerInteractEvent e){
+	public void onItemSwingBlock(PlayerInteractEvent e) {
 		if(e.getAction() != Action.PHYSICAL && !(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null && e.getAction().equals(Action.LEFT_CLICK_BLOCK))))
 			return;
 		Player player = e.getPlayer();
@@ -79,13 +79,13 @@ public class GlobalListener extends BaseListener{
 	 * @param e
 	 */
 	@EventHandler
-	public void onItemSwingEntity(EntityDamageByEntityEvent e){
+	public void onItemSwingEntity(EntityDamageByEntityEvent e) {
 		if(!(e.getDamager() instanceof LivingEntity))
 			return;
 		// To avoid infinite damage loops, targets who are damaged by this plugin are tagged with "Brewery_DAMAGE".
 		// If they have this tag, then we do not want to trigger this damage event as this would create an infinite damage loop.
 		// This acts as "blocking" the registration of the BrItem's Damage and removing its DAMAGE metadata in the process.
-		if(e.getEntity().hasMetadata("Brewery_DAMAGE")){
+		if(e.getEntity().hasMetadata("Brewery_DAMAGE")) {
 			e.getEntity().removeMetadata("Brewery_DAMAGE", Brewery.getInstance());
 			return;
 		}
@@ -119,7 +119,7 @@ public class GlobalListener extends BaseListener{
 	 * @param e
 	 */
 	@EventHandler
-	public void onItemRightClick(PlayerInteractEvent e){
+	public void onItemRightClick(PlayerInteractEvent e) {
 		if(e.getAction() != Action.PHYSICAL && !(e.getHand().equals(EquipmentSlot.HAND) && (e.getAction() != null  && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))))
 			return;
 		Player player = e.getPlayer();
@@ -149,7 +149,7 @@ public class GlobalListener extends BaseListener{
 	// When 'MaxStacks' is implemented, add a checker to ensure the dropped ItemStack adheres to MaxStacks. (
 	// ***************** IMPORTANT *********************
 	@EventHandler
-	public void onCreativeItemDrop(PlayerDropItemEvent e){
+	public void onCreativeItemDrop(PlayerDropItemEvent e) {
 		if(e.getPlayer().getGameMode() != GameMode.CREATIVE)
 			return;
 		ItemStack item = e.getItemDrop().getItemStack();
@@ -414,7 +414,7 @@ public class GlobalListener extends BaseListener{
 				this.cancel();
 				return;
 			}
-			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR){
+			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR) {
 				item.setPickupDelay(0);
 				item.remove();
 				hitGround(brItem, item.getLocation(), executor);

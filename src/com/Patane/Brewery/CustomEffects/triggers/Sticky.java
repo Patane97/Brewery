@@ -10,13 +10,18 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
 
-@Namer(name="sticky")
+@ClassDescriber(
+		name="sticky",
+		desc="Sticks to the initial living entities hit and applies the Modifier to them at a fixed rate over a duration.")
 public class Sticky extends Trigger{
+	@FieldDescriber(desc="Rate at which to apply the Modifier. Measured in seconds.")
 	public float rate;
+	@FieldDescriber(desc="Duration for the effect to stick. This must be greater than or equal to the rate and is measured in seconds.")
 	public float duration;
 	
 	public Sticky() {
@@ -32,7 +37,7 @@ public class Sticky extends Trigger{
 		rate = Check.greaterThan((float) getDouble(fields, "rate"), 0, "Rate must be greater than 0.");
 		duration = Check.greaterThanEqual((float) getDouble(fields, "duration"), rate, "Duration must be greater than or equal to the rate ("+rate+").");
 	}
-	public Sticky(float rate, float duration){
+	public Sticky(float rate, float duration) {
 		this.rate = rate;
 		this.duration = duration;
 		construct();
@@ -80,7 +85,7 @@ public class Sticky extends Trigger{
 		private final LivingEntity target;
 		private final List<LivingEntity> entities;
 		
-		public StickyTask(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> entities){
+		public StickyTask(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> entities) {
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = impact;
@@ -92,7 +97,7 @@ public class Sticky extends Trigger{
 			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
 			effect.applyTag(this, entities);
 		}
-		public StickyTask(BrEffect effect, LivingEntity executor, LivingEntity target, List<LivingEntity> entities){
+		public StickyTask(BrEffect effect, LivingEntity executor, LivingEntity target, List<LivingEntity> entities) {
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = null;

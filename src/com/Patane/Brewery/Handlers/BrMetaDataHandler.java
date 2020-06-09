@@ -12,23 +12,23 @@ import com.Patane.util.general.StringsUtil;
 
 public class BrMetaDataHandler extends MetaDataHandler{
 
-	public static boolean add(PatRunnable task, LivingEntity entity, String metaName, Object value){
+	public static boolean add(PatRunnable task, LivingEntity entity, String metaName, Object value) {
 		return MetaDataHandler.add(entity, packMetaName(task, metaName), value);
 	}
-	public static boolean add(PatRunnable task, List<LivingEntity> entities, String metaName, Object value){
+	public static boolean add(PatRunnable task, List<LivingEntity> entities, String metaName, Object value) {
 		return MetaDataHandler.add(entities, packMetaName(task, metaName), value);
 	}
-	public static boolean remove(PatRunnable task, LivingEntity entity, String metaName){
+	public static boolean remove(PatRunnable task, LivingEntity entity, String metaName) {
 		return MetaDataHandler.remove(entity, packMetaName(task, metaName));
 	}
-	public static boolean remove(PatRunnable task, String metaName){
+	public static boolean remove(PatRunnable task, String metaName) {
 		return MetaDataHandler.remove(packMetaName(task, metaName));
 	}
-	public static boolean check(LivingEntity entity, String regex){
+	public static boolean check(LivingEntity entity, String regex) {
 		return MetaDataHandler.check(entity, "\\[\\d+\\]"+regex);
 	}
 	
-	private static String packMetaName(PatRunnable task, String metaName){
+	private static String packMetaName(PatRunnable task, String metaName) {
 		return StringsUtil.normalize("["+task.getID()+"]"+metaName+"");
 	}
 	
@@ -42,12 +42,12 @@ public class BrMetaDataHandler extends MetaDataHandler{
 	 * @param value Value to be added within the metadata.
 	 * @return
 	 */
-	public static boolean addClean(PatRunnable task, List<LivingEntity> entities, String metaName, Object value){
+	public static boolean addClean(PatRunnable task, List<LivingEntity> entities, String metaName, Object value) {
 		// Firstly adds any entities which are not already on the collection List.
 		boolean result = add(task, entities, metaName, value);
 		
 		// If the metaNames List is available.
-		if(collection.get(packMetaName(task, metaName)) != null){
+		if(collection.get(packMetaName(task, metaName)) != null) {
 			// Loop through each entity on the collection list and if they are not in the newly added List, remove them from the collection List.
 			for(LivingEntity entity : new ArrayList<LivingEntity>(collection.get(packMetaName(task, metaName))))
 				if(!entities.contains(entity))
@@ -65,13 +65,13 @@ public class BrMetaDataHandler extends MetaDataHandler{
 	 * @param entities Entities which have the metadata.
 	 * @param metaName Name portion of the metadata.
 	 */
-	public static void addOrReset(PatTimedRunnable task, List<LivingEntity> entities, String metaName){
+	public static void addOrReset(PatTimedRunnable task, List<LivingEntity> entities, String metaName) {
 		
 		// Loops through entities made from a cloned List.
-		for(LivingEntity entity : new ArrayList<LivingEntity>(entities)){
+		for(LivingEntity entity : new ArrayList<LivingEntity>(entities)) {
 			
 			// If the entity is in within metadata collection found from using the given regex.
-			if(BrMetaDataHandler.check(entity, metaName)){
+			if(BrMetaDataHandler.check(entity, metaName)) {
 				try{
 					// Grab the first metadata value (in this case, a PatTimedRunnable) stored within the entity from using the given regex.
 					PatTimedRunnable storedTask = (PatTimedRunnable) BrMetaDataHandler.grabFirst(entity, "\\[\\d+\\]"+metaName);
@@ -83,7 +83,7 @@ public class BrMetaDataHandler extends MetaDataHandler{
 					entities.remove(entity);
 				} 
 				// In the rare case that the grabbed Object from 'grabFirst' isnt a PatTimedRunnable.
-				catch (ClassCastException e){
+				catch (ClassCastException e) {
 					BrMetaDataHandler.add(task, entity, metaName, task);
 				}
 			}

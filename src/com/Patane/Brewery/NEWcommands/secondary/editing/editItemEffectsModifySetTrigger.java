@@ -64,18 +64,16 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 			// Attempting to create the trigger using the found Class
 			// and all the arguments after the first (as the first is the trigger type)
 			trigger = GeneralUtil.createMapParsable(triggerClass, Commands.grabArgs(args, 1, args.length));
-		} 
-		// This will catch if any errors occurred when creating the actual object.
-		// It will catch other exceptions and throw it as InvocationTargetException, with the original exception as its cause
-		// For example, if the constructor throws an 'IllegalArgumentException', it will be caught here as an
-		// InvocationTargetException with the above IllegalArgumentException as its cause.
-		catch(InvocationTargetException e) {
-			Messenger.send(sender, StringsUtil.hoverText("&cTrigger could not be set due to an error. Hover to view!", "&7"+e.getCause().getMessage()));
-			return true;
-		} 
-		// This will catch if any arguments are missing
-		catch (IllegalArgumentException e) {
+		}
+		// This will catch if either the value is missing OR an incorrect value was given for an argument
+		catch(IllegalArgumentException|NullPointerException e) {
+			// These exceptions are formatted and coloured for players to see properly
 			Messenger.send(sender, e.getMessage());
+			return true;
+		}
+		// This will catch if theres any other error with generating this mapParsable
+		catch(InvocationTargetException e) {
+			Messenger.send(sender, "&cTrigger could not be set due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
 		

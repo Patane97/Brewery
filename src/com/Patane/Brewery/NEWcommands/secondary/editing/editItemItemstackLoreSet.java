@@ -110,7 +110,7 @@ public class editItemItemstackLoreSet extends editItemItemstackLore {
 				else {
 					// Create a list showing all available line numbers along with 'Above' and 'Below'
 					List<String> lines = new ArrayList<String>();
-					for(int i=1 ; i<lore.size() ; i++)
+					for(int i=1 ; i<lore.size()+1 ; i++)
 						lines.add(Integer.toString(i));
 					lines.add("Above");
 					lines.add("Below");

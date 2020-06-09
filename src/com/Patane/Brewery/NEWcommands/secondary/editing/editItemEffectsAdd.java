@@ -46,16 +46,16 @@ public class editItemEffectsAdd extends editItemEffects {
 		// If effect is already on this item, do nothing and send appropriate message
 		if(brItem.hasEffect(effectName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&eThis Effect is already present on &7"+brItem.getName()+"&e. Hover to view all effects for this item!"
-					, BrEffect.manyToChatString(0, false, brItem.getEffects().toArray(new BrEffect[0]))));
+					, StringsUtil.manyToChatString(0, 2, false, null, null, brItem.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
 		String successMsg = "&aEffect added to &7"+brItem.getName()+"&a. Hover to view details!";
-		String successHoverText = BrEffect.manyToChatString(0, false, brItem.getEffects().toArray(new BrEffect[0]));
+		String successHoverText = StringsUtil.manyToChatString(0, 2, false, null, null, brItem.getEffects().toArray(new BrEffect[0]));
 		
 		BrEffect brEffect = null;
 		
 		// If the effect doesnt already exist
-		if(!Brewery.getEffectCollection().hasItem(effectName)){			
+		if(!Brewery.getEffectCollection().hasItem(effectName)) {			
 			// Create a new empty one and save to brEffect and collection
 			brEffect = new BrEffect(effectName, new None(), new Instant(), null, null, null, null, null, null, null);
 			Brewery.getEffectCollection().add(brEffect);

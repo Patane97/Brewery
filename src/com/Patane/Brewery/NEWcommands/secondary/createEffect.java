@@ -3,6 +3,7 @@ package com.Patane.Brewery.NEWcommands.secondary;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
@@ -11,6 +12,7 @@ import com.Patane.Brewery.CustomEffects.modifiers.None;
 import com.Patane.Brewery.CustomEffects.triggers.Instant;
 import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -42,7 +44,7 @@ public class createEffect extends createCommand {
 		if(Brewery.getEffectCollection().hasItem(effectName)) {
 			effect = Brewery.getEffectCollection().getItem(effectName);
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is already a Brewery Effect named &7"+effectName+"&e. Hover to view its details!"
-														, effect.toChatString(0, false)));
+														, effect.toChatString(0, true)));
 			return true;
 		}
 		String successMsg = "&aCreated a new Effect. Hover to view its details!";
@@ -51,21 +53,19 @@ public class createEffect extends createCommand {
 		try {
 			// Creating the new effect
 			effect = new BrEffect(effectName, new None(), new Instant(), null, null, null, null, null, null, null);
-			
+						
+			// Save new effect onto hover text
+			successHoverText = effect.toChatString(0, true, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
+
 			// Attempt to save the effect to YML. If this gives us exceptions then we dont add the effect to the collection
 			BrEffect.YML().save(effect);
 			
 			// Add effect to collection
 			Brewery.getEffectCollection().add(effect);
 			
-			// Save new effect onto hover text
-			successHoverText = BrEffect.manyToChatString(0, false, effect);
-			
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
-			successMsg = "&cThere was an error with creating this effect. Hover for error details!";
-			// Save the exception message on hover. Dat shi ugly
-			successHoverText = "&7"+e.getMessage();
+			successMsg = "&cEffect could not be created due to an error. Please check server console for error trace.";
 			e.printStackTrace();
 		}
 		// Allows the user to view the details on hover

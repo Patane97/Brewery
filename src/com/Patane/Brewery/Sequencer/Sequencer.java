@@ -9,10 +9,10 @@ public class Sequencer {
 	 */
 	private static SequencesYML yml;
 
-	public static void setYML(SequencesYML yml){
+	public static void setYML(SequencesYML yml) {
 		Sequencer.yml = yml;
 	}
-	public static SequencesYML YML(){
+	public static SequencesYML YML() {
 		return yml;
 	}
 	/**
@@ -20,19 +20,19 @@ public class Sequencer {
 	 */
 	HashMap<Runnable, Integer> sequence = new HashMap<Runnable, Integer>();
 	
-	public boolean run(){
+	public boolean run() {
 //		Iterator<Runnable> runnableIterator = sequence.keySet().iterator();
 //		
 //		Runnable current = runnableIterator.next();
 //		Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), arg1, arg2);
 		return true;
 	}
-	public boolean load(){
+	public boolean load() {
 		
 		return true;
 	}
 	public class Sequencable implements Runnable{
-		Sequencable(Iterator<Runnable> runnableIterator){
+		Sequencable(Iterator<Runnable> runnableIterator) {
 			
 		}
 

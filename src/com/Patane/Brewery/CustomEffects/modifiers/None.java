@@ -3,9 +3,11 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
 
-@Namer(name="none")
+@ClassDescriber(
+		name="none",
+		desc="Does absolutely nothing.")
 public class None extends Modifier{
 	
 	public None() {

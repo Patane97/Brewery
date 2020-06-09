@@ -70,7 +70,7 @@ public class editItemItemstackFlagsRemove extends editItemItemstackFlags {
 			}
 			
 			// If specified itemflag isnt in ite, send appropriate message and do nothing
-			if(!ItemsUtil.getFlags(currentItem).contains(itemFlag)){
+			if(!ItemsUtil.getFlags(currentItem).contains(itemFlag)) {
 				// Sends hover message showing all current flags
 				Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e does not have that Item Flag. Hover to view which ones it does have!"
 						, (ItemsUtil.getFlags(currentItem).isEmpty() ? successHoverText+"\n&8No Flags!" : successHoverText+StringsUtil.singleColumnFormatter(0, s -> "\n&2> &7"+s[0], StringsUtil.enumValueStrings(ItemsUtil.getFlags(currentItem).toArray(new ItemFlag[0]))))));

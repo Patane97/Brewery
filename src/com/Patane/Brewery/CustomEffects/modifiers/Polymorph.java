@@ -16,7 +16,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 /**
@@ -25,11 +26,16 @@ import com.Patane.util.general.Messenger;
  * @author Stephen
  *
  */
-@Namer(name="polymorph")
+
+@ClassDescriber(
+		name="polymorph",
+		desc="Transforms a living entity into a specified mob for a certain duration.")
 public class Polymorph extends Modifier{
 	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
 	
+	@FieldDescriber(desc="Mob to transform the living entity into.")
 	public EntityType entity;
+	@FieldDescriber(desc="Duration the living entity is transformed for.")
 	public int duration;
 	
 	public Polymorph() {
@@ -47,7 +53,7 @@ public class Polymorph extends Modifier{
 		duration = Math.round(Check.greaterThan((float) getDouble(fields, "duration")*20, 0, "Duration must be greater than 0."));
 	}
 	
-	public Polymorph(EntityType entity, int duration){
+	public Polymorph(EntityType entity, int duration) {
 		this.entity = entity;
 		this.duration = duration;
 		construct();
@@ -87,17 +93,17 @@ public class Polymorph extends Modifier{
 		
 			if(morphed instanceof Attributable)
 				((Attributable) morphed).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-			if(morphed instanceof LivingEntity){
+			if(morphed instanceof LivingEntity) {
 				((LivingEntity) morphed).setCollidable(false);
 				((LivingEntity) morphed).addPotionEffects(currentEffects);
 				((LivingEntity) morphed).setFireTicks(targetEntity.getFireTicks());
 			}
 			currentlyMorphed.put(targetEntity, morphed);
-			Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable(){
+			Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
 				@Override
-				public void run(){
+				public void run() {
 					Location location = morphed.getLocation();
-					if(morphed instanceof LivingEntity){
+					if(morphed instanceof LivingEntity) {
 						targetEntity.addPotionEffects(((LivingEntity) morphed).getActivePotionEffects());
 						targetEntity.setFireTicks(((LivingEntity) morphed).getFireTicks());
 					}
@@ -105,9 +111,9 @@ public class Polymorph extends Modifier{
 					
 					morphed.remove();
 					targetEntity.teleport(location);
-					Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable(){
+					Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
 						@Override
-						public void run(){
+						public void run() {
 							targetEntity.removePotionEffect(PotionEffectType.INVISIBILITY);
 							targetEntity.setInvulnerable(false);
 							targetEntity.setCollidable(true);

@@ -60,7 +60,7 @@ public class giveCommand extends PatCommand {
 		// If no effect with that name exists, do nothing and message appropriately
 		if(!Brewery.getItemCollection().hasItem(itemName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is no Brewery Item named &7"+itemName+"&e. Hover to view all Items!"
-														, "&8Not implemented yet"));
+														, StringsUtil.stringJoiner(Brewery.getItemCollection().getAllIDs(), "\n&2> &f&l", "&2> &f&l", "")));
 			return true;
 		}
 		
@@ -68,9 +68,8 @@ public class giveCommand extends PatCommand {
 		BrItem item = Brewery.getItemCollection().getItem(itemName);
 
 		String successMsg = "&aGiving &7"+player.getDisplayName()+"&a a &7"+item.getName()+"&a. Hover to view its details!";
-		// *** Not implemented yet
-//		String successHoverText = item.toChatString();
-		String successHoverText = "&8Not implemented yet";
+
+		String successHoverText = item.toChatString(0, true);
 		
 		// Give the player the itemStack
 		player.getInventory().addItem(item.generateItem());

@@ -8,11 +8,13 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.util.YAML.TypeParsable;
-import com.Patane.util.YAML.Typer;
+import com.Patane.util.annotations.TypeDescriber;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 
-@Typer(type="Modifier")
-public abstract class Modifier extends TypeParsable{
+@TypeDescriber(
+		name="Modifier",
+		desc="Modifies each living entity hit by the attached effect in a unique way.")
+public abstract class Modifier extends TypeParsable {
 	
 	public Modifier() {
 		super();
@@ -23,7 +25,7 @@ public abstract class Modifier extends TypeParsable{
 
 	public abstract void modify(ModifierInfo info);
 	
-	public void damage(LivingEntity damagee, LivingEntity damager, double amount){
+	public void damage(LivingEntity damagee, LivingEntity damager, double amount) {
 		damagee.setMetadata("Brewery_DAMAGE", new FixedMetadataValue(Brewery.getInstance(), null));
 		damagee.damage(amount, damager);
 	}
@@ -33,7 +35,7 @@ public abstract class Modifier extends TypeParsable{
 	 * ================================================================================
 	 */
 	@Override
-	public LambdaStrings layout(){
+	public LambdaStrings layout() {
 		// Example: &2Type: &7Name
 		return s -> "&2"+s[0]+"&2: &7"+s[1];
 	}
@@ -44,7 +46,7 @@ public abstract class Modifier extends TypeParsable{
 		private final LivingEntity targeter;
 		private final LivingEntity target;
 
-		public ModifierInfo(Location impact, LivingEntity targeter, LivingEntity target){
+		public ModifierInfo(Location impact, LivingEntity targeter, LivingEntity target) {
 			this.impact = impact;
 			this.targeter = targeter;
 			this.target = target;

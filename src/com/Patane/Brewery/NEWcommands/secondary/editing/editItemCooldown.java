@@ -82,8 +82,8 @@ public class editItemCooldown extends editItem {
 	}
 	
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects){
-		switch(args.length){
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		switch(args.length) {
 		case 1:
 			return Arrays.asList("<amount>");
 		default:

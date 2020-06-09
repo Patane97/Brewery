@@ -39,11 +39,11 @@ public class itemEditEffectsEditSet extends itemEditEffectsEdit {
 		LambdaStrings layout = s -> "&2"+s[0]+": &7"+s[1];
 		
 		// Check if Effect exists
-		if(effect == null) {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&c has no effects with the name &7"+args[0]+"&c. Hover to view this items effects!"
-														, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
-			return true;
-		}
+//		if(effect == null) {
+//			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&c has no effects with the name &7"+args[0]+"&c. Hover to view this items effects!"
+//														, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
+//			return true;
+//		}
 
 		// Check if next argument/child command is provided
 		if(args.length < 2) {

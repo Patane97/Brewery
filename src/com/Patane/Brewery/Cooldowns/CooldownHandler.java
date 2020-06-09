@@ -23,10 +23,10 @@ public class CooldownHandler {
 	 */
 	private static YAMLData yml;
 
-	public static void setYML(YAMLData yml){
+	public static void setYML(YAMLData yml) {
 		CooldownHandler.yml = yml;
 	}
-	public static YAMLData YML(){
+	public static YAMLData YML() {
 		return yml;
 	}
 	/**
@@ -35,7 +35,7 @@ public class CooldownHandler {
 
 	private static Map<UUID, CooldownTracker> cooldowns = new TreeMap<UUID, CooldownTracker>();
 	
-	public static Map<UUID, CooldownTracker> cooldowns(){
+	public static Map<UUID, CooldownTracker> cooldowns() {
 		return cooldowns;
 	}
 	public static boolean noCooldowns() {
@@ -83,7 +83,7 @@ public class CooldownHandler {
 		UUID uuid = getUUID(item);
 		
 		// Checks if the uuid is currently on cooldown.
-		if(cooldowns.containsKey(uuid)){
+		if(cooldowns.containsKey(uuid)) {
 			// If the entity is a player and they are not on the display list for this cooldown, add them and return true.
 			if(entity instanceof Player && !(cooldowns.get(uuid).hasPlayer((Player) entity))) {
 				cooldowns.get(uuid).addPlayer((Player) entity);

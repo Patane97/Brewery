@@ -3,11 +3,15 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 
-@Namer(name="smite")
+@ClassDescriber(
+		name="smite",
+		desc="Smites a living entity with thunder.")
 public class Smite extends Modifier{
+	@FieldDescriber(desc="Amount to damage the living entity for.")
 	public double amount;
 	
 	public Smite() {
@@ -24,7 +28,7 @@ public class Smite extends Modifier{
 		amount = Check.greaterThanEqual(getDouble(fields, "amount"), 0, "Amount must be greater than or equal to 0.");
 	}
 	
-	public Smite(double amount){
+	public Smite(double amount) {
 		this.amount = amount;
 		construct();
 	}

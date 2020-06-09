@@ -6,12 +6,17 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 
-@Namer(name="force")
+@ClassDescriber(
+		name="force",
+		desc="Force or push a living entity into a direction.")
 public class Force extends Modifier{
+	@FieldDescriber(desc="Direction to push the living entity from the impact location.")
 	public Direction direction;
+	@FieldDescriber(desc="Intensity of the push.")
 	public double intensity;
 	
 	public Force() {
@@ -28,7 +33,7 @@ public class Force extends Modifier{
 		direction = getEnumValue(Direction.class, fields, "direction");
 		intensity = Check.greaterThan(getDouble(fields, "intensity"), 0, "Intensity must be greater than 0.");
 	}
-	public Force(Direction direction, double intensity){
+	public Force(Direction direction, double intensity) {
 		this.direction = direction;
 		this.intensity = intensity;
 		construct();
@@ -53,40 +58,40 @@ public class Force extends Modifier{
 	 */
 	
 	public enum Direction {
-		TOWARDS(new ForceAction(){
-			public Vector getVector(Location from, Location to){
+		TOWARDS(new ForceAction() {
+			public Vector getVector(Location from, Location to) {
 		        return to.toVector().subtract(from.toVector());
 			}
 			public double getIntensity(Location from, Location to) {
 				return from.distance(to)/10;
 			}
 		}),
-		AWAY(new ForceAction(){
-			public Vector getVector(Location from, Location to){
+		AWAY(new ForceAction() {
+			public Vector getVector(Location from, Location to) {
 		        return to.toVector().subtract(from.toVector()).multiply(-1);
 			}
 			public double getIntensity(Location from, Location to) {
 				return 1/from.distance(to);
 			}
 		}),
-		UP(new ForceAction(){
-			public Vector getVector(Location from, Location to){
+		UP(new ForceAction() {
+			public Vector getVector(Location from, Location to) {
 		        return new Vector(0,0.1,0);
 			}
 			public double getIntensity(Location from, Location to) {
 				return 1;
 			}
 		}),
-		DOWN(new ForceAction(){
-			public Vector getVector(Location from, Location to){
+		DOWN(new ForceAction() {
+			public Vector getVector(Location from, Location to) {
 		        return new Vector(0,-0.1,0);
 			}
 			public double getIntensity(Location from, Location to) {
 				return 1;
 			}
 		}),
-		RANDOM(new ForceAction(){
-			public Vector getVector(Location from, Location to){
+		RANDOM(new ForceAction() {
+			public Vector getVector(Location from, Location to) {
 		        return new Vector(0,0,0);
 			}
 			public double getIntensity(Location from, Location to) {
@@ -95,13 +100,13 @@ public class Force extends Modifier{
 		});
 		
 		private final ForceAction action;
-		Direction(ForceAction action){
+		Direction(ForceAction action) {
 			this.action = action;
 		}
-		public Vector getVector(Location from, Location to){
+		public Vector getVector(Location from, Location to) {
 			return action.getVector(from, to);
 		}
-		public double getIntensity(Location from, Location to){
+		public double getIntensity(Location from, Location to) {
 			return action.getIntensity(from, to);
 		}
 	}

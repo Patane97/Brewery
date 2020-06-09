@@ -72,8 +72,8 @@ public class editItemType extends editItem {
 	}
 	
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects){
-		switch(args.length){
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		switch(args.length) {
 		case 1:
 			// Showing all Types
 			return Arrays.asList(StringsUtil.enumValueStrings(CustomType.class));

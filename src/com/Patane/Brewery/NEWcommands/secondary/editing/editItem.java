@@ -48,7 +48,7 @@ public class editItem extends editCommand {
 	}
 	
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects){
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		switch(args.length) {
 			case 1: return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
 		}

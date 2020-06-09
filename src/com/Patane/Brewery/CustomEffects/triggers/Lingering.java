@@ -10,13 +10,18 @@ import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
 
-@Namer(name="lingering")
+@ClassDescriber(
+		name="lingering",
+		desc="Applies the Modifier at a fixed rate over a duration. Calculates which living entities are hit at each rate.")
 public class Lingering extends Trigger{
+	@FieldDescriber(desc="Rate at which to apply the Modifier. Measured in seconds.")
 	public float rate;
+	@FieldDescriber(desc="Duration for the effect to linger. This must be greater than or equal to the rate and is measured in seconds.")
 	public float duration;
 	
 	public Lingering() {
@@ -32,7 +37,7 @@ public class Lingering extends Trigger{
 		rate = Check.greaterThan((float) getDouble(fields, "rate"), 0, "Rate must be greater than 0.");
 		duration = Check.greaterThanEqual((float) getDouble(fields, "duration"), rate, "Duration must be greater than or equal to the rate ("+rate+").");
 	}
-	public Lingering(float rate, float duration){
+	public Lingering(float rate, float duration) {
 		this.rate = rate;
 		this.duration = duration;
 		construct();
@@ -72,14 +77,14 @@ public class Lingering extends Trigger{
 		private final LivingEntity executor;
 		private final LivingEntity target;
 		
-		public LingeringTask(BrEffect effect, Location impact, LivingEntity executor){
+		public LingeringTask(BrEffect effect, Location impact, LivingEntity executor) {
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = impact;
 			this.executor = executor;
 			this.target = null;
 		}
-		public LingeringTask(BrEffect effect, LivingEntity executor, LivingEntity target){
+		public LingeringTask(BrEffect effect, LivingEntity executor, LivingEntity target) {
 			super(0, rate, duration);
 			this.effect = effect;
 			this.impact = null;

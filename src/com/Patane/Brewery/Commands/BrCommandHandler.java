@@ -1,15 +1,7 @@
 package com.Patane.Brewery.Commands;
 
-import com.Patane.Brewery.Commands.secondary.editSessionEffect;
-import com.Patane.Brewery.Commands.secondary.editSessionEnd;
-import com.Patane.Brewery.Commands.secondary.editSessionItem;
-import com.Patane.Brewery.Commands.secondary.infoEffect;
-import com.Patane.Brewery.Commands.secondary.infoItem;
-import com.Patane.Brewery.Commands.secondary.listEffects;
-import com.Patane.Brewery.Commands.secondary.listItems;
 import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Brewery.NEWcommands.primary.editCommand;
-import com.Patane.Brewery.NEWcommands.primary.editSessionCommand;
 import com.Patane.Brewery.NEWcommands.primary.giveCommand;
 import com.Patane.Brewery.NEWcommands.primary.helpCommand;
 import com.Patane.Brewery.NEWcommands.primary.infoCommand;
@@ -18,6 +10,10 @@ import com.Patane.Brewery.NEWcommands.primary.reloadCommand;
 import com.Patane.Brewery.NEWcommands.primary.removeCommand;
 import com.Patane.Brewery.NEWcommands.secondary.createEffect;
 import com.Patane.Brewery.NEWcommands.secondary.createItem;
+import com.Patane.Brewery.NEWcommands.secondary.infoEffect;
+import com.Patane.Brewery.NEWcommands.secondary.infoItem;
+import com.Patane.Brewery.NEWcommands.secondary.listEffects;
+import com.Patane.Brewery.NEWcommands.secondary.listItems;
 import com.Patane.Brewery.NEWcommands.secondary.removeEffect;
 import com.Patane.Brewery.NEWcommands.secondary.removeItem;
 import com.Patane.Brewery.NEWcommands.secondary.editing.editItem;
@@ -77,7 +73,6 @@ public class BrCommandHandler extends CommandHandler{
 		register(infoCommand.class);
 		register(createCommand.class);
 		register(removeCommand.class);
-		register(editSessionCommand.class);
 		register(editCommand.class);
 //		register(guiCommand.class);
 		
@@ -90,9 +85,6 @@ public class BrCommandHandler extends CommandHandler{
 		register(removeItem.class);
 		register(createEffect.class);
 		register(removeEffect.class);
-		register(editSessionEnd.class);
-		register(editSessionItem.class);
-		register(editSessionEffect.class);
 		
 		register(editItem.class);
 		register(editItemCooldown.class);

@@ -8,12 +8,16 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.StringsUtil;
 
-@Namer(name="effect")
+@ClassDescriber(
+		name="effect",
+		desc="Activates a different, pre-existing effect when the attached effect is activated.")
 public class Effect extends Modifier{
+	@FieldDescriber(desc="Brewery effect to activate.")
 	public BrEffect effect;
 	
 	public Effect() {
@@ -31,7 +35,7 @@ public class Effect extends Modifier{
 		String effectName = fields.get("effect");
 		Check.notNull(effectName, "'effect' field is missing.");
 		
-		if(BrEffectCollection.isProcessing(effectName)){
+		if(BrEffectCollection.isProcessing(effectName)) {
 			throw new YAMLException("'"+effectName+"' effect is currently being processed. "
 					+ "Does this effect have itself as its modifier or does it loop with one to many other effects with the EFFECT modifier? "
 					+ "Please check your YML files.");
@@ -62,7 +66,7 @@ public class Effect extends Modifier{
 			throw new IllegalArgumentException("'"+effect.getName()+"' must be complete for this modifier. Please update the item to add the following values: "+StringsUtil.stringJoiner(effect.getIncomplete(), "&c, &7"));
 			
 	}
-	public Effect(BrEffect effect){
+	public Effect(BrEffect effect) {
 		this.effect = effect;
 		construct();
 	}

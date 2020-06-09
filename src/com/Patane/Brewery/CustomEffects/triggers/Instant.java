@@ -7,10 +7,12 @@ import org.bukkit.entity.LivingEntity;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.ingame.Focus;
 
-@Namer(name="instant")
+@ClassDescriber(
+		name="instant",
+		desc="Instantly applies the Modifier to all living entities hit.")
 public class Instant extends Trigger{
 	
 	public Instant() {

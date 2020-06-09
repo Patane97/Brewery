@@ -35,7 +35,7 @@ public class itemEditEffectsEditSetFilterAdd extends itemEditEffectsEditSetFilte
 		
 		String filterType = args[0].toLowerCase();
 		
-		if(!Arrays.asList(FilterGroups.values()).contains(filterType)){
+		if(!Arrays.asList(FilterGroups.values()).contains(filterType)) {
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid Filter Type.");
 			return true;
 		}

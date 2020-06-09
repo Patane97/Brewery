@@ -55,7 +55,7 @@ public class BrItemYML extends BreweryYAML{
 	public void load() throws IllegalStateException {
 		List<String> loadedNames = new ArrayList<String>();
 		setSelect(getPrefix());
-		for(String itemName : getPrefix().getKeys(false)){
+		for(String itemName : getPrefix().getKeys(false)) {
 			Messenger.debug("Attempting to load Item '"+itemName+"' ...");
 			setSelect(getPrefix());
 			BrItem loadedItem = load(getSection(itemName));
@@ -277,7 +277,7 @@ public class BrItemYML extends BreweryYAML{
 			CustomType type = null;
 			try{
 				type = getEnumFromString(getSelect().getString("type"), CustomType.class);
-			} catch (NullPointerException e){}
+			} catch (NullPointerException e) {}
 			
 			/*
 			 * ==================> ITEM <==================
@@ -288,7 +288,7 @@ public class BrItemYML extends BreweryYAML{
 			Material material = null;
 			try{
 				material = getEnumFromString(getSelect().getString("material"), Material.class);
-			} catch (NullPointerException e){}
+			} catch (NullPointerException e) {}
 			
 			// >>> Name
 			String name = getSelect().getString("name");
@@ -450,7 +450,7 @@ public class BrItemYML extends BreweryYAML{
 			Float cooldown = null;
 			try{
 				cooldown = getFloat("cooldown", getSelect());
-			} catch (NullPointerException e){}
+			} catch (NullPointerException e) {}
 			
 			/*
 			 * ==================> EFFECTS <==================
@@ -461,7 +461,7 @@ public class BrItemYML extends BreweryYAML{
 			List<BrEffect> effects = new ArrayList<BrEffect>();
 			
 			// Loops through each key in effect section
-			for(String effectName : getSelect().getKeys(false)){
+			for(String effectName : getSelect().getKeys(false)) {
 				// Surrounded in try/catch to ensure that one failed effect
 				// doesnt stop other effects from being retrieved.
 				try{
@@ -474,11 +474,11 @@ public class BrItemYML extends BreweryYAML{
 					// Adds the effect to the effects list.
 					effects.add(effect);
 				}
-				catch(NullPointerException e){
+				catch(NullPointerException e) {
 					Messenger.warning("'"+effectName+"' Effect could not been added to '"+itemName+"'. Did the effect fail to load?");
 				}
 				// Generally NullPointerExceptions, however some other can come from retieve if handled incorrectly.
-				catch(Exception e){
+				catch(Exception e) {
 					Messenger.warning("'"+effectName+"' Effect for '"+itemName+" Item failed to be retireved:");
 					e.printStackTrace();
 				}
@@ -490,7 +490,7 @@ public class BrItemYML extends BreweryYAML{
 			if(!Brewery.getItemCollection().hasItem(item.getName()))
 				Brewery.getItemCollection().add(item);
 			return item;
-		} catch(YAMLException e){
+		} catch(YAMLException e) {
 			Messenger.warning("An item failed to be found and loaded:");
 			e.printStackTrace();
 		} catch (IllegalStateException e) {

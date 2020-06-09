@@ -9,6 +9,7 @@ import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.NEWcommands.primary.removeCommand;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -39,7 +40,7 @@ public class removeEffect extends removeCommand {
 		// If no effect with that name exists, do nothing and message appropriately
 		if(!Brewery.getEffectCollection().hasItem(effectName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is no Brewery Effect named &7"+effectName+"&e. Hover to view all Effects!"
-														, StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), "\n&e> &f&l", "&e> &f&l", "")));
+														, StringsUtil.stringJoiner(Brewery.getEffectCollection().getAllIDs(), "\n&2> &f&l", "&2> &f&l", "")));
 			return true;
 		}
 
@@ -50,20 +51,18 @@ public class removeEffect extends removeCommand {
 			// Grabbing the effect
 			effect = Brewery.getEffectCollection().getItem(effectName);
 			
+			// Save removed effect onto hover text with removed layout/title layouts
+			successHoverText = effect.toChatString(0, false, s -> "&c&m"+Chat.replace(s[0], "&c&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m"));
+
 			// Attempt to clear the effect from YML. If this gives us exceptions then we dont remove the effect from the collection
 			BrEffect.YML().clearSection(effect.getName());
 			
 			// Remove effect from collection
 			Brewery.getEffectCollection().remove(effect.getName());
 			
-			// Save removed effect onto hover text with removed layout/title layouts
-			successHoverText = effect.toChatString(0, false);
-		
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
-			successMsg = "&cThere was an error with removing this effect. Hover for error details!";
-			// Save the exception message on hover. Dat shi ugly
-			successHoverText = "&7"+e.getMessage();
+			successMsg = "&cEffect could not be removed due to an error. Please check server console for error trace.";
 			e.printStackTrace();
 		}
 		// Allows the user to view the details on hover

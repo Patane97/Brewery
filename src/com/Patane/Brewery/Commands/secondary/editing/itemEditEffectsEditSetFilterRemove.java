@@ -39,7 +39,7 @@ public class itemEditEffectsEditSetFilterRemove extends itemEditEffectsEditSetFi
 		
 		String filterGroup = args[0].toLowerCase();
 		
-		if(!Arrays.asList(FilterTypes.values()).contains(filterGroup)){
+		if(!Arrays.asList(FilterTypes.values()).contains(filterGroup)) {
 			Messenger.send(sender, "&7"+args[0]+" &cis not a valid Filter Type.");
 			return true;
 		}

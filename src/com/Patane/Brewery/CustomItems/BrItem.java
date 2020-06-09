@@ -27,6 +27,10 @@ import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.ItemsUtil;
 
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+
 
 public class BrItem extends ChatCollectable{
 	/**
@@ -34,10 +38,10 @@ public class BrItem extends ChatCollectable{
 	 */
 	private static BrItemYML yml;
 
-	public static void setYML(BrItemYML yml){
+	public static void setYML(BrItemYML yml) {
 		BrItem.yml = yml;
 	}
-	public static BrItemYML YML(){
+	public static BrItemYML YML() {
 		return yml;
 	}
 	/**
@@ -47,14 +51,16 @@ public class BrItem extends ChatCollectable{
 	protected CustomType type;
 	protected List<BrEffect> effects;
 	protected Float cooldown; // Measured in seconds
+	
+	protected LambdaStrings title = s -> "&f&l"+s[0]+"&r";
 
 	/* ================================================================================
 	 * Constructors
 	 * ================================================================================
 	 */
-	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown){
+	public BrItem(String name, CustomType type, ItemStack item, List<BrEffect> effects, Float cooldown) {
 		super(name);
-		if(Brewery.getItemCollection().hasItem(getName())){
+		if(Brewery.getItemCollection().hasItem(getName())) {
 			throw new IllegalArgumentException(getName()+" already exists!");
 		}
 		setType(type);
@@ -150,7 +156,7 @@ public class BrItem extends ChatCollectable{
 	}
 
 	/* ================================================================================
-	 * ChatStringable Methods
+	 * ChatStringable & ChatHoverable Methods
 	 * ================================================================================
 	 */
 	
@@ -159,12 +165,120 @@ public class BrItem extends ChatCollectable{
 		// Example: &2Type: &7Name
 		return s -> "&2"+s[0]+"&2: &7"+s[1];
 	}
-	/**
-	 * *** NOT IMPLEMENTED YET
-	 */
+
+	@Override
 	public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
-		return "&8Not implemented yet";
+		// If the alternateLayout is null, we want to use the default layout for itself
+		alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+		
+		// Starting with the item name as a bolded title
+		String itemInfo = title.build(getName());
+		
+		// Saving the Type
+		itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Type", type.toString());
+		
+		// Saving the ItemStack
+		if(deep) {
+			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Item", "")
+					  + "\n" + StringsUtil.toChatString(indentCount+1, deep, alternateLayout, item);
+		}
+		else
+			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Item", item.getType().toString());
+		
+		// Saving the Cooldown
+		itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Cooldown", (cooldown != null ? Float.toString(cooldown)+" second"+(cooldown > 1 ? "s" : "") : "None"));
+		
+		// Saving the effects
+		if(deep && effects.size() > 0) {
+			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Effects", "")
+					  + StringsUtil.singleColumnFormatter(indentCount+1, s -> "&2> &7"+s[0], StringsUtil.getCollectableNames(effects).toArray(new String[0]));
+		}
+		else
+			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Effects", Integer.toString(effects.size()));
+		
+		return itemInfo;
 	}
+	
+	@Override
+	public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+		// If the alternateLayout is null, we want to use the default layout for itself
+		alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+		
+		List<TextComponent> componentList = new ArrayList<TextComponent>();
+		
+		// Title
+		TextComponent current = StringsUtil.createTextComponent(Chat.indent(indentCount)+title.build(getName()));
+		componentList.add(current);
+		
+		indentCount++;
+		
+		// Type
+		// Saving Type with layout
+		current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Type", type.toString()));
+		// Saving Hover as Type name and description
+		current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+				"&f&l"+type.toString() 
+			  + "\n&7"+type.getDescription())).create()));
+		componentList.add(current);
+		
+		// ItemStack
+		if(deep) {
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Item", "\n"));
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(ItemsUtil.ItemStackToJSON(item)).create()));
+			componentList.add(current);
+			
+			componentList.addAll(Arrays.asList(StringsUtil.toChatHover(indentCount+1, deep, alternateLayout, item)));
+		}
+		else {
+			// If not deep, show item with type as its only value
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Item", item.getType().toString()));
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(ItemsUtil.ItemStackToJSON(item)).create()));
+			componentList.add(current);
+		}
+			// Set Hover as the itemstack itself
+		
+		// Cooldown
+		if(cooldown != null) {
+			// If not empty, set Cooldown with layout
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Cooldown", Float.toString(cooldown)+" second"+(cooldown > 1 ? "s" : "")));
+			// Show how cooldown works
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+					"&f&lCooldown"
+				  + "\n&7Once used, this item will take "+cooldown+" second"+(cooldown > 1 ? "s" : "")+" to recover its use again.")).create()));
+		}
+		else {
+			// If empty, set cooldown with none
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Cooldown", "None"));
+			// Show how 'none' cooldown works
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+					"&f&lCooldown"
+				  + "\n&7This item does not take any time to recover its use.")).create()));
+		}
+		componentList.add(current);
+		
+		// Effects
+		if(deep && effects.size() > 0) {
+			// Set Effects with layout
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Effects", ""));
+			componentList.add(current);
+			// Loop through effect and show its name and all its details OnHover and add to arraylist
+			for(BrEffect effect : effects) {
+				current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount+1)+"&2> &7"+effect.getName());
+				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r "+effect.toChatString(0, true))).create()));
+				componentList.add(current);
+			}
+		}
+		else {
+			// If not deep, just show the total effect number and show all effects OnHover
+			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Effects", Integer.toString(effects.size())));
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r\n"+StringsUtil.manyToChatString(1, 2, true, null, null, effects.toArray(new BrEffect[0])))).create()));
+			componentList.add(current);
+		}
+		
+		// Return componentList as Array, not arraylist
+		return componentList.toArray(new TextComponent[0]);
+	}
+	
 	/* ================================================================================
 	 * Item Executors
 	 * ================================================================================
@@ -240,7 +354,7 @@ public class BrItem extends ChatCollectable{
 		+(hasEffects() ? "\n&2Effects: &a"+StringsUtil.stringJoiner(effectNames, "&2, &a") : ""));
 	}
 	
-	public static BrItem get(ItemStack item){
+	public static BrItem get(ItemStack item) {
 		String brItemName = ItemEncoder.getString(item, "name");
 		if(brItemName == null)
 			return null;
@@ -314,7 +428,7 @@ public class BrItem extends ChatCollectable{
 		private ItemStack guiItem;
 		private String description;
 		
-		CustomType(Material material, String description){
+		CustomType(Material material, String description) {
 			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.stringSplitter(description, 5, "&7")));
 			this.guiItem = ItemsUtil.addFlavourText(ItemsUtil.setItemNameLore(icon,"&6Item Type: &2"+ItemsUtil.getDisplayName(icon)), "Click to change");
 			this.description = description;

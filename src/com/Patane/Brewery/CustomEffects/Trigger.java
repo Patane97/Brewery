@@ -10,12 +10,15 @@ import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YAML.TypeParsable;
-import com.Patane.util.YAML.Typer;
+import com.Patane.util.annotations.TypeDescriber;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Focus;
 
-@Typer(type="Trigger")
+
+@TypeDescriber(
+		name="Trigger",
+		desc="Defines how or when the Modifier of the attached effect will Trigger on Living Entities.")
 public abstract class Trigger extends TypeParsable{
 
 	public Trigger() {
@@ -108,12 +111,12 @@ public abstract class Trigger extends TypeParsable{
 	 * @param hitEntity LivingEntity to execute the effect on.
 	 * @return The LivingEntity in which the effects were executed on, or null if they are dead.
 	 */
-	protected LivingEntity executeOne(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity){
+	protected LivingEntity executeOne(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity) {
 		// If ignore_user is true and the hit entity is the user, then return null.
 		if(effect.ignoreUser() && executor.equals(hitEntity))
 			return null;
 		// If the entity is dead, do not perform any actions onto them. Let them rest in peace dangit!
-		if(!hitEntity.isDead()){
+		if(!hitEntity.isDead()) {
 			// Applies visual/auditory effects if they focus on Entities.
 			applyByFocus(effect, hitEntity.getEyeLocation(), Focus.ENTITY);
 			
@@ -144,7 +147,7 @@ public abstract class Trigger extends TypeParsable{
 	 * @param executor The LivingEntity who cast the effect.
 	 * @param hitEntity The LivingEntity to apply the modifier to.
 	 */
-	protected void applyModifiers(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity){
+	protected void applyModifiers(BrEffect effect, Location impact, LivingEntity executor, LivingEntity hitEntity) {
 		effect.getModifier().modify(new ModifierInfo(impact, executor, hitEntity));
 	}
 
@@ -154,7 +157,7 @@ public abstract class Trigger extends TypeParsable{
 	 * @param location Location to focus on.
 	 * @param focus Focus type.
 	 */
-	protected void applyByFocus(BrEffect effect, Location location, Focus focus){
+	protected void applyByFocus(BrEffect effect, Location location, Focus focus) {
 		/*
 		 *  Applying Particles
 		 */

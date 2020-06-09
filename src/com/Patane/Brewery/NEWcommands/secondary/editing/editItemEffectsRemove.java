@@ -48,7 +48,7 @@ public class editItemEffectsRemove extends editItemEffects {
 		// If the item does not contain the effect, do nothing and message appropriately
 		if(!item.hasEffect(effectName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&a does not have this Effect. Hover to view which ones it does has!"
-					, BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]))));
+					, StringsUtil.manyToChatString(0, 2, false, null, null, item.getEffects().toArray(new BrEffect[0]))));
 			return true;
 		}
 		// Grabbing effect for later use
@@ -60,7 +60,7 @@ public class editItemEffectsRemove extends editItemEffects {
 		String successMsg = "&aEffect removed from &7"+item.getName()+"&a. Hover to view details!";
 		
 		// Success hover text is all effects remaining on item PLUS the removed effect with 'slashed out' formatting
-		String successHoverText = BrEffect.manyToChatString(0, false, item.getEffects().toArray(new BrEffect[0]));
+		String successHoverText = StringsUtil.manyToChatString(0, 2, false, null, null, item.getEffects().toArray(new BrEffect[0]));
 		
 		// Adding the removed effect.
 		// If there are effects, add them and new lines dividers

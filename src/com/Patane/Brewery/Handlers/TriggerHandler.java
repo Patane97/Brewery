@@ -9,7 +9,7 @@ import com.Patane.Brewery.CustomEffects.triggers.Instant;
 import com.Patane.Brewery.CustomEffects.triggers.Lingering;
 import com.Patane.Brewery.CustomEffects.triggers.Sticky;
 import com.Patane.handlers.PatHandler;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -17,8 +17,8 @@ import com.Patane.util.general.StringsUtil;
 public class TriggerHandler implements PatHandler{
 	private static HashMap<String, Class< ? extends Trigger>> triggers;
 	
-	public static Class< ? extends Trigger> get(String trigger){
-		for(String triggerName : triggers.keySet()){
+	public static Class< ? extends Trigger> get(String trigger) {
+		for(String triggerName : triggers.keySet()) {
 			if(triggerName.equalsIgnoreCase(trigger))
 				return triggers.get(triggerName);
 		}
@@ -28,7 +28,7 @@ public class TriggerHandler implements PatHandler{
 		triggers = new HashMap<String, Class< ? extends Trigger>>();
 //		Reflections reflections = new Reflections("com.Patane.Brewery.CustomEffects.types");
 //		Set<Class<? extends Trigger>> allClasses = reflections.getSubTypesOf(Trigger.class);
-//		for(Class<? extends Trigger> clazz : allClasses){
+//		for(Class<? extends Trigger> clazz : allClasses) {
 //			register(clazz);
 //		}
 		register(Instant.class);
@@ -36,10 +36,10 @@ public class TriggerHandler implements PatHandler{
 		register(Sticky.class);
 		Messenger.debug("Registered Types: "+StringsUtil.stringJoiner(triggers.keySet(), ", "));
 	}
-	private static void register(Class< ? extends Trigger> triggerClass){
-		Namer info = triggerClass.getAnnotation(Namer.class);
-		if(info == null){
-			Messenger.warning("Failed to register Trigger '"+triggerClass.getSimpleName()+".class': Missing annotation!");
+	private static void register(Class< ? extends Trigger> triggerClass) {
+		ClassDescriber info = triggerClass.getAnnotation(ClassDescriber.class);
+		if(info == null) {
+			Messenger.severe("Failed to register Trigger '"+triggerClass.getSimpleName()+".class': Missing annotation! Please contact plugin creator to fix this issue.");
 			return;
 		}
 		triggers.put(info.name(), triggerClass);

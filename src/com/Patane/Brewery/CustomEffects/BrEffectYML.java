@@ -239,7 +239,7 @@ public class BrEffectYML extends BreweryYAML{
 	 * @param defaultHeader The default root that will be used to fill any values that could not be determined/found in the YML. If this is set to null, then the YML MUST provide all details, or the effect's retrieval will fail.
 	 * @param incompleteAllowed Whether essential values (such as Trigger) can be missing. Generally true if this is retireving a default effect.
 	 */
-	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader){
+	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader) {
 		// Setting the name of the current essential task. Used to give a little bit of info when errors occur.
 //		String essentialTask = null;
 		try{			
@@ -273,8 +273,8 @@ public class BrEffectYML extends BreweryYAML{
 			try{
 				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 				modifier = getMapParsable(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
-			} catch (YAMLException e){
-			} catch (ClassNotFoundException e){
+			} catch (YAMLException e) {
+			} catch (ClassNotFoundException e) {
 				throw new ClassNotFoundException("Type required for 'modifier' is missing or unknown.");
 			}
 
@@ -296,8 +296,8 @@ public class BrEffectYML extends BreweryYAML{
 				try{
 					// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 					trigger = getMapParsable(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
-				} catch (YAMLException e){
-				} catch (ClassNotFoundException e){
+				} catch (YAMLException e) {
+				} catch (ClassNotFoundException e) {
 					throw new ClassNotFoundException("'type' field is required but missing.");
 				}
 			}
@@ -361,7 +361,7 @@ public class BrEffectYML extends BreweryYAML{
 			Filter filter = null;
 			
 			// If either the base or the default headers have a filter, then its added (base taking priority).
-				if(currentHeader != null){
+				if(currentHeader != null) {
 					// This is within a try/catch because it is optional.
 					// If it failed, we dont want to halt the entire retrieval process.
 					try{
@@ -371,7 +371,7 @@ public class BrEffectYML extends BreweryYAML{
 						filter = new Filter(target, ignore);
 					} 
 					// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-					catch(Exception e){
+					catch(Exception e) {
 						Messenger.warning("Failed to retrieve "+effectName+" filter:");
 						e.printStackTrace();
 					}
@@ -387,7 +387,7 @@ public class BrEffectYML extends BreweryYAML{
 			// BrTag is null if there are no tags in the base or default headers.
 			BrTag tag = null;
 			// If either the base or the default headers have a tag, then its added (base taking priority).
-			if(currentHeader != null){
+			if(currentHeader != null) {
 				// This is within a try/catch because it is optional.
 				// If it failed, we dont want to halt the entire retrieval process.
 				try{
@@ -397,7 +397,7 @@ public class BrEffectYML extends BreweryYAML{
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-				catch(Exception e){
+				catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" tag:");
 					e.printStackTrace();
 				}
@@ -415,7 +415,7 @@ public class BrEffectYML extends BreweryYAML{
 			BrParticleEffect particleEffect = null;
 
 			// If either the base or the default headers have a particle, then its added (base taking priority).
-			if(currentHeader != null){
+			if(currentHeader != null) {
 				// This is within a try/catch because it is optional.
 				// If it failed, we dont want to halt the entire retrieval process.
 				try{
@@ -425,7 +425,7 @@ public class BrEffectYML extends BreweryYAML{
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-				catch(Exception e){
+				catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" particle effect:");
 					e.printStackTrace();
 				}
@@ -442,7 +442,7 @@ public class BrEffectYML extends BreweryYAML{
 			BrSoundEffect soundEffect = null;
 
 			// If either the base or the default headers have a sound, then its added (base taking priority).
-			if(currentHeader != null){
+			if(currentHeader != null) {
 				// This is within a try/catch because it is optional.
 				// If it failed, we dont want to halt the entire retrieval process.
 				try{
@@ -452,7 +452,7 @@ public class BrEffectYML extends BreweryYAML{
 				} 
 				
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-				catch(Exception e){
+				catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" sound effect:");
 					e.printStackTrace();
 				}
@@ -470,10 +470,10 @@ public class BrEffectYML extends BreweryYAML{
 			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 			
 			// If either the base or the default headers have potion effects, then they are added (base taking priority).
-			if(currentHeader != null){
+			if(currentHeader != null) {
 				
 				// Loops through each potion effect on the list.
-				for(String potionName : currentHeader.getKeys(false)){
+				for(String potionName : currentHeader.getKeys(false)) {
 					// This is within a try/catch because it is optional.
 					// If it failed, we dont want to halt the entire retrieval process.
 					try{
@@ -485,7 +485,7 @@ public class BrEffectYML extends BreweryYAML{
 						if(potionEffect != null) potionEffects.add(potionEffect);
 						
 					// Throws a NullPointerException if the potionEffect is null and debugging is on.
-					} catch(NullPointerException e){
+					} catch(NullPointerException e) {
 						Messenger.warning("Failed to retrieve "+effectName+" potion effect '"+potionName+"':");
 						e.printStackTrace();
 					}
@@ -500,7 +500,7 @@ public class BrEffectYML extends BreweryYAML{
 				Brewery.getEffectCollection().add(effect);
 			
 			return effect;
-		} catch(YAMLException e){
+		} catch(YAMLException e) {
 			Messenger.warning("An effect failed to be found and loaded:");
 			e.printStackTrace();
 		} catch(Exception e) {
@@ -524,7 +524,7 @@ public class BrEffectYML extends BreweryYAML{
 	 * @param defaultHeader The default root that will be used to fill any values that could not be determined/found in the YML. If this is set to null, then the YML MUST provide all details, or the effect's retrieval will fail.
 	 * @param incompleteAllowed Whether essential values (such as Trigger) can be missing. Generally true if this is retireving a default effect.
 	 */
-//	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader){
+//	public static BrEffect retrieve(ConfigurationSection baseHeader, ConfigurationSection defaultHeader) {
 //		// Setting the name of the current essential task. Used to give a little bit of info when errors occur.
 //		String essentialTask = null;
 //		try{			
@@ -558,8 +558,8 @@ public class BrEffectYML extends BreweryYAML{
 //			try{
 //				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 //				modifier = getMapParsable(currentHeader, getSection(defaultHeader, "modifier"), ModifierHandler.get(modifierName), "type");
-//			} catch (YAMLException e){
-//			} catch (ClassNotFoundException e){
+//			} catch (YAMLException e) {
+//			} catch (ClassNotFoundException e) {
 //				throw new ClassNotFoundException("Type required for 'modifier' is missing.");
 //			}
 //
@@ -580,8 +580,8 @@ public class BrEffectYML extends BreweryYAML{
 //			try{
 //				// Setting the modifier using the currentHeader, defaultHeader and getSimpleClassDefault method.
 //				trigger = getMapParsable(currentHeader, getSection(defaultHeader, "trigger"), TriggerHandler.get(triggerName), "type");
-//			} catch (YAMLException e){
-//			} catch (ClassNotFoundException e){
+//			} catch (YAMLException e) {
+//			} catch (ClassNotFoundException e) {
 //				throw new ClassNotFoundException("'type' field is required but missing.");
 //			}
 //			
@@ -644,7 +644,7 @@ public class BrEffectYML extends BreweryYAML{
 //			Filter filter = null;
 //			
 //			// If either the base or the default headers have a filter, then its added (base taking priority).
-//				if(currentHeader != null){
+//				if(currentHeader != null) {
 //					// This is within a try/catch because it is optional.
 //					// If it failed, we dont want to halt the entire retrieval process.
 //					try{
@@ -654,7 +654,7 @@ public class BrEffectYML extends BreweryYAML{
 //						filter = new Filter(target, ignore);
 //					} 
 //					// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-//					catch(Exception e){
+//					catch(Exception e) {
 //						Messenger.warning("Failed to retrieve "+effectName+" filter:");
 //						e.printStackTrace();
 //					}
@@ -670,7 +670,7 @@ public class BrEffectYML extends BreweryYAML{
 //			// BrTag is null if there are no tags in the base or default headers.
 //			BrTag tag = null;
 //			// If either the base or the default headers have a tag, then its added (base taking priority).
-//			if(currentHeader != null){
+//			if(currentHeader != null) {
 //				// This is within a try/catch because it is optional.
 //				// If it failed, we dont want to halt the entire retrieval process.
 //				try{
@@ -680,7 +680,7 @@ public class BrEffectYML extends BreweryYAML{
 //				} 
 //				
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-//				catch(Exception e){
+//				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" tag:");
 //					e.printStackTrace();
 //				}
@@ -698,7 +698,7 @@ public class BrEffectYML extends BreweryYAML{
 //			BrParticleEffect particleEffect = null;
 //
 //			// If either the base or the default headers have a particle, then its added (base taking priority).
-//			if(currentHeader != null){
+//			if(currentHeader != null) {
 //				// This is within a try/catch because it is optional.
 //				// If it failed, we dont want to halt the entire retrieval process.
 //				try{
@@ -708,7 +708,7 @@ public class BrEffectYML extends BreweryYAML{
 //				} 
 //				
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-//				catch(Exception e){
+//				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" particle effect:");
 //					e.printStackTrace();
 //				}
@@ -725,7 +725,7 @@ public class BrEffectYML extends BreweryYAML{
 //			BrSoundEffect soundEffect = null;
 //
 //			// If either the base or the default headers have a sound, then its added (base taking priority).
-//			if(currentHeader != null){
+//			if(currentHeader != null) {
 //				// This is within a try/catch because it is optional.
 //				// If it failed, we dont want to halt the entire retrieval process.
 //				try{
@@ -735,7 +735,7 @@ public class BrEffectYML extends BreweryYAML{
 //				} 
 //				
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-//				catch(Exception e){
+//				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" sound effect:");
 //					e.printStackTrace();
 //				}
@@ -753,10 +753,10 @@ public class BrEffectYML extends BreweryYAML{
 //			List<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 //			
 //			// If either the base or the default headers have potion effects, then they are added (base taking priority).
-//			if(currentHeader != null){
+//			if(currentHeader != null) {
 //				
 //				// Loops through each potion effect on the list.
-//				for(String potionName : currentHeader.getKeys(false)){
+//				for(String potionName : currentHeader.getKeys(false)) {
 //					// This is within a try/catch because it is optional.
 //					// If it failed, we dont want to halt the entire retrieval process.
 //					try{
@@ -768,7 +768,7 @@ public class BrEffectYML extends BreweryYAML{
 //						if(potionEffect != null) potionEffects.add(potionEffect);
 //						
 //					// Throws a NullPointerException if the potionEffect is null and debugging is on.
-//					} catch(NullPointerException e){
+//					} catch(NullPointerException e) {
 //						Messenger.warning("Failed to retrieve "+effectName+" potion effect '"+potionName+"':");
 //						e.printStackTrace();
 //					}
@@ -783,7 +783,7 @@ public class BrEffectYML extends BreweryYAML{
 //				Brewery.getEffectCollection().add(effect);
 //			
 //			return effect;
-//		} catch(YAMLException e){
+//		} catch(YAMLException e) {
 //			Messenger.warning("An effect failed to be found and loaded:");
 //			e.printStackTrace();
 //		} catch(Exception e) {

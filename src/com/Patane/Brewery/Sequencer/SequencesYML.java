@@ -14,11 +14,11 @@ public class SequencesYML extends BreweryYAML{
 
 	@Override
 	public void load() {
-		for(String seqName : getSelect().getKeys(false)){
+		for(String seqName : getSelect().getKeys(false)) {
 //			int currentDelay = 0;
 			setSelect(seqName);
-//			for(String keyName : getSelect().getKeys(false)){
-////				switch(keyName){
+//			for(String keyName : getSelect().getKeys(false)) {
+////				switch(keyName) {
 ////				case "Effect":
 ////					// Need to work in Trigger somehow
 ////					break;

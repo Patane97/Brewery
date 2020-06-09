@@ -3,11 +3,15 @@ package com.Patane.Brewery.CustomEffects.modifiers;
 import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
-import com.Patane.util.YAML.Namer;
+import com.Patane.util.annotations.ClassDescriber;
+import com.Patane.util.annotations.FieldDescriber;
 import com.Patane.util.general.Check;
 
-@Namer(name="heal")
+@ClassDescriber(
+		name="heal",
+		desc="Heals a living entity for a certain amount.")
 public class Heal extends Modifier{
+	@FieldDescriber(desc="Amount of healing applied to the living entity.")
 	public double amount;
 	
 	public Heal() {
@@ -24,7 +28,7 @@ public class Heal extends Modifier{
 		amount = Check.greaterThan(getDouble(fields, "amount"), 0, "Amount must be greater than 0.");
 	}
 	
-	public Heal(double amount){
+	public Heal(double amount) {
 		this.amount = amount;
 		construct();
 	}

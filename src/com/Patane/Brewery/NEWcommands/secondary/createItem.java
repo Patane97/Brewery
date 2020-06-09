@@ -3,6 +3,7 @@ package com.Patane.Brewery.NEWcommands.secondary;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.CustomItems.BrItem.CustomType;
 import com.Patane.Brewery.NEWcommands.primary.createCommand;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -49,47 +51,41 @@ public class createItem extends createCommand {
 		
 		// Checking item name is given
 		if(args.length < 1) {
-			Messenger.send(player, "&cPlease specify a name for the item.");
+			Messenger.send(player, "&cPlease provide a name for the item.");
 			return true;
 		}
 		
 		// Setting name
 		String itemName = Commands.combineArgs(args);
-
-		// *** Not implemented yet
-		// Storing these as its used multiple times and looks messy :3
-//		LambdaStrings title = s -> "&f&l"+s[0];
-//		LambdaStrings layout = s -> "&2"+s[0]+": &7"+s[1];
+		
+		BrItem item = null;
 		
 		// If an item with that name already exists, do nothing and message appropriately
 		if(Brewery.getItemCollection().hasItem(itemName)) {
-			// *** Need to add item 'toChatString' here when created
-			Messenger.send(player, StringsUtil.hoverText("&eThere is already a Brewery Item named &7"+itemName+" &e. Hover to view its details!"
-														,"&8Not implemented yet"));
+			item = Brewery.getItemCollection().getItem(itemName);
+			Messenger.send(player, StringsUtil.hoverText("&eThere is already a Brewery Item named &7"+itemName+"&e. Hover to view its details!"
+														, item.toChatString(0, false)));
 			return true;
 		}
 		String successMsg = "&aCreated a new Brewery Item. Hover to view its details!";
 		String successHoverText = null;
 		
 		try {
-			BrItem item = new BrItem(itemName, CustomType.HITTABLE, itemStack, null, null);
+			item = new BrItem(itemName, CustomType.HITTABLE, itemStack, null, null);
 			
+
+			// Save new effect onto hover text
+			successHoverText = item.toChatString(0, true, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
+
 			// Attempt to save the item to YML. If this gives us exceptions then we dont add the item to the collection
 			BrItem.YML().save(item);
 			
 			// Add item to collection
 			Brewery.getItemCollection().add(item);
-
-			// Save new effect onto hover text
-			// *** Not implemented yet
-//			successHoverText = BrItem.manyToChatString(title, layout, false, item);
-			successHoverText = "&8Not implemented yet";
 			
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
-			successMsg = "&cThere was an error with creating this item. Hover for error details!";
-			// Save the exception message on hover. Dat shi ugly
-			successHoverText = "&7"+e.getMessage();
+			successMsg = "&cItem could not be created due to an error. Please check server console for error trace.";
 			e.printStackTrace();
 		}
 		// Allows the user to view the details on hover

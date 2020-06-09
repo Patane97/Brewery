@@ -11,12 +11,15 @@ import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.util.general.Chat;
+import com.Patane.util.general.ChatHoverable;
 import com.Patane.util.general.ChatStringable;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.LocationsUtil;
 
-public class Filter implements ChatStringable{
+import net.md_5.bungee.api.chat.TextComponent;
+
+public class Filter implements ChatStringable, ChatHoverable{
 	private FilterType target;
 	private FilterType ignore;
 	
@@ -51,16 +54,16 @@ public class Filter implements ChatStringable{
 	}
 	
 	public boolean hasEntities() {
-		return (target.getEntities().isEmpty() && target.getEntities().isEmpty() ? false : true);
+		return (target.getEntities().isEmpty() && ignore.getEntities().isEmpty() ? false : true);
 	}
 	public boolean hasPlayers() {
-		return (target.getPlayers().isEmpty() && target.getPlayers().isEmpty() ? false : true);
+		return (target.getPlayers().isEmpty() && ignore.getPlayers().isEmpty() ? false : true);
 	}
 	public boolean hasPermissions() {
-		return (target.getPermissions().isEmpty() && target.getPermissions().isEmpty() ? false : true);
+		return (target.getPermissions().isEmpty() && ignore.getPermissions().isEmpty() ? false : true);
 	}
 	public boolean hasTags() {
-		return (target.getTags().isEmpty() && target.getTags().isEmpty() ? false : true);
+		return (target.getTags().isEmpty() && ignore.getTags().isEmpty() ? false : true);
 	}
 	public boolean isActive() {
 		return (target.noFilter() && ignore.noFilter() ? false : true);
@@ -161,10 +164,8 @@ public class Filter implements ChatStringable{
 	
 	@Override
 	public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
-		// USEFUL SECTION TO COPY TO OTHER TOCHATSTRINGS!
 		// If the alternateLayout is null, we want to use the default layout for itself
 		alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
-		// //////////////////////////////////////////////
 
 		// If it is inactive, show it
 		if(!isActive())
@@ -214,6 +215,79 @@ public class Filter implements ChatStringable{
 			filterString += "\n" + Chat.indent(indentCount) + insert.build(selectedSymbol, value);
 		
 		return filterString;
+	}
+
+	@Override
+	public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+		// If the alternateLayout is null, we want to use the default layout for itself
+		alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+
+		List<TextComponent> componentList = new ArrayList<TextComponent>();
+		
+		TextComponent current;
+		// If it is inactive, show it
+		if(!isActive()) {
+			current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build("Filter", "&8Inactive")
+			, "&f&lFilter"
+			+ "&7The filter is not currently active. All living entities are being targetted.");
+			componentList.add(current);
+		}
+		
+		// If its not deep, we just want to show the filter and how many elements it is targetting and ignoring
+		// Current format: Active (TICK5 CROSS3)
+		if(!deep) {
+			current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build("Filter", 
+					"Active ("+FilterTypes.TARGET.symbol+"&7"+target.getSize()+" "+FilterTypes.IGNORE.symbol+"&7"+ignore.getSize()+")")
+			, this.toChatString(0, true, alternateLayout));
+			componentList.add(current);
+		}
+		else {
+			// Adding the filter title with descriptive hover text
+			current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build("Filter", "")
+			, "&f&lFilter"
+			+ String.format("\n&7Determines if a living entity should be hit with the attached effect through being either targetted (%s&7) or ignored (%s&7).", FilterTypes.TARGET.symbol, FilterTypes.IGNORE.symbol));
+			// Adding filter title
+			componentList.add(current);
+			
+			// If this filter has entities, add it to componentList with descriptive hover text
+			if(hasEntities()) {
+				current = StringsUtil.hoverText(entitiesToChatString(indentCount+1, false, alternateLayout)
+						, "&f&lEntities"
+						+ String.format("\n&7Living entities of this entity type will be either targetted (%s&7) or ignored (%s&7).", FilterTypes.TARGET.symbol, FilterTypes.IGNORE.symbol));
+				componentList.add(current);
+			}
+			
+			// If this filter has players, add it to componentList with descriptive hover text
+			if(hasPlayers()) {
+				current = StringsUtil.hoverText(playersToChatString(indentCount+1, false, alternateLayout)
+						, "&f&lPlayers"
+						+ String.format("\n&7Players with these names will be either targetted (%s&7) or ignored (%s&7).", FilterTypes.TARGET.symbol, FilterTypes.IGNORE.symbol));
+				componentList.add(current);
+			}
+			
+			// If this filter has permissions, add it to componentList with descriptive hover text
+			if(hasPermissions()) {
+				current = StringsUtil.hoverText(permissionsToChatString(indentCount+1, false, alternateLayout)
+						, "&f&lPermissions"
+						+ String.format("\n&7Players with these permissions will be either targetted (%s&7) or ignored (%s&7).", FilterTypes.TARGET.symbol, FilterTypes.IGNORE.symbol));
+				componentList.add(current);
+			}
+			
+			// If this filter has tags, add it to componentList with descriptive hover text
+			if(hasTags()) {
+				current = StringsUtil.hoverText(tagsToChatString(indentCount+1, false, alternateLayout)
+						, "&f&lTags"
+						+ String.format("\n&7Living entities with these effect tags will be either targetted (%s&7) or ignored (%s&7).", FilterTypes.TARGET.symbol, FilterTypes.IGNORE.symbol));
+				componentList.add(current);
+			}
+		}
+		
+		// Returns the filter component list.
+		return componentList.toArray(new TextComponent[0]);
+	}
+	@Override
+	public TextComponent[] toChatHover(int indentCount, boolean deep) {
+		return toChatHover(indentCount, deep, null);
 	}
 	/* ================================================================================
 	 * Private ChatStringable-related Methods
@@ -311,20 +385,20 @@ public class Filter implements ChatStringable{
 	 * @param entities
 	 * @return
 	 */
-	public List<LivingEntity> filter(List<LivingEntity> entities){
+	public List<LivingEntity> filter(List<LivingEntity> entities) {
 		List<LivingEntity> filtered = new ArrayList<LivingEntity>();
 		// Loops through each entity given.
-		for(LivingEntity entity : entities){
+		for(LivingEntity entity : entities) {
 			// Checks if the entity must be ignored (Ignore takes priority over Target)
 			// If 'ignore' doesnt match and 'target' DOES match.
-			if(!ignore.match(entity) && target.match(entity)){
+			if(!ignore.match(entity) && target.match(entity)) {
 				filtered.add(entity);
 			}
 		}
 		return filtered;
 	}
 	
-	public List<LivingEntity> filter(LivingEntity entity){
+	public List<LivingEntity> filter(LivingEntity entity) {
 		List<LivingEntity> filtered = new ArrayList<LivingEntity>();
 		// Checks if the entity must be ignored (Ignore takes priority over Target)
 		// If 'ignore' doesnt match and 'target' DOES match.
@@ -333,7 +407,7 @@ public class Filter implements ChatStringable{
 		return filtered;
 	}
 	
-	public List<LivingEntity> filter(Location impact, float radius){
+	public List<LivingEntity> filter(Location impact, float radius) {
 //		return filter(LocationsUtil.getEntities(impact, radius));
 		return filter(LocationsUtil.getRadius(impact, radius));
 	}
@@ -350,7 +424,7 @@ public class Filter implements ChatStringable{
 		TARGET("&f\u2714"), IGNORE("&8\u2718");
 		
 		public String symbol;
-		FilterTypes(String symbol){
+		FilterTypes(String symbol) {
 			this.symbol = symbol;
 		}
 	}
@@ -372,7 +446,7 @@ public class Filter implements ChatStringable{
 		
 		private boolean defaultReturn;
 		
-		public FilterType(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn){
+		public FilterType(List<EntityType> entities, List<String> players, List<String> permissions, List<String> tags, boolean defaultReturn) {
 			this.entities = (entities == null ? new ArrayList<EntityType>() : entities);
 			this.players = (players == null ? new ArrayList<String>() : players);
 			this.permissions = (permissions == null ? new ArrayList<String>() : permissions);
@@ -417,7 +491,7 @@ public class Filter implements ChatStringable{
 			return totalSize;
 		}
 		
-		public List<EntityType> getEntities(){
+		public List<EntityType> getEntities() {
 			return entities;
 		}
 		private void addEntity(EntityType entityType) {
@@ -429,7 +503,7 @@ public class Filter implements ChatStringable{
 				totalSize --;
 		}
 		
-		public List<String> getPlayers(){
+		public List<String> getPlayers() {
 			return players;
 		}
 		private void addPlayer(String player) {
@@ -441,7 +515,7 @@ public class Filter implements ChatStringable{
 				totalSize --;
 		}
 		
-		public List<String> getPermissions(){
+		public List<String> getPermissions() {
 			return permissions;
 		}
 		private void addPermission(String permission) {
@@ -453,7 +527,7 @@ public class Filter implements ChatStringable{
 				totalSize --;
 		}
 		
-		public List<String> getTags(){
+		public List<String> getTags() {
 			return tags;
 		}
 		private void addTag(String tag) {
@@ -487,33 +561,33 @@ public class Filter implements ChatStringable{
 					return false;
 			return true;
 		}
-		public boolean match(LivingEntity entity){
+		public boolean match(LivingEntity entity) {
 			// If there is no filter, then the entity automatically passes.
-			if(noFilter()){
+			if(noFilter()) {
 				return defaultReturn;
 			}
 			// Looping through each EntityType in entities
-			for(EntityType entityType : entities){
+			for(EntityType entityType : entities) {
 				// If the group matches, they pass.
 				if(entity.getType() == entityType)
 					return true;
 			}
 			// Looping through each Tag.
-			for(String tag : tags){
+			for(String tag : tags) {
 				// Checks if the regex with the tag matches the entity.
 				if(BrMetaDataHandler.check(entity, "<TAG-"+tag+">"))
 					return true;
 			}
 			// If the entity is a player
-			if(entity instanceof Player){
+			if(entity instanceof Player) {
 				// Loop through player strings (can be name OR UUID)
-				for(String player : players){
+				for(String player : players) {
 					// Checks if the name OR UUID matches. If so, they pass.
 					if(entity.getName().equals(player) || entity.getUniqueId().toString().equals(player))
 						return true;
 				}
 				// Loop through permission strings
-				for(String permission : permissions){
+				for(String permission : permissions) {
 					// Checks if the player entity has given permission.
 					if(entity.hasPermission(permission))
 						return true;
@@ -608,19 +682,19 @@ public class Filter implements ChatStringable{
 //		filterGroups.get(filterGroup).getList(t)
 //	}
 //	
-//	public List<EntityType> getEntities(){
+//	public List<EntityType> getEntities() {
 //		return filterGroups.get(FilterGroup.ENTITIES).getList(EntityType.class);
 //	}
 //	
-//	public List<String> getPlayers(){
+//	public List<String> getPlayers() {
 //		return filterGroups.get(FilterGroup.PLAYERS).getList(String.class);
 //	}
 //	
-//	public List<String> getPermissions(){
+//	public List<String> getPermissions() {
 //		return filterGroups.get(FilterGroup.PERMISSIONS).getList(String.class);
 //	}
 //	
-//	public List<String> getTags(){
+//	public List<String> getTags() {
 //		return filterGroups.get(FilterGroup.TAGS).getList(String.class);
 //	}
 //	
@@ -642,11 +716,11 @@ public class Filter implements ChatStringable{
 //	}
 //	
 //	@SuppressWarnings("unchecked")
-//	public <L> List<L> getList(T type){
+//	public <L> List<L> getList(T type) {
 //		return (List<L>) groupList;
 //	}
 //	
-//	public List<T> getList(){
+//	public List<T> getList() {
 //		return groupList;
 //	}
 //	
@@ -659,7 +733,7 @@ public class Filter implements ChatStringable{
 //	
 //	public final Class<?> clazz;
 //	
-//	FilterGroup(Class<?> clazz){
+//	FilterGroup(Class<?> clazz) {
 //		this.clazz = clazz;
 //	}
 //}
