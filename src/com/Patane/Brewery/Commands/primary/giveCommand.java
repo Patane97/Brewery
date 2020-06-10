@@ -1,6 +1,5 @@
 package com.Patane.Brewery.Commands.primary;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -8,15 +7,18 @@ import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Commands.CommandHandler.CommandPackage;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
+import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
+import com.Patane.util.ingame.Commands;
+
+import net.md_5.bungee.api.chat.TextComponent;
 
 @CommandInfo(
 	name = "give",
-	description = "Gives a specified player a specified Brewery item.",
+	description = "Gives a player a Brewery Item. Player must currently be on the server to receive the item.",
 	usage = "/brewery give <player> <item name>",
 	permission = "brewery.give",
 	maxArgs = 2
@@ -25,54 +27,68 @@ public class giveCommand extends PatCommand {
 	
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
-		// Checks if there is more than 1 argument. If not, player name is missing.
+		
+		// Checks if player name is given
 		if(args.length < 1) { 
-			Messenger.send(sender, "&cPlease specify a player name.");
-			return false;
+			Messenger.send(sender, "&cPlease specify a players display name.");
+			return true;
 		}
 		
-		Player target = null;
-		// Loops through each online player and checks if the first arg is their name.
-		for(Player player : Brewery.getInstance().getServer().getOnlinePlayers()) {
-			if(args[0].equalsIgnoreCase(player.getPlayerListName())) {
-				target = player;
+		Player player = null;
+		
+		// Finding the target player.
+		// If it is a player as sender, we only allow all VISIBLE online players to be selected.
+		// When a player is invisible to the sender but still online, they will be treated as if they were offline
+		// This is ignored if it is not a Player sending the command (ie. the Console can see all players)
+		for(Player onlinePlayer : (sender instanceof Player ? GeneralUtil.getVisibleOnlinePlayers((Player) sender): GeneralUtil.getOnlinePlayers())) {
+			if(args[0].equalsIgnoreCase(onlinePlayer.getPlayerListName())) {
+				player = onlinePlayer;
 				break;
 			}
+			Messenger.send(sender, "&7"+args[0]+" &e is currently not online or does not exist.");
+			return true;
 		}
-		// Checks if player was found currently on server.
-		if(target == null) {
-			Messenger.send(sender, "&7"+args[0]+" &cis not online or does not exist.");
-			return false;
-		}
-		
-		// Sets the item name to the rest of the args given.
-		String itemName = StringsUtil.stringJoiner(Arrays.copyOfRange(args, 1, args.length), " ");
-		
-		// Checks if itemname cannot be constructed into a string for any reason.
-		if(itemName == null || itemName.trim().isEmpty()) {
-			Messenger.send(sender, "&cPlease specify an item name.");
-			return false;
+		// Checks if item name is given
+		if(args.length < 2) { 
+			Messenger.send(sender, "&cPlease specify an item to give.");
+			return true;
 		}
 		
-		// Grabs the BrItem using the itemName.
+		// Grab the item name from remaining arguments
+		String itemName = Commands.combineArgs(args, 1, args.length);
+		
+		// If no effect with that name exists, do nothing and message appropriately
+		if(!Brewery.getItemCollection().hasItem(itemName)) {
+			Messenger.send(sender, StringsUtil.hoverText("&eThere is no Brewery Item named &7"+itemName+"&e. Hover to view all Items!"
+														, StringsUtil.stringJoiner(Brewery.getItemCollection().getAllIDs(), "\n&2> &f&l", "&2> &f&l", "")));
+			return true;
+		}
+		
+		// Grabbing the item
 		BrItem item = Brewery.getItemCollection().getItem(itemName);
+
+		String successMsg = "&aGiving &7"+player.getDisplayName()+"&a a &7"+item.getName()+"&a. Hover to view its details!";
+
+		String successHoverText = item.toChatString(0, true);
 		
-		if(item == null) {
-			Messenger.send(sender, "&cThere is no item with the name &7"+itemName+"&c.");
-			return false;
-		}
+		// Give the player the itemStack
+		player.getInventory().addItem(item.generateItem());
 		
-		target.getInventory().addItem(item.generateItem());
-		Messenger.send(sender, "&aGiving &7"+target.getDisplayName()+"&a a &7"+item.getName()+"&a.");
-			
+		// Allows the user to view the details on hover
+		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
+		
+		// Send the hover message to sender
+		Messenger.send(sender, successMsgComponent);
 		return true;
 	}
-	
+
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, CommandPackage thisPackage) {
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		switch(args.length) {
-			case 2: return StringsUtil.getOnlinePlayerNames();
-			default: return Brewery.getItemCollection().getAllIDs();
+			case 1: return (sender instanceof Player 
+					? StringsUtil.getVisibleOnlinePlayerNames((Player) sender)
+					: StringsUtil.getOnlinePlayerNames()) ;
+			default: return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
 		}
 	}
 }

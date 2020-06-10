@@ -35,7 +35,7 @@ public class Polymorph extends Modifier{
 	
 	@FieldDescriber(desc="Mob to transform the living entity into.")
 	public EntityType entity;
-	@FieldDescriber(desc="Duration the living entity is transformed for.")
+	@FieldDescriber(desc="Duration the living entity is transformed for. Measured in server ticks (1s = 20ticks).")
 	public int duration;
 	
 	public Polymorph() {
@@ -50,7 +50,7 @@ public class Polymorph extends Modifier{
 	@Override
 	protected void populateFields(Map<String, String> fields) {
 		entity = getEnumValue(EntityType.class, fields, "entity");
-		duration = Math.round(Check.greaterThan((float) getDouble(fields, "duration")*20, 0, "Duration must be greater than 0."));
+		duration = Math.round(Check.greaterThan((float) getDouble(fields, "duration"), 0, "Duration must be greater than 0."));
 	}
 	
 	public Polymorph(EntityType entity, int duration) {
@@ -65,7 +65,7 @@ public class Polymorph extends Modifier{
 	@Override
 	protected void valueConverts() {
 		// duration is converted from MC ticks to seconds (20 ticks = 1 second)
-		customValueConverter.put("duration", i -> (int)i/20+"s");
+		customValueConverter.put("duration", i -> (int)i+" ticks");
 	}
 	/* 
 	 * ================================================================================

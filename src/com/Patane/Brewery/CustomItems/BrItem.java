@@ -125,15 +125,6 @@ public class BrItem extends ChatCollectable{
 			}
 		}
 	}
-	public void updateEffect(BrEffect newBrEffect) {
-		for(BrEffect brEffect : effects) {
-			if(brEffect.getName().equalsIgnoreCase(newBrEffect.getName())) {
-				effects.remove(brEffect);
-				effects.add(newBrEffect);
-				return;
-			}
-		}
-	}
 	
 	public boolean hasCooldown() {
 		return (cooldown == null ? false :  true);
@@ -271,7 +262,9 @@ public class BrItem extends ChatCollectable{
 		else {
 			// If not deep, just show the total effect number and show all effects OnHover
 			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Effects", Integer.toString(effects.size())));
-			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r\n"+StringsUtil.manyToChatString(1, 2, true, null, null, effects.toArray(new BrEffect[0])))).create()));
+			// If there are effects, show them on hover.
+			if(effects.size() > 0)
+				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r\n"+StringsUtil.manyToChatString(1, 2, true, null, null, effects.toArray(new BrEffect[0])))).create()));
 			componentList.add(current);
 		}
 		

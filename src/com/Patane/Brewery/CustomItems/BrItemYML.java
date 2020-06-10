@@ -40,7 +40,6 @@ public class BrItemYML extends BreweryYAML{
 		List<String> savedNames = new ArrayList<String>();
 		setSelect(getPrefix());
 		for(BrItem item : Brewery.getItemCollection().getAllItems()) {
-			Messenger.debug("Attempting to save Item '"+item.getName()+"' ...");
 			setSelect(getPrefix());
 			if(save(item))
 				savedNames.add(item.getName());
@@ -54,13 +53,10 @@ public class BrItemYML extends BreweryYAML{
 	@Override
 	public void load() throws IllegalStateException {
 		List<String> loadedNames = new ArrayList<String>();
-		setSelect(getPrefix());
 		for(String itemName : getPrefix().getKeys(false)) {
-			Messenger.debug("Attempting to load Item '"+itemName+"' ...");
-			setSelect(getPrefix());
-			BrItem loadedItem = load(getSection(itemName));
-			if(loadedItem != null)
-				loadedNames.add(loadedItem.getName());
+			BrItem item = load(itemName);
+			if(item != null)
+				loadedNames.add(item.getName());
 		}
 		setSelect(getPrefix());
 		Messenger.info("Successfully loaded Items: "+StringsUtil.stringJoiner(loadedNames, ", "));
@@ -71,6 +67,7 @@ public class BrItemYML extends BreweryYAML{
 			// Making sure item is not null.
 			Check.notNull(item, "Item is null");
 
+			Messenger.info("Saving Item: "+item.getName());
 			/*
 			 * ==================> NAME <==================
 			 */
@@ -258,8 +255,16 @@ public class BrItemYML extends BreweryYAML{
 		return false;
 	}
 	
-	public BrItem load(ConfigurationSection section) throws IllegalStateException{
+	public BrItem load(String itemName) throws IllegalStateException{
 		try{
+			Messenger.info("Loading Item: "+itemName);
+			
+			// Resetting prefix
+			setSelect(getPrefix());
+			
+			// Grabbing item as section
+			ConfigurationSection section = getSection(itemName);
+			
 			// Making sure the section is not null.
 			Check.notNull(section);
 
@@ -267,7 +272,7 @@ public class BrItemYML extends BreweryYAML{
 			 * ==================> NAME <==================
 			 */
 			// Getting the item name from the last portion of the section.
-			String itemName = extractLast(section);
+			itemName = extractLast(section);
 			
 			/*
 			 * ==================> TYPE <==================
@@ -496,7 +501,7 @@ public class BrItemYML extends BreweryYAML{
 		} catch (IllegalStateException e) {
 			throw e;
 		} catch (Exception e) {
-			Messenger.warning("'"+extractLast(section)+"' Item failed to load:");
+			Messenger.warning("'"+itemName+"' Item failed to load:");
 			e.printStackTrace();
 		}
 		return null;

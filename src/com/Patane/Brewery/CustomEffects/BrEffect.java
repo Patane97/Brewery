@@ -10,8 +10,9 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
+import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
@@ -72,10 +73,11 @@ public class BrEffect extends ChatCollectable{
 	protected BrTag tag;
 	protected boolean ignoreUser;
 //	protected boolean stack;
-
+	
 	protected List<String> incomplete = new ArrayList<String>();
 
 	protected LambdaStrings title = s -> "&f&l"+s[0]+"&r";
+	
 
 	/* ================================================================================
 	 * Constructors
@@ -196,13 +198,17 @@ public class BrEffect extends ChatCollectable{
 		potionEffects.add(potionEffect);
 		sortPotionsByAmplifier();
 		
+	}	
+	public void removePotion(PotionEffect potionEffect) {
+		potionEffects.remove(potionEffect);
+		// Dont need to sort here as its already in correct order
 	}
 	/**
 	 * Sorting the potions by amplifier is important when layering multiple potions of the same type
 	 * For some reason, minecraft will not apply a potion of lesser amplification if a potion of greater amplification of the same TYPE is currently applied.
 	 * Applying the smaller amps first allows all potions to be applied, independant of their amplification!
 	 */
-	private void sortPotionsByAmplifier() {
+	protected void sortPotionsByAmplifier() {
 		potionEffects.sort((p1,p2) -> {
 			if(p1.getAmplifier() < p2.getAmplifier())
 				return -1;
@@ -210,20 +216,6 @@ public class BrEffect extends ChatCollectable{
 				return 0;
 			return 1;
 		});
-	}
-	@Deprecated
-	public void removePotions(PotionEffectType potionEffectType) {
-		List<PotionEffect> newPotionEffects = new ArrayList<PotionEffect>();
-		for(PotionEffect potionEffect : potionEffects) {
-			if(!potionEffect.getType().getName().equals(potionEffectType.getName()))
-				newPotionEffects.add(potionEffect);
-		}
-		setPotions(newPotionEffects);
-	}
-	
-	public void removePotion(PotionEffect potionEffect) {
-		potionEffects.remove(potionEffect);
-		// Dont need to sort here as its already in correct order
 	}
 	
 	// Tags
@@ -259,7 +251,21 @@ public class BrEffect extends ChatCollectable{
 //	public boolean stack() {
 //		return stack;
 //	}
-
+	
+	public void updateReferences() {
+		Messenger.info("Reloading all items using Effect: "+this.getName()+" ...");
+		List<BrItem> currentItems = Brewery.getItemCollection().getAllItems();
+		for(BrItem item : currentItems) {
+			for(BrEffect effect : item.getEffects()) {
+				if(this.getName().equals(effect.getName())) {
+					// "refreshing" item
+					Brewery.getItemCollection().remove(item.getName());
+					BrItem.YML().load(item.getName());
+				}
+			}
+		}
+	}
+	
 	/* ================================================================================
 	 * Completion-check
 	 * ================================================================================
@@ -692,7 +698,7 @@ public class BrEffect extends ChatCollectable{
 			if(!deep)
 				return Chat.indent(indentCount)+alternateLayout.build(className(), "&7Active");
 			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
-					+ super.toChatString(indentCount, deep, alternateLayout);
+					+ super.toChatString(indentCount+1, deep, alternateLayout);
 		}
 		@Override
 		public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {

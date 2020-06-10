@@ -47,9 +47,8 @@ public class BrEffectYML extends BreweryYAML{
 	@Override
 	public void load() throws IllegalStateException {
 		List<String> loadedNames = new ArrayList<String>();
-		setSelect(getPrefix());
-		for(String effectName : getSelect().getKeys(false)) {
-			BrEffect effect = load(getSectionAndWarn(getSelect(), effectName));
+		for(String effectName : getPrefix().getKeys(false)) {
+			BrEffect effect = load(effectName);
 			if(effect != null)
 				loadedNames.add(effect.getName());
 		}
@@ -57,6 +56,7 @@ public class BrEffectYML extends BreweryYAML{
 	}
 	
 	public boolean save(BrEffect effect) throws IllegalStateException {
+		Messenger.info("Saving Effect: "+effect.getName());
 		if(post(getPrefix(), effect, null, null)) {
 			configHandler.saveConfigQuietly();
 			return true;
@@ -64,7 +64,10 @@ public class BrEffectYML extends BreweryYAML{
 		return false;
 	}
 	
-	public BrEffect load(ConfigurationSection section) {
+	public BrEffect load(String effectName) {
+		Messenger.info("Loading Effect: "+effectName);
+		setSelect(getPrefix());
+		ConfigurationSection section = getSection(effectName);
 		return retrieve(section, null);
 	}
 
@@ -88,7 +91,6 @@ public class BrEffectYML extends BreweryYAML{
 			if(defaultEffect == null)
 				defaultEffect = effect;
 			
-			Messenger.debug("Posting effect: "+effect.getName());
 			ConfigurationSection currentHeader = baseHeader;
 
 			/*
@@ -191,7 +193,6 @@ public class BrEffectYML extends BreweryYAML{
 					else {
 						peCount = typeCounts.get(potionEffect.getType())+1;
 					}
-					Messenger.debug("type: "+potionEffect.getType().getName()+" | count: "+peCount);
 					BrEffectYML.postPotionEffect(currentHeader, peCount, potionEffect);
 					typeCounts.put(potionEffect.getType(), peCount++);
 				}
@@ -203,7 +204,6 @@ public class BrEffectYML extends BreweryYAML{
 			 */
 			
 			if(effect.hasFilter()) {
-				Messenger.debug("==> Has Filter");
 				if(effect.getFilter().equals(defaultEffect.getFilter()))
 					currentHeader = defaultHeader.createSection("filter");
 				else 
