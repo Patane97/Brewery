@@ -31,10 +31,10 @@ public abstract class BreweryYAML extends YAMLEditable{
 	public static void postPotionEffect(ConfigurationSection section, int a, PotionEffect effect) {
 		String effectName = effect.getType().getName();
 		
-		if(a == 0)
-			effectName = effect.getType().getName();
-		else
-			effectName = effect.getType().getName()+"("+a+")";
+		a = (a < 0 ? 0 : a);
+		
+		if(a != 0)
+			effectName = String.format("%s(%d)", effectName, a);
 		
 		section = section.createSection(effectName);
 		section.set("duration", effect.getDuration());
@@ -47,7 +47,6 @@ public abstract class BreweryYAML extends YAMLEditable{
 			section.set("icon", effect.hasParticles());
 	}
 	/**
-	 *  *** Need to allow users to supply different values, such as giving an 'icon' value, but NOT a 'particles' value
 	 * Retireves a potion effect from a YML and creates it based on the values given.
 	 * @param section ConfigurationSection to grab potion effect from.
 	 * @return New PotionEffect with given values. If there is an error, returns null and prints error message.
@@ -55,7 +54,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 	public static PotionEffect retrievePotionEffect(ConfigurationSection section) {
 		String effectName = null;
 		String effectNameRaw = null;
-		Pattern namePattern = Pattern.compile("(\\w+)(?=\\(\\d\\))");
+		Pattern namePattern = Pattern.compile("(\\w+).*(?=\\(\\d\\))");
 		Matcher nameMatch;
 		try{
 			// Grabbing the raw effect name before removing any "(/d)"s
@@ -75,6 +74,8 @@ public abstract class BreweryYAML extends YAMLEditable{
 			int duration = parseInt(section.getString("duration"));
 			int amplifier = parseInt(section.getString("amplifier"));
 			
+			// For ambient, particles and icon, the default values are set, THEN we check if the actual value is supplied.
+			// This way, they can provide 'particles' without providing 'ambient' and not have any errors.
 			boolean ambient = true;
 			if(section.contains("ambient"))
 				ambient = parseBoolean(section.getString("ambient"));
@@ -95,6 +96,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 			return null;
 		}
 	}
+	
 	/**
 	 * Checks if string is of valid format. Format is upper case with no spaces (Underscores replace spaces).
 	 * @param string String to check.

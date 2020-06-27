@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffect;
 import com.Patane.Brewery.CustomEffects.Modifier.ModifierInfo;
 import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.annotations.TypeDescriber;
+import com.Patane.util.formables.SpecialParticle;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.Focus;
@@ -78,7 +79,7 @@ public abstract class Trigger extends TypeParsable{
 	 * @param executor LivingEntity who cast the effect.
 	 * @return A List of the LivingEntities in which the effects were executed on.
 	 */
-	protected List<LivingEntity> executeMany(BrEffect effect, Location impact, LivingEntity executor) {	
+	protected List<LivingEntity> executeMany(BrEffect effect, Location impact, LivingEntity executor) {
 		// Grabs all entites within the radius and filters them appropriately.
 		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
 		return executeMany(effect, impact, executor, hitEntities);
@@ -164,10 +165,23 @@ public abstract class Trigger extends TypeParsable{
 		// Applying particle if there IS and
 		// If its focus matches the focus given. For example, If given focus is Focus.ENTITY, then the particle effect
 		// will only apply if the particles formation has Focus.ENTITY within it (eg, the 'Entity' formation)
-		if(effect.hasParticle() && effect.getParticleEffect().getFormation().getFocus() == focus)
-			// Applies the particle effect in its given formation.
-			effect.getParticleEffect().getFormation().form(effect, location);
+//		if(effect.hasParticle() && effect.getParticleEffect().getFormation().getFocus() == focus)
+//			// Applies the particle effect in its given formation.
+//			effect.getParticleEffect().getFormation().form(effect, location);
+		
+		if(effect.hasParticles()) {
+			for(SpecialParticle particle : effect.getParticles()) {
+				if(particle.getFormation().getFocus() == focus) {
+					long startTime = System.currentTimeMillis();
+					
+					// Form the particle using the location & intensity. If it also has its own radius, use that. Otherwise, use the effects radius
+					particle.getFormation().form(particle, location, particle.getIntensity(), (particle.hasRadius() ? particle.getRadius() : effect.getRadius()));
 
+					long endTime = System.currentTimeMillis();
+					Messenger.debug(String.format("Particle %s for %s took %dms.", particle.className(), effect.getName(), endTime-startTime));
+				}
+			}
+		}
 		/*
 		 *  Applying Sounds
 		 */

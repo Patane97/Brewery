@@ -6,14 +6,14 @@ import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="feed",
 		desc="Feeds a living player for a certain amount.")
 public class Feed extends Modifier{
-	@FieldDescriber(desc="Amount of food given to the living player.")
+	@ParseField(desc="Amount of food given to the living player.")
 	public double amount;
 	
 	public Feed() {

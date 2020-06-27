@@ -4,14 +4,14 @@ import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="heal",
 		desc="Heals a living entity for a certain amount.")
 public class Heal extends Modifier{
-	@FieldDescriber(desc="Amount of healing applied to the living entity.")
+	@ParseField(desc="Amount of healing applied to the living entity.")
 	public double amount;
 	
 	public Heal() {

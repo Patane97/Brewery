@@ -34,6 +34,7 @@ import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetFilterRemo
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetIgnoreuser;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetModifier;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetParticles;
+import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetParticlesAdd;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotions;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotionsAdd;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotionsRemove;
@@ -110,6 +111,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(createEffect.class);
 		register(removeEffect.class);
 		
+		// Edit Effects
 		register(editEffect.class);
 		register(editEffectSet.class);
 		register(editEffectSetModifier.class);
@@ -122,6 +124,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(editEffectSetFilterAdd.class);
 		register(editEffectSetFilterRemove.class);
 		register(editEffectSetParticles.class);
+		register(editEffectSetParticlesAdd.class);
 		register(editEffectSetSounds.class);
 		register(editEffectSetTag.class);
 		register(editEffectSetIgnoreuser.class);
@@ -135,6 +138,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(editEffectRemoveRadius.class);
 		register(editEffectRemoveTag.class);
 		
+		// Edit Items
 		register(editItem.class);
 		register(editItemCooldown.class);
 		register(editItemType.class);
@@ -153,6 +157,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemItemstackLoreDelete.class);
 		register(editItemItemstackName.class);
 		
+		// Edit Items Effects
 		register(editItemEffects.class);
 		register(editItemEffectsAdd.class);
 		register(editItemEffectsRemove.class);
@@ -180,42 +185,6 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemEffectsModifyRemovePotions.class);
 		register(editItemEffectsModifyRemoveParticles.class);
 		register(editItemEffectsModifyRemoveSounds.class);
-		// Edit Item commands
-		/*
-		register(itemEditItem.class);
-		register(itemEditItemName.class);
-		register(itemEditItemLore.class);
-		register(itemEditItemLoreSet.class);
-		register(itemEditItemLoreDelete.class);
-		register(itemEditItemFlags.class);
-		register(itemEditItemFlagsAdd.class);
-		register(itemEditItemFlagsRemove.class);
-		register(itemEditItemEnchantment.class);
-		register(itemEditItemEnchantmentAdd.class);
-		register(itemEditItemEnchantmentRemove.class);
-		register(itemEditItemAttributes.class);
-		register(itemEditItemAttributesAdd.class);
-		register(itemEditItemAttributesRemove.class);
-		register(itemEditType.class);
-		register(itemEditCooldown.class);
-		register(itemEditEffects.class);
-		register(itemEditEffectsAdd.class);
-		register(itemEditEffectsRemove.class);
-		register(itemEditEffectsEdit.class);
-		register(itemEditEffectsEditSet.class);
-		register(itemEditEffectsEditSetModifier.class);
-		register(itemEditEffectsEditSetTrigger.class);
-		register(itemEditEffectsEditSetRadius.class);
-		register(itemEditEffectsEditSetFilter.class);
-		register(itemEditEffectsEditSetFilterAdd.class);
-		register(itemEditEffectsEditSetFilterRemove.class);
-		register(itemEditEffectsEditSetParticles.class);
-		register(itemEditEffectsEditSetSounds.class);
-		register(itemEditEffectsEditSetTag.class);
-		register(itemEditEffectsEditSetIgnoreUser.class);
-		register(itemEditEffectsEditSetPotions.class);
-		register(itemEditEffectsEditSetPotionsAdd.class);
-		register(itemEditEffectsEditSetPotionsRemove.class);
-		*/
+		
 	}
 }

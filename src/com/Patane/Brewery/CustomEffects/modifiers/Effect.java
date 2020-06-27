@@ -9,7 +9,7 @@ import com.Patane.Brewery.Collections.BrEffectCollection;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.StringsUtil;
 
@@ -17,7 +17,7 @@ import com.Patane.util.general.StringsUtil;
 		name="effect",
 		desc="Activates a different, pre-existing effect when the attached effect is activated.")
 public class Effect extends Modifier{
-	@FieldDescriber(desc="Brewery effect to activate.")
+	@ParseField(desc="Brewery effect to activate.")
 	public BrEffect effect;
 	
 	public Effect() {

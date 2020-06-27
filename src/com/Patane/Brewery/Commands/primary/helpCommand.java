@@ -1,5 +1,8 @@
 package com.Patane.Brewery.Commands.primary;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Commands.BrCommandHandler;
@@ -44,5 +47,10 @@ public class helpCommand extends PatCommand {
 			
 		}
 		return true;
+	}
+
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		return Arrays.asList();
 	}
 }

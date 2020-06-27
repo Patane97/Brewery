@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class Sequencer {
-	/**
-	 * ******************* STATIC YML SECTION *******************
+	/** =========================================================
+	 *  Static YML Section
+	 *  =========================================================
 	 */
 	private static SequencesYML yml;
 
@@ -16,7 +17,7 @@ public class Sequencer {
 		return yml;
 	}
 	/**
-	 * **********************************************************
+	 *  =========================================================
 	 */
 	HashMap<Runnable, Integer> sequence = new HashMap<Runnable, Integer>();
 	

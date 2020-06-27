@@ -3,12 +3,15 @@ package com.Patane.Brewery.Commands.secondary.edit.item.effects;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.formables.Radius;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -30,25 +33,25 @@ public class editItemEffectsModifyRemoveRadius extends editItemEffectsModifyRemo
 		BrEffect effect = (BrEffect) objects[1];
 		
 		// Default message assumes there is no previous radius, thus 'set' message is given
-		String successMsg = "&aRemoved radius for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
+		String successMsg = String.format("&aRemoved radius for &7%s&a's instance of &7%s&a. Hover to view the details!", item.getName(), effect.getName());
 		
 		String successHoverText = generateEditingTitle(item, effect);
-
-		Float currentRadius = effect.getRadius();
+		
+		Radius currentRadius = effect.getRadius();
 		// Grab the previous radius for later use
-		Float defaultRadius = Brewery.getEffectCollection().getItem(effect.getName()).getRadius();
+		Radius defaultRadius = Brewery.getEffectCollection().getItem(effect.getName()).getRadius();
 		
 		if(defaultRadius == null) {
 			// If both default and current radius are ALREADY removed, do nothing and message appropriately
 			if(currentRadius == null) {
-				Messenger.send(sender, StringsUtil.hoverText("&eBoth &7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e and the original effect already have no radius. Hover to view the items effect!"
+				Messenger.send(sender, StringsUtil.hoverText(String.format("&eBoth &7%s&e's instance of &7%s&e and the original effect already have no radius. Hover to view the items effect!", item.getName(), effect.getName())
 						, generateEditingTitle(item) + effect.toChatString(0, false)));
 				return true;
 			}
 			// If there is no default radius but there IS a current radius, then remove the current radius
 			else {
 				// Uses original successMsg
-				successHoverText += "&c&mRadius&c: &8&m"+currentRadius+"&r";
+				successHoverText += currentRadius.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r");
 				
 				// Removing the radius from effect
 				effect.setRadius(null);
@@ -56,18 +59,18 @@ public class editItemEffectsModifyRemoveRadius extends editItemEffectsModifyRemo
 		} 
 		// If there IS a default radius the current radius and default do not match, then we are actually removing AND reverting to the default radius rather than just removing
 		else if(!currentRadius.equals(defaultRadius)) {
-			successMsg = "&aReverted radius for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a to original effects radius. Hover to view the details!";
-			successHoverText += "&c&mRadius&c: &8&m" + currentRadius +"&r"
+			successMsg = String.format("&aReverted radius for &7%s&a's instance of &7%s&a to original effects radius. Hover to view the details!", item.getName(), effect.getName());
+			successHoverText += currentRadius.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r")
 							  + "\n"
-							  + "&2&lRadius&2: &7" + defaultRadius;
+							  + defaultRadius.toChatString(0, true, s -> Chat.add("&2"+s[0]+"&2: &7"+s[1], ChatColor.BOLD));
 			
 			// Setting radius to default radius
 			effect.setRadius(defaultRadius);
 		}
 		// If there IS a default radius and current/default radiuss are the same, then we cannot remove the radius from here. Must be done in standard effect edit command
 		else {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e is using the original effects radius. You must edit the original effect to remove it. Hover to view the radius!"
-					, successHoverText + "&2Radius: &7"+currentRadius));
+			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e's instance of &7%s&e is using the original effects radius. You must edit the original effect to remove it. Hover to view the radius!", item.getName(), effect.getName())
+					, successHoverText + currentRadius.toChatString(0, true)));
 			return true;
 		}
 	

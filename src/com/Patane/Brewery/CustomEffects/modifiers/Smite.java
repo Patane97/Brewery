@@ -4,14 +4,14 @@ import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="smite",
 		desc="Smites a living entity with thunder.")
 public class Smite extends Modifier{
-	@FieldDescriber(desc="Amount to damage the living entity for.")
+	@ParseField(desc="Amount to damage the living entity for.")
 	public double amount;
 	
 	public Smite() {

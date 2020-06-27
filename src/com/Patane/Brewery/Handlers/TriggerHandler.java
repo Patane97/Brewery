@@ -13,7 +13,6 @@ import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
-// *** Combine all Handler junk into 'PatHandler'. Formation/Modifier/Trigger handlers have the same code :(
 public class TriggerHandler implements PatHandler{
 	private static HashMap<String, Class< ? extends Trigger>> triggers;
 	

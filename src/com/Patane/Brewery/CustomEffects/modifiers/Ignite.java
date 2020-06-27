@@ -4,14 +4,14 @@ import java.util.Map;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="ignite",
 		desc="Ignites a living entity for a certain duration.")
 public class Ignite extends Modifier{
-	@FieldDescriber(desc="Duration the living entity is ignited for. Measured in server ticks (1s = 20ticks).")
+	@ParseField(desc="Duration the living entity is ignited for. Measured in server ticks (1s = 20ticks).")
 	public int duration;
 	
 	public Ignite() {

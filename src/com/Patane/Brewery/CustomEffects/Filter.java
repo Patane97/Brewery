@@ -10,12 +10,12 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
+import com.Patane.util.formables.Radius;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.ChatHoverable;
 import com.Patane.util.general.ChatStringable;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
-import com.Patane.util.ingame.LocationsUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -407,9 +407,14 @@ public class Filter implements ChatStringable, ChatHoverable{
 		return filtered;
 	}
 	
-	public List<LivingEntity> filter(Location impact, float radius) {
+	public List<LivingEntity> filter(Location impact, Radius radius) {
 //		return filter(LocationsUtil.getEntities(impact, radius));
-		return filter(LocationsUtil.getRadius(impact, radius));
+//		return filter(new ArrayList<LivingEntity>(RadiusUtil.getLivingEntitiesInCube(impact, radius, radius, radius, null)));
+		return radius.getLivingEntities(impact, entity -> {
+			if(!ignore.match(entity) && target.match(entity))
+				return true;
+			return false;
+		});
 	}
 
 /* ================================================================================
@@ -598,8 +603,8 @@ public class Filter implements ChatStringable, ChatHoverable{
 	}
 
 	/* ================================================================================
-	 * *** Temporary attempt of generating FilterType using TYPEs.
-	 *     Doesnt work, probably not worth looking into but will keep here just incase
+	 * Temporary attempt of generating FilterType using TYPEs.
+	 * Doesnt work, probably not worth looking into but will keep here just incase
 	 * ================================================================================
 	 */
 	// This is an attempt at making filter type work as one list (filterGroups). Was not successful but could be attempted later.

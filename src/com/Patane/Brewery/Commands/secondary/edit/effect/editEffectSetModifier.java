@@ -152,7 +152,7 @@ public class editEffectSetModifier extends editEffectSet {
 			return Arrays.asList();
 		
 		// Save all fields for found modifier class
-		Field[] fields = modifierClass.getFields();
+		Field[] fields = MapParsable.getFields(modifierClass);
 		
 		// index is this as we want the last argument (args.length-1) PAST the modifier arg (-2 instead of -1)
 		int index = args.length - 2;

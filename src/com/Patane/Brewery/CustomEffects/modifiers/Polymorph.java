@@ -17,7 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 /**
@@ -33,9 +33,9 @@ import com.Patane.util.general.Messenger;
 public class Polymorph extends Modifier{
 	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
 	
-	@FieldDescriber(desc="Mob to transform the living entity into.")
+	@ParseField(desc="Mob to transform the living entity into.")
 	public EntityType entity;
-	@FieldDescriber(desc="Duration the living entity is transformed for. Measured in server ticks (1s = 20ticks).")
+	@ParseField(desc="Duration the living entity is transformed for. Measured in server ticks (1s = 20ticks).")
 	public int duration;
 	
 	public Polymorph() {

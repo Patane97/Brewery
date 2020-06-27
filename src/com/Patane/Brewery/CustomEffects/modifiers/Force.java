@@ -7,16 +7,16 @@ import org.bukkit.util.Vector;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="force",
 		desc="Force or push a living entity into a direction.")
 public class Force extends Modifier{
-	@FieldDescriber(desc="Direction to push the living entity from the impact location.")
+	@ParseField(desc="Direction to push the living entity from the impact location.")
 	public Direction direction;
-	@FieldDescriber(desc="Intensity of the push.")
+	@ParseField(desc="Intensity of the push.")
 	public double intensity;
 	
 	public Force() {

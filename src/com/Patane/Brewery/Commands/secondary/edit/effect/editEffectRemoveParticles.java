@@ -6,9 +6,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
-import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Commands.CommandInfo;
-import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -31,19 +29,19 @@ public class editEffectRemoveParticles extends editEffectRemove {
 		
 		String successHoverText = generateEditingTitle(effect);
 
-		BrParticleEffect currentParticles = effect.getParticleEffect();
-		
-		// If both default and current particles are ALREADY removed, do nothing and message appropriately
-		if(currentParticles == null) {
-			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e already has no particle effects. Hover to view the effect!", effect.getName())
-					, effect.toChatString(0, false)));
-			return true;
-		}
-		// Uses original successMsg
-		successHoverText += currentParticles.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r");
-		
-		// Removing the particles from effect
-		effect.setParticleEffect(null);
+//		NewBrParticleEffect currentParticles = effect.getParticles();
+//		
+//		// If both default and current particles are ALREADY removed, do nothing and message appropriately
+//		if(currentParticles == null) {
+//			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e already has no particle effects. Hover to view the effect!", effect.getName())
+//					, effect.toChatString(0, false)));
+//			return true;
+//		}
+//		// Uses original successMsg
+//		successHoverText += currentParticles.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r");
+//		
+//		// Removing the particles from effect
+//		effect.setParticleEffect(null);
 
 		// Save the Effect to YML
 		BrEffect.YML().save(effect);

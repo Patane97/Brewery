@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
@@ -17,8 +16,10 @@ import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.collections.ChatCollectable;
+import com.Patane.util.formables.Radius;
+import com.Patane.util.formables.SpecialParticle;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
@@ -27,8 +28,10 @@ import com.Patane.util.general.StringsUtil.LambdaStrings;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class BrEffect extends ChatCollectable{
-	/**
-	 * ******************* STATIC YML SECTION *******************
+
+	/** =========================================================
+	 *  Static YML Section
+	 *  =========================================================
 	 */
 	private static BrEffectYML yml;
 
@@ -39,35 +42,13 @@ public class BrEffect extends ChatCollectable{
 		return yml;
 	}
 	/**
-	 * ***************** STATIC METHODS SECTION *****************
-	 */
-	
-//	/**
-//	 * Gets many effects to a single string in default format
-//	 * @param indentCount
-//	 * @param deep
-//	 * @param effects
-//	 * @return
-//	 */
-//	public static String manyToChatString(int indentCount, boolean deep, BrEffect... effects) {
-//		String effectsString = "";
-//		if(effects.length == 0)
-//			return "&8Nothing here!";
-//		for(BrEffect effect : effects) {
-//			if(effect != effects[0])
-//				effectsString += "\n\n";
-//			effectsString += effect.toChatString(indentCount, deep);
-//		}
-//		return effectsString;
-//	}
-	/**
-	 * **********************************************************
+	 *  =========================================================
 	 */
 	protected Modifier modifier;
 	protected Trigger trigger;
-	protected Float radius;
+	protected Radius radius;
 	protected Filter filter;
-	protected BrParticleEffect particles;
+	protected List<SpecialParticle> particles;
 	protected BrSoundEffect sounds;
 	protected List<PotionEffect> potionEffects;
 	protected BrTag tag;
@@ -83,8 +64,8 @@ public class BrEffect extends ChatCollectable{
 	 * Constructors
 	 * ================================================================================
 	 */
-	public BrEffect(String name, Modifier modifier, Trigger trigger, Float radius, 
-			Filter filter, BrParticleEffect particles, BrSoundEffect sounds, List<PotionEffect> potionEffects, 
+	public BrEffect(String name, Modifier modifier, Trigger trigger, Radius radius, 
+			Filter filter, List<SpecialParticle> particles, BrSoundEffect sounds, List<PotionEffect> potionEffects, 
 			BrTag tag, Boolean ignoreUser) {
 		// Setting the name
 		super(name);
@@ -101,13 +82,13 @@ public class BrEffect extends ChatCollectable{
 		// These values can be null. However if some objects are null, they are converted to empty objects.
 		// If radius isnt set, then it only applies to any entities hit?
 		this.radius = radius;
-		this.particles = particles;
 		this.sounds = sounds;
 		this.tag = tag;
 		
 		// DEFAULTED VALUES.
 		// These values will always have a setting. If the given value is null, then the default is set.
 		this.filter = (filter == null ? new Filter() : filter);
+		this.particles = (particles == null ? new ArrayList<SpecialParticle>() : particles);
 		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
 		this.ignoreUser = (ignoreUser == null ? true : ignoreUser);
 //		this.stack = false;
@@ -146,10 +127,10 @@ public class BrEffect extends ChatCollectable{
 	public boolean hasRadius() {
 		return(radius == null ? false : true);
 	}
-	public Float getRadius() {
+	public Radius getRadius() {
 		return radius;
 	}
-	public void setRadius(Float radius) {
+	public void setRadius(Radius radius) {
 		this.radius = radius;
 	}
 	// Filter
@@ -163,15 +144,22 @@ public class BrEffect extends ChatCollectable{
 		this.filter = (filter == null ? new Filter() : filter);
 	}
 	// Particle
-	public boolean hasParticle() {
+	public boolean hasParticles() {
 		return (particles == null ? false : true);
 	}
-	public BrParticleEffect getParticleEffect() {
+	public List<SpecialParticle> getParticles() {
 		return particles;
 	}
-	public void setParticleEffect(BrParticleEffect particles) {
+	public void setParticles(List<SpecialParticle> particles) {
 		this.particles = particles;
 	}
+	public void addParticle(SpecialParticle particle) {
+		particles.add(particle);
+	}
+	public void removePotion(SpecialParticle particle) {
+		particles.remove(particle);
+	}
+	
 	// Sound
 	public boolean hasSound() {
 		return (sounds == null ? false : true);
@@ -197,8 +185,7 @@ public class BrEffect extends ChatCollectable{
 	public void addPotion(PotionEffect potionEffect) {
 		potionEffects.add(potionEffect);
 		sortPotionsByAmplifier();
-		
-	}	
+	}
 	public void removePotion(PotionEffect potionEffect) {
 		potionEffects.remove(potionEffect);
 		// Dont need to sort here as its already in correct order
@@ -317,7 +304,7 @@ public class BrEffect extends ChatCollectable{
 		effectInfo += "\n" + trigger;
 		// If radius is present, show it
 		if(hasRadius())
-			effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Radius", radius.toString());
+			effectInfo += "\n" + radius.toChatString(indentCount, deep, deepLayout);
 		
 		// If tag is present, show it
 		if(hasTag())
@@ -340,9 +327,15 @@ public class BrEffect extends ChatCollectable{
 		}
 		
 		// If particles are present, show them. Does not need null check as we know we have them
-		if(hasParticle())
-			effectInfo += "\n" + particles.toChatString(indentCount, deep, deepLayout);
-
+		if(hasParticles()) {
+			if(deep) {
+				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")
+							+ StringsUtil.manyToChatString(indentCount+1, 0, deep, s -> "\n"+s, null, particles.toArray(new SpecialParticle[0]));
+			}
+			else
+				effectInfo += "\n" + Chat.indent(indentCount+1) + alternateLayout.build("Particle Effects", Integer.toString(particles.size()));
+		}
+		
 		// If sounds are present, show them. Does not need null check as we know we have them
 		if(hasSound())
 			effectInfo += "\n" + sounds.toChatString(indentCount, deep, deepLayout);
@@ -396,10 +389,9 @@ public class BrEffect extends ChatCollectable{
 		
 		// Radius
 		if(hasRadius())
-			componentList.add(StringsUtil.hoverText("\n" + Chat.indent(indentCount) + alternateLayout.build("Radius", radius.toString())
-			, "&f&lRadius"
-			+ String.format("\n&7This effect will hit each living entity within %.1f blocks of the activated location.", radius)));
-		
+			componentList.add(StringsUtil.createTextComponent("\n"));
+			componentList.addAll(Arrays.asList(radius.toChatHover(indentCount, deep, deepLayout)));
+
 		// Tag
 		if(hasTag()) {
 			componentList.add(StringsUtil.createTextComponent("\n"));
@@ -425,14 +417,25 @@ public class BrEffect extends ChatCollectable{
 			}
 			else {
 				current = StringsUtil.hoverText("\n"+Chat.indent(indentCount) + alternateLayout.build("Potion Effects", Integer.toString(potionEffects.size()))
-						, StringsUtil.toChatString(indentCount, true, alternateLayout, potionEffects.toArray(new PotionEffect[0])));
+						, StringsUtil.toChatString(0, true, deepLayout, potionEffects.toArray(new PotionEffect[0])));
+				componentList.add(current);
 			}
 		}
-		
-		// If particles are present, show them.
-		if(hasParticle()) {
-			componentList.add(StringsUtil.createTextComponent("\n"));
-			componentList.addAll(Arrays.asList(particles.toChatHover(indentCount, deep, deepLayout)));
+		if(hasParticles()) {
+			// Manually doing deep check as each SpecialParticle has its own toHoverString
+			if(deep) {
+				componentList.add(StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")));
+				for(SpecialParticle particleEffect : particles) {
+					current = StringsUtil.hoverText(String.format("\n%s&2> &7%s", Chat.indent(indentCount+1), particleEffect.className())
+					, particleEffect.toChatString(0, true, deepLayout));
+					componentList.add(current);
+				}
+			}
+			else {
+				current = StringsUtil.hoverText("\n"+Chat.indent(indentCount) + alternateLayout.build("Particle Effects", Integer.toString(particles.size()))
+						, StringsUtil.manyToChatString(0, 0, true, null, null, particles.toArray(new SpecialParticle[0])));
+				componentList.add(current);
+			}
 		}
 		
 		// If sounds are present, show them.
@@ -464,7 +467,7 @@ public class BrEffect extends ChatCollectable{
 			trigger.execute(this, impact, executor);
 			return true;
 		} catch(Exception e) {
-			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Location:");
+			Messenger.severe(String.format("Failed to execute Brewery Effect %s at Location:", this.getName()));
 			e.printStackTrace();
 			return false;
 		}
@@ -482,171 +485,158 @@ public class BrEffect extends ChatCollectable{
 			trigger.execute(this, executor, target);
 			return true;
 		} catch(Exception e) {
-			Messenger.warning("Failed to execute '"+getName()+"' effect onto specific Living Entity:");
+			Messenger.severe(String.format("Failed to execute Brewery Effect %s on Living Entity:", this.getName()));
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	/* ================================================================================
-	 * *** OLD, TO BE REPLACED COMPLETELY BY TOCHATSTRING
-	 * ================================================================================
-	 */
-	@Deprecated
-	public String hoverDetails() {
-		return Chat.translate("&7"+getName()
-		+"\n&2Modifier: &a"+(getModifier() != null ? getModifier().className() : "&cUndefined")
-		+"\n&2Trigger: &a"+(getTrigger() != null ? getTrigger().className() : "&cUndefined")
-		+(hasRadius() ? "\n&2Radius: &a"+getRadius() : "")
-		+(hasTag() ? "\n&2Tag: &a"+getTag().name : "")
-		+(hasParticle() ? "\n&2Particles: &aApplied" : "")
-		+(hasSound() ? "\n&2Sounds: &aApplied" : "")
-		+(hasPotions() ? "\n&2Potion Effects: &a"+getPotions().size() : "")
-		+(hasFilter() ? "\n&2Filters: &aApplied" : ""));
 	}
 
 /* ================================================================================
  * Effect Specific Classes
  * ================================================================================
  */
+	
 	/* ================================================================================
 	 * Particle Effects
 	 * ================================================================================
 	 */
-	@ClassDescriber(
-			name="Particle Effect",
-			desc="Applies custom particle effects when the attached effect is activated.")
-	public static class BrParticleEffect extends MapParsable {
-		@FieldDescriber(desc="Custom particle effects to appear.")
-		public Particle type;
-		@FieldDescriber(desc="Formation to place the particles.")
-		public Formation formation;
-		@FieldDescriber(desc="Intensity or multitude of particles to display.")
-		public int intensity;
-		@FieldDescriber(desc="Initial Velocity for the particles being spawned.")
-		public double velocity;
-		
-		public BrParticleEffect() {
-			super();
-		}
-		
-		public BrParticleEffect(Map<String, String> fields) {
-			super(fields);
-		}		
-
-		@Override
-		protected void populateFields(Map<String, String> fields) {
-			this.type = getEnumValue(Particle.class, fields, "type");
-			this.formation = getEnumValue(Formation.class, fields, "formation");
-			try{ 
-				this.intensity = getInt(fields, "intensity");
-				this.velocity = getDouble(fields, "velocity");
-			} catch (IllegalArgumentException e) {
-				Messenger.warning("Particle Effect failed to load:");
-				throw e;
-			}
-		}
-		public BrParticleEffect(Particle type, Formation formation, int intensity, double velocity) {
-			this.type = type;
-			this.formation = formation;
-			this.intensity = intensity;
-			this.velocity = velocity;
-			construct();
-		}
-		@Override
-		public LambdaStrings layout() {
-			// Example: &2Type: &7Name
-			return s -> "&2"+s[0]+"&2: &7"+s[1];
-		}
-		@Override
-		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
-			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
-			if(!deep)
-				return Chat.indent(indentCount)+alternateLayout.build(className(), "&7Active");
-			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
-					+ super.toChatString(indentCount+1, deep, alternateLayout);
-		}
-		
-		@Override
-		public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {
-			// If the alternateLayout is null, we want to use the default layout for itself
-			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
-			List<TextComponent> componentList = new ArrayList<TextComponent>();
-			
-			TextComponent current;
-			
-			if(!deep) {
-				current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build(className(), "&7Active")
-				, toChatString(0, true, alternateLayout));
-				componentList.add(current);
-			}
-			else {
-			
-				current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build(className(), "")
-						, "&f&l"+className()
-						+ "\n&7"+classDesc());
-				componentList.add(current);
-				
-				for(String fieldName : fieldMap.keySet()) {
-					// If the field is also a Formation, run this same method and add a new line AND its results to compontnList
-					if(fieldMap.get(fieldName) instanceof Formation) {
-						Formation foundFormation = (Formation) fieldMap.get(fieldName);
-						current = StringsUtil.hoverText("\n"+Chat.indent(indentCount+1) + alternateLayout.build(fieldName, foundFormation.toString())
-							, "&f&l"+fieldName
-							+ "\n&7"+getFieldDesc(fieldName)
-							+ "\n"+Chat.INDENT+"&f&l\u2193"
-							+ "\n&f&l"+foundFormation.toString()
-							+ "\n&7"+foundFormation.getDesc());
-						componentList.add(current);
-					}
-					// Otherwise, build the hover text to show the fieldname with its description on hover
-					else {
-						current = StringsUtil.hoverText("\n"+Chat.indent(indentCount+1) + alternateLayout.build(fieldName, this.getValueStrings().get(fieldName))
-								, "&f&l"+fieldName
-								+ "\n&7"+getFieldDesc(fieldName));
-						componentList.add(current);
-					}
-				}
-			}
-			
-			return componentList.toArray(new TextComponent[0]);
-			
-		}
-		
-		public Particle getType() {
-			return type;
-		}
-
-		public Formation getFormation() {
-			return formation;
-		}
-
-		public int getIntensity() {
-			return intensity;
-		}
-
-		public double getVelocity() {
-			return velocity;
-		}
-
-		
-		/* 
-		 * ================================================================================
-		 */
-		
-		public void spawn(Location location, float radius) {
-			spawn(location, radius, intensity, velocity);
-		}
-		public void spawn(Location location, float radius, int intensity) {
-			spawn(location, radius, intensity, velocity);
-		}
-		public void spawn(Location location, float radius, int intensity, double velocity) {
-//			if(radius == null)
-//				radius = 0.5f;
-			double offset = radius/2;
-			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(Math.max(radius, 1), 3)*intensity), offset,offset,offset, velocity);
-		}
-	}
+//	@Deprecated
+//	@ClassDescriber(
+//			name="Particle Effect",
+//			desc="Applies custom particle effects when the attached effect is activated.")
+//	public static class BrParticleEffect extends MapParsable {
+//		@ParseField(desc="Custom particle effects to appear.")
+//		public Particle type;
+//		@ParseField(desc="Formation to place the particles.")
+//		public Formation formation;
+//		@ParseField(desc="Intensity or multitude of particles to display.")
+//		public int intensity;
+//		@ParseField(desc="Initial Velocity for the particles being spawned.")
+//		public double velocity;
+//		
+//		public BrParticleEffect() {
+//			super();
+//		}
+//		
+//		public BrParticleEffect(Map<String, String> fields) {
+//			super(fields);
+//		}		
+//		
+//		@Override
+//		protected void populateFields(Map<String, String> fields) {
+//			this.type = getEnumValue(Particle.class, fields, "type");
+//			this.formation = getEnumValue(Formation.class, fields, "formation");
+//			try{ 
+//				this.intensity = getInt(fields, "intensity");
+//				this.velocity = getDouble(fields, "velocity");
+//			} catch (IllegalArgumentException e) {
+//				Messenger.warning("Particle Effect failed to load:");
+//				throw e;
+//			}
+//		}
+//		public BrParticleEffect(Particle type, Formation formation, int intensity, double velocity) {
+//			this.type = type;
+//			this.formation = formation;
+//			this.intensity = intensity;
+//			this.velocity = velocity;
+//			construct();
+//		}
+//		@Override
+//		public LambdaStrings layout() {
+//			// Example: &2Type: &7Name
+//			return s -> "&2"+s[0]+"&2: &7"+s[1];
+//		}
+//		@Override
+//		public String toChatString(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+//			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+//			if(!deep)
+//				return Chat.indent(indentCount)+alternateLayout.build(className(), "&7Active");
+//			return Chat.indent(indentCount)+alternateLayout.build(className(), "")
+//					+ super.toChatString(indentCount+1, deep, alternateLayout);
+//		}
+//		
+//		@Override
+//		public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {
+//			// If the alternateLayout is null, we want to use the default layout for itself
+//			alternateLayout = (alternateLayout == null ? layout() : alternateLayout);
+//			List<TextComponent> componentList = new ArrayList<TextComponent>();
+//			
+//			TextComponent current;
+//			
+//			if(!deep) {
+//				current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build(className(), "&7Active")
+//				, toChatString(0, true, alternateLayout));
+//				componentList.add(current);
+//			}
+//			else {
+//			
+//				current = StringsUtil.hoverText(Chat.indent(indentCount) + alternateLayout.build(className(), "")
+//						, "&f&l"+className()
+//						+ "\n&7"+classDesc());
+//				componentList.add(current);
+//				
+//				for(String fieldName : fieldMap.keySet()) {
+//					// If the field is also a Formation, run this same method and add a new line AND its results to compontnList
+//					if(fieldMap.get(fieldName) instanceof Formation) {
+//						Formation foundFormation = (Formation) fieldMap.get(fieldName);
+//						current = StringsUtil.hoverText("\n"+Chat.indent(indentCount+1) + alternateLayout.build(fieldName, foundFormation.toString())
+//							, "&f&l"+fieldName
+//							+ "\n&7"+getFieldDesc(fieldName)
+//							+ "\n"+Chat.INDENT+"&f&l\u2193"
+//							+ "\n&f&l"+foundFormation.toString()
+//							+ "\n&7"+foundFormation.getDesc());
+//						componentList.add(current);
+//					}
+//					// Otherwise, build the hover text to show the fieldname with its description on hover
+//					else {
+//						current = StringsUtil.hoverText("\n"+Chat.indent(indentCount+1) + alternateLayout.build(fieldName, this.getValueStrings().get(fieldName))
+//								, "&f&l"+fieldName
+//								+ "\n&7"+getFieldDesc(fieldName));
+//						componentList.add(current);
+//					}
+//				}
+//			}
+//			
+//			return componentList.toArray(new TextComponent[0]);
+//			
+//		}
+//		
+//		public Particle getType() {
+//			return type;
+//		}
+//
+//		public Formation getFormation() {
+//			return formation;
+//		}
+//
+//		public int getIntensity() {
+//			return intensity;
+//		}
+//
+//		public double getVelocity() {
+//			return velocity;
+//		}
+//
+//		
+//		/* 
+//		 * ================================================================================
+//		 */
+//		
+//		public void spawn(Location location, float radius) {
+//			spawn(location, radius, intensity, velocity);
+//		}
+//		public void spawn(Location location, float radius, int intensity) {
+//			spawn(location, radius, intensity, velocity);
+//		}
+//		public void spawn(Location location, float radius, int intensity, double velocity) {
+////			if(radius == null)
+////				radius = 0.5f;
+//			double offset = radius/2;
+//			location.getWorld().spawnParticle(type, location, Math.min(Integer.MAX_VALUE, (int) Math.pow(Math.max(radius, 1), 3)*intensity), offset,offset,offset, velocity);
+////			DustOptions dustOptions = new DustOptions(Color.fromRGB(0, 127, 255), 1);
+////			location.getWorld().spawnParticle(Particle.REDSTONE, location, 50, dustOptions);
+//		}
+//	}
 	/* ================================================================================
 	 * Sound Effects
 	 * ================================================================================
@@ -655,12 +645,12 @@ public class BrEffect extends ChatCollectable{
 			name="Sound Effect",
 			desc="Applies a custom sound effect when the attached effect is activated.")
 	public static class BrSoundEffect extends MapParsable{
-		@FieldDescriber(desc="Custom sound effect to be heard.")
+		@ParseField(desc="Custom sound effect to be heard.")
 		public Sound type;
 //		public Formation formation;
-		@FieldDescriber(desc="Volume of the sound effect.")
+		@ParseField(desc="Volume of the sound effect.")
 		public float volume;
-		@FieldDescriber(desc="Altered pitch of the sound effect.")
+		@ParseField(desc="Altered pitch of the sound effect.")
 		public float pitch;
 		
 		public BrSoundEffect() {
@@ -748,12 +738,11 @@ public class BrEffect extends ChatCollectable{
 	 * Tags
 	 * ================================================================================
 	 */
-	// *** Update this description if tags have more uses!
 	@ClassDescriber(
 			name="Tag",
 			desc="Adds a tag to each living entity being affected by the attached effect. This tag can be used in other effects filters to target or ignore entities hit by this effect.")
 	public static class BrTag extends MapParsable{
-		@FieldDescriber(desc="The word or phrase to recognise this tag with.")
+		@ParseField(desc="The word or phrase to recognise this tag with.")
 		public String name;
 		
 		public BrTag() {

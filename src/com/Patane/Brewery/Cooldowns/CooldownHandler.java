@@ -18,8 +18,9 @@ import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.main.PataneUtil;
 
 public class CooldownHandler {
-	/**
-	 * ******************* STATIC YML SECTION *******************
+	/** =========================================================
+	 *  Static YML Section
+	 *  =========================================================
 	 */
 	private static YAMLData yml;
 
@@ -30,7 +31,7 @@ public class CooldownHandler {
 		return yml;
 	}
 	/**
-	 * **********************************************************
+	 *  =========================================================
 	 */
 
 	private static Map<UUID, CooldownTracker> cooldowns = new TreeMap<UUID, CooldownTracker>();
@@ -68,7 +69,7 @@ public class CooldownHandler {
 	}
 	
 	/**
-	 * ***When using this method, it is already assumed that 'item' is classified as a BrItem and therefore has a UUID attached to it. If not, an IllegalArgumentException will be thrown.
+	 * Note: When using this method, it is already assumed that 'item' is classified as a BrItem and therefore has a UUID attached to it. If not, an IllegalArgumentException will be thrown.
 	 * @param entity
 	 * @param item
 	 * @param brItem
@@ -147,7 +148,7 @@ public class CooldownHandler {
 				// Either adds the user to a currently runnning Cooldown with the same UUID as their item
 				// or it extracts the saved cooldown from YAML and subtracts the remaining time appropriately, then adds the player.
 				// Both of these cases return true, otherwise we continue.
-				if(CooldownHandler.updateFromYAML(player, item, BrItem.get(item)))
+				if(CooldownHandler.updateFromYAML(player, item, BrItem.getFromItemStack(item)))
 					return;
 				
 				// Loops through each UUID on cooldown and compares it to their held item UUID.

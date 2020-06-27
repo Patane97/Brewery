@@ -7,10 +7,9 @@ import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
-import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
-import com.Patane.Brewery.CustomEffects.Formation;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.formables.Formation;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -105,7 +104,7 @@ public class editItemEffectsModifySetParticles extends editItemEffectsModifySet 
 		}
 		
 		// Creating the particle effect
-		BrParticleEffect particleEffect = new BrParticleEffect(particle, formation, intensity, velocity);
+//		BrParticleEffect particleEffect = new BrParticleEffect(particle, formation, intensity, velocity);
 		
 		// Grabbing item
 		BrItem item = (BrItem) objects[0];
@@ -117,28 +116,28 @@ public class editItemEffectsModifySetParticles extends editItemEffectsModifySet 
 		
 		String successHoverText = generateEditingTitle(item, effect);
 		
-		BrParticleEffect previousParticleEffect = effect.getParticleEffect();
-
-		// If the particle effect values are the same, do nothing and message appropriately
-		if(particleEffect.equals(previousParticleEffect)) {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Particle Effect with those values. Hover to view it!"
-														, successHoverText + effect.getParticleEffect().toChatString(0, true)));
-			return true;
-		}
-		if(previousParticleEffect != null) {
-			// If its different, then it is changing
-			successMsg = "&aChanged the Particle Effect for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
-			successHoverText += "&2"+particleEffect.className()+":\n"
-							  + StringsUtil.tableCompareFormatter(0,
-								s -> "&2  "+s[0]+": &7"+s[1]
-							  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
-							  , StringsUtil.getFieldNames(BrParticleEffect.class) , StringsUtil.prepValueStrings(previousParticleEffect) , StringsUtil.prepValueStrings(particleEffect));
-		}
-		else
-			successHoverText += particleEffect.toChatString(0, true);
-		
-		// Sets the particle effect to effect
-		effect.setParticleEffect(particleEffect);
+//		NewBrParticleEffect previousParticleEffect = effect.getParticleEffect();
+//
+//		// If the particle effect values are the same, do nothing and message appropriately
+//		if(particleEffect.equals(previousParticleEffect)) {
+//			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Particle Effect with those values. Hover to view it!"
+//														, successHoverText + effect.getParticleEffect().toChatString(0, true)));
+//			return true;
+//		}
+//		if(previousParticleEffect != null) {
+//			// If its different, then it is changing
+//			successMsg = "&aChanged the Particle Effect for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
+//			successHoverText += "&2"+particleEffect.className()+":\n"
+//							  + StringsUtil.tableCompareFormatter(0,
+//								s -> "&2  "+s[0]+": &7"+s[1]
+//							  , s -> "&2  "+s[0]+": &8"+s[1]+" &7-> "+s[2]
+//							  , StringsUtil.getFieldNames(BrParticleEffect.class) , StringsUtil.prepValueStrings(previousParticleEffect) , StringsUtil.prepValueStrings(particleEffect));
+//		}
+//		else
+//			successHoverText += particleEffect.toChatString(0, true);
+//		
+//		// Sets the particle effect to effect
+//		effect.setParticleEffect(particleEffect);
 
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);

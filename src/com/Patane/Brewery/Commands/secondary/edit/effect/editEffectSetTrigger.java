@@ -8,7 +8,6 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.TriggerHandler;
@@ -140,7 +139,7 @@ public class editEffectSetTrigger extends editEffectSet {
 		
 		if(effect == null)
 			return Arrays.asList();
-		
+
 		// If its the first argument (args.length == 1), send all Triggers
 		if(args.length < 2)
 			return TriggerHandler.getKeys();
@@ -153,7 +152,7 @@ public class editEffectSetTrigger extends editEffectSet {
 			return Arrays.asList();
 		
 		// Save all fields for found trigger class
-		Field[] fields = triggerClass.getFields();
+		Field[] fields = MapParsable.getFields(triggerClass);
 		
 		// index is this as we want the last argument (args.length-1) PAST the trigger arg (-2 instead of -1)
 		int index = args.length - 2;
@@ -161,19 +160,8 @@ public class editEffectSetTrigger extends editEffectSet {
 		// If index is past fields length
 		if(index >= fields.length)
 			return Arrays.asList();
-		
-		// Very specific scenario for Effect trigger.
-		// *** Low priority: find a spot for this within effect trigger. 
-		//     Is difficult as trigger ISNT an actual object by this point, only a class.
-		//     Only thought is to have a "specialSuggestion" methos that runs onLoad.
-		if(args[0].equalsIgnoreCase("effect") && fields[index].getType().isAssignableFrom(BrEffect.class))
-			return StringsUtil.encase(Brewery.getEffectCollection().getAllIDs(), "'", "'");
-		
+			
 		// Gets the suggestion. If its an enum, shows the enums available
 		return MapParsable.getSuggestion(fields[index]);
-	}
-	
-	protected String generateEditingTitle(BrEffect effect) {
-		return "&f&l" + effect.getNameLimited(15)+"\n";
 	}
 }

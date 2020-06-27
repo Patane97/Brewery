@@ -6,17 +6,17 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 
 @ClassDescriber(
 		name="damage",
 		desc="Damages a living entity for a certain amount.")
 // *** Need to actually implement DamageCause!!!
-public class Damage extends Modifier{
-	@FieldDescriber(desc="Defines in which way the damage is being caused, such as through fire or poison.")
+public class Damage extends Modifier {
+	@ParseField(desc="Defines in which way the damage is being caused, such as through fire or poison.")
 	public DamageCause cause;
-	@FieldDescriber(desc="Amount of damage applied to the living entity.")
+	@ParseField(desc="Amount of damage applied to the living entity.")
 	public double amount;
 	
 	public Damage() {

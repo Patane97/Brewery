@@ -11,7 +11,7 @@ import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
 
@@ -19,9 +19,9 @@ import com.Patane.util.ingame.Focus;
 		name="sticky",
 		desc="Sticks to the initial living entities hit and applies the Modifier to them at a fixed rate over a duration.")
 public class Sticky extends Trigger{
-	@FieldDescriber(desc="Rate at which to apply the Modifier. Measured in seconds.")
+	@ParseField(desc="Rate at which to apply the Modifier. Measured in seconds.")
 	public float rate;
-	@FieldDescriber(desc="Duration for the effect to stick. This must be greater than or equal to the rate and is measured in seconds.")
+	@ParseField(desc="Duration for the effect to stick. This must be greater than or equal to the rate and is measured in seconds.")
 	public float duration;
 	
 	public Sticky() {

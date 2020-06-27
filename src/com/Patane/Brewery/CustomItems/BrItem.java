@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
@@ -21,11 +22,11 @@ import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.general.Messenger.Msg;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.ingame.ItemsUtil;
+import com.Patane.util.main.PataneUtil;
 
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -33,8 +34,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 
 public class BrItem extends ChatCollectable{
-	/**
-	 * ******************* STATIC YML SECTION *******************
+
+	/** =========================================================
+	 *  Static YML Section
+	 *  =========================================================
 	 */
 	private static BrItemYML yml;
 
@@ -45,8 +48,9 @@ public class BrItem extends ChatCollectable{
 		return yml;
 	}
 	/**
-	 * **********************************************************
+	 *  =========================================================
 	 */
+	
 	protected ItemStack item;
 	protected CustomType type;
 	protected List<BrEffect> effects;
@@ -145,6 +149,17 @@ public class BrItem extends ChatCollectable{
 	public ItemStack generateItem() {
 		return ItemEncoder.addTag(item.clone(), "UUID", UUID.randomUUID().toString());
 	}
+	
+	/**
+	 * Gets the connected BrItem from an ItemStack by checking its encoded value.
+	 * @return The connected BrItem or null if there is none.
+	 */
+	public static BrItem getFromItemStack(ItemStack item) {
+		String itemName = ItemEncoder.getString(item, "name");
+		if(itemName == null)
+			return null;
+		return Brewery.getItemCollection().getItem(itemName);
+	}
 
 	/* ================================================================================
 	 * ChatStringable & ChatHoverable Methods
@@ -181,8 +196,11 @@ public class BrItem extends ChatCollectable{
 		
 		// Saving the effects
 		if(deep && effects.size() > 0) {
-			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Effects", "")
-					  + StringsUtil.singleColumnFormatter(indentCount+1, s -> "&2> &7"+s[0], StringsUtil.getCollectableNames(effects).toArray(new String[0]));
+			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Effects", "");
+			for(BrEffect effect : effects) {
+				// Prints the effect with &7 if its complete or &8&o if its not
+				itemInfo += String.format("\n%s&2> %s%s", Chat.indent(indentCount+1), (effect.isComplete() ? "&7" : "&8&o"), effect.getName());
+			}
 		}
 		else
 			itemInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Effects", Integer.toString(effects.size()));
@@ -254,7 +272,8 @@ public class BrItem extends ChatCollectable{
 			componentList.add(current);
 			// Loop through effect and show its name and all its details OnHover and add to arraylist
 			for(BrEffect effect : effects) {
-				current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount+1)+"&2> &7"+effect.getName());
+				// Prints the effect with &7 if its complete or &8&o if its not
+				current = StringsUtil.createTextComponent(String.format("\n%s&2> %s%s", Chat.indent(indentCount+1), (effect.isComplete() ? "&7" : "&8&o"), effect.getName()));
 				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r "+effect.toChatString(0, true))).create()));
 				componentList.add(current);
 			}
@@ -284,26 +303,30 @@ public class BrItem extends ChatCollectable{
 	public boolean execute(Location location, LivingEntity executor) {
 		try {
 			// Checks if either location or executor are null for any reason.
-			Check.notNull(location, "Location of impact is missing.");
-			Check.notNull(executor, "Executing entity is missing.");
-			Messenger.debug(executor, "&7You &ahave activated &7"+getName()+"&a on a location.");
-			// Collects a list of all successfully deployed effects.
-			List<String> successful = new ArrayList<String>();
+			Check.notNull(location, String.format("Impact location for %s is missing.", this.getName()));
+			Check.notNull(executor, String.format("Executing entity for %s is missing.", this.getName()));
 			
+			long startTime = System.currentTimeMillis();
 			// Loops through each effect within this BrItem.
 			for(BrEffect effect : effects) {
 				// If the effect has a radius, then it can be executed.
 				// If the effect does not have a radius, then it cannot be executed on a specific location.
 				if(effect.isComplete())
 					if(effect.hasRadius())
-						// If the effect executes successfully, add it to the successful array.
-						if(effect.execute(location, executor))
-							successful.add(effect.getName());
+						effect.execute(location, executor);
 			}
-			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
+
+			// Collecting information and displaying it in one line in console
+			String executorName = (executor instanceof Player ? "Player("+((Player) executor).getDisplayName()+")" : executor.getName());
+			String locationString = String.format("(%s, %.2f, %.2f, %.2f)", location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
+			
+			long completeTime = System.currentTimeMillis();
+			Messenger.info(String.format("Brewery Item %s activated by %s at %s in %dms.", this.getName(), executorName, locationString, completeTime-startTime));
+			if(PataneUtil.getDebug())
+				Messenger.send(executor, String.format("&eDebug: &7You &eactivated Item &7%s &eat &7%s &ein &7%dms&e.", this.getName(), locationString, completeTime-startTime));
 			return true;
 		} catch (Exception e) {
-			Messenger.send(Msg.WARNING, "Failed to execute item '"+getName()+"' in specific Location:");
+			Messenger.severe(String.format("Failed to execute Brewery Item %s at Location:", this.getName()));
 			e.printStackTrace();
 			return false;
 		}
@@ -311,49 +334,32 @@ public class BrItem extends ChatCollectable{
 	public boolean execute(LivingEntity executor, LivingEntity target) {
 		try {
 			// Checks if either executor or target are null for any reason.
-			Check.notNull(executor, "Executing entity is missing.");
-			Check.notNull(target, "Target of impact is missing.");
-			Messenger.debug(executor, "&7You &ahave activated &7"+getName()+"&a on an entity.");
-			// Collects a list of all successfully deployed effects.
-			List<String> successful = new ArrayList<String>();
+			Check.notNull(executor, String.format("Executing entity for %s is missing.", this.getName()));
+			Check.notNull(target, String.format("Target of impact for %s is missing.", this.getName()));
+
+			long startTime = System.currentTimeMillis();
 			// Loops through each effect within this BrItem.
 			for(BrEffect effect : effects) {
 				if(effect.isComplete())
-					if(effect.execute(executor, target))
-						successful.add(effect.getName());
+					effect.execute(executor, target);
 			}
-			Messenger.debug(executor, "&aThe following effects have been executed due to &7"+getName()+"&a: &7"+StringsUtil.stringJoiner(successful, "&a, &7"));
+			
+			// Collecting information and displaying it in one line in console
+			String executorName = (executor instanceof Player ? "Player("+((Player) executor).getDisplayName()+")" : executor.getName());
+			String targetName = (target instanceof Player ? "Player("+((Player) target).getDisplayName()+")" : target.getName());
+			String locationString = String.format("(%s, %.2f, %.2f, %.2f)", target.getEyeLocation().getWorld().getName(), target.getEyeLocation().getX(), target.getEyeLocation().getY(), target.getEyeLocation().getZ());
+			
+			long completeTime = System.currentTimeMillis();
+			Messenger.info(String.format("Brewery Item %s activated by %s on %s at %s in %dms.", this.getName(), executorName, targetName, locationString, completeTime-startTime));
+			if(PataneUtil.getDebug())
+				Messenger.send(executor, String.format("&eDebug: &7You &eactivated Item &7%s &eon &7%s &eat &7%s &ein &7%dms&e.", this.getName(), targetName, locationString, completeTime-startTime));
 			return true;
 		} catch (Exception e) {
-			Messenger.send(Msg.WARNING, "Failed to execute item '"+getName()+"' on specific Living Entity:");
+			Messenger.severe(String.format("Failed to execute Brewery Item %s on Living Entity:", this.getName()));
 			e.printStackTrace();
 			return false;
 		}
 	}
-
-	/* ================================================================================
-	 * *** OLD, TO BE REPLACED COMPLETELY BY TOCHATSTRING
-	 * ================================================================================
-	 */
-	public String hoverDetails() {
-		List<String> effectNames = new ArrayList<String>();
-		for(BrEffect effect : getEffects())
-			effectNames.add(effect.getName());
-		
-		return Chat.translate("&7"+getName()
-		+"\n&2Type: &a"+getType()
-		+"\n&2Item: &a"+ItemsUtil.getDisplayName(getItemStack())
-		+(hasCooldown() ? "\n&2Cooldown: &a"+getCooldown() : "")
-		+(hasEffects() ? "\n&2Effects: &a"+StringsUtil.stringJoiner(effectNames, "&2, &a") : ""));
-	}
-	
-	public static BrItem get(ItemStack item) {
-		String brItemName = ItemEncoder.getString(item, "name");
-		if(brItemName == null)
-			return null;
-		return Brewery.getItemCollection().getItem(brItemName);
-	}
-
 
 	/* ================================================================================
 	 * GUI Section. Still in very early development, likely rework needed

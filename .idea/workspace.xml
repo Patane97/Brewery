@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="e2201260-02ed-47dc-8275-537181dc026d" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1dLSAA4vvHLY76elDwmNxa93NSN" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e2201260-02ed-47dc-8275-537181dc026d" name="Default Changelist" comment="" />
+      <created>1592202733835</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1592202733835</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1060" y="425" key="FileChooserDialogImpl" timestamp="1592202789862">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1060" y="425" key="FileChooserDialogImpl/0.0.2560.1400/2560.-251.1050.1640@0.0.2560.1400" timestamp="1592202789862" />
+    <state x="945" y="460" key="NewModule_or_Project.wizard" timestamp="1592202800124">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="945" y="460" key="NewModule_or_Project.wizard/0.0.2560.1400/2560.-251.1050.1640@0.0.2560.1400" timestamp="1592202800124" />
+  </component>
+</project>

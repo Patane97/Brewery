@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Commands.CommandInfo;
+import com.Patane.util.formables.Radius;
+import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
@@ -28,8 +30,8 @@ public class editEffectRemoveRadius extends editEffectRemove {
 		String successMsg = String.format("&aRemoved radius for &7%s&a. Hover to view the details!", effect.getName());
 		
 		String successHoverText = generateEditingTitle(effect);
-
-		Float currentRadius = effect.getRadius();
+		
+		Radius currentRadius = effect.getRadius();
 		
 		// If both default and current radius are ALREADY removed, do nothing and message appropriately
 		if(currentRadius == null) {
@@ -38,7 +40,7 @@ public class editEffectRemoveRadius extends editEffectRemove {
 			return true;
 		}
 		// Uses original successMsg
-		successHoverText += "&cRadius&c: &8&m"+currentRadius+"&r";
+		successHoverText += currentRadius.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&c")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r");
 		
 		// Removing the radius from effect
 		effect.setRadius(null);

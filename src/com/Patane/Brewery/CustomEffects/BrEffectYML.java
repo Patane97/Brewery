@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -12,7 +13,6 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.Collections.BrEffectCollection;
-import com.Patane.Brewery.CustomEffects.BrEffect.BrParticleEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrSoundEffect;
 import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
 import com.Patane.Brewery.CustomEffects.Filter.FilterType;
@@ -20,6 +20,10 @@ import com.Patane.Brewery.CustomEffects.Filter.FilterTypes;
 import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.YAML.BreweryYAML;
+import com.Patane.util.formables.ParticleHandler;
+import com.Patane.util.formables.Radius;
+import com.Patane.util.formables.SpecialParticle;
+import com.Patane.util.formables.Particles.OTHER;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
@@ -122,10 +126,11 @@ public class BrEffectYML extends BreweryYAML{
 			 */
 			
 			if(effect.hasRadius()) {
-				if(effect.getRadius().equals(defaultEffect.getRadius()))
-					defaultHeader.set("radius", effect.getRadius());
-				else
-					baseHeader.set("radius", effect.getRadius());
+				setMapParsable(baseHeader.createSection("radius"), defaultHeader.getConfigurationSection("radius"), effect.getRadius(), defaultEffect.getRadius());
+//				if(effect.getRadius().equals(defaultEffect.getRadius()))
+//					defaultHeader.set("radius", effect.getRadius());
+//				else
+//					baseHeader.set("radius", effect.getRadius());
 			}
 			else 
 				baseHeader.set("radius", null);
@@ -157,10 +162,25 @@ public class BrEffectYML extends BreweryYAML{
 			/*
 			 * ==================> PARTICLE EFFECTS <==================
 			 */
-			if(effect.hasParticle())
-				setMapParsable(baseHeader.createSection("particles"), defaultHeader.getConfigurationSection("particles"), effect.getParticleEffect(), defaultEffect.getParticleEffect());
-			else 
-				baseHeader.set("particles", null);
+			if(effect.hasParticles()) {
+				if(effect.getParticles().equals(defaultEffect.getParticles()))
+					currentHeader = defaultHeader.createSection("particle effects");
+				else
+					currentHeader = baseHeader.createSection("particle effects");
+				Map<Particle, Integer> counts = new HashMap<Particle, Integer>();
+				
+				// *** Maybe a cleaner way of writing all this (1) duplicates for mapparsable and potionffects (below)?
+				for(SpecialParticle particle : effect.getParticles()) {
+					int pCount = 0;
+					if(!counts.containsKey(particle.getParticle()))
+						counts.put(particle.getParticle(), 0);
+					else
+						pCount = counts.get(particle.getParticle())+1;
+					String particleName = getDuplicateName(particle.getParticle().toString(), pCount);
+					setMapParsable(currentHeader.createSection(particleName), null, particle, null);
+					counts.put(particle.getParticle(), pCount++);
+				}
+			}
 			/*
 			 * ==================> SOUND EFFECTS <==================
 			 */
@@ -312,22 +332,15 @@ public class BrEffectYML extends BreweryYAML{
 			/*
 			 * ==================> RADIUS <==================
 			 */
-			
-			// Setting currentHeader to the baseHeader.
-			// If this doesnt have a radius, then currentHeader is set to the defaultSection.
-			// If defaultSection doesnt have a radius, then currentHeader is null.
-			currentHeader = getAvailableWithSet("radius", getSection(baseHeader), getSection(defaultHeader));
 
-			// Extracting the nullable Float from the radius, currentHeader and defaultHeader.
-			Float radius = null;
-			if(currentHeader != null) {
-				try {
-					radius = getFloat("radius", currentHeader, defaultHeader);
-				} catch(Exception e) {
-					Messenger.warning("Failed to retrieve "+effectName+" radius:");
-					e.printStackTrace();
-				}
-			}
+			// Setting currentHeader to the baseHeader's trigger.
+			// If this is unavailable, then currentHeader is set to the defaultSection's trigger.
+			currentHeader = getAvailable(getSection(baseHeader, "radius"), getSection(defaultHeader, "radius"));
+			
+			Radius radius = null;
+			try{
+				radius = getMapParsable(currentHeader, getSection(defaultHeader, "radius"), Radius.class);
+			} catch (YAMLException e) {}
 
 			/*
 			 * ==================> IGNORE USER <==================
@@ -409,25 +422,56 @@ public class BrEffectYML extends BreweryYAML{
 			
 			// Setting currentHeader to the baseHeader's particles.
 			// If this is unavailable, then currentHeader is set to the defaultSection's particles.
-			currentHeader = getAvailable(getSection(baseHeader, "particles"), getSection(defaultHeader, "particles"));
+			currentHeader = getAvailable(getSection(baseHeader, "particle effects"), getSection(defaultHeader, "particle effects"));
 			
 			// ParticleEffect is null if there are no particles in the base or default headers.
-			BrParticleEffect particleEffect = null;
+			List<SpecialParticle> particles = new ArrayList<SpecialParticle>();
 
 			// If either the base or the default headers have a particle, then its added (base taking priority).
 			if(currentHeader != null) {
-				// This is within a try/catch because it is optional.
-				// If it failed, we dont want to halt the entire retrieval process.
-				try{
-
-					// Setting the particle effect using the currentHeader, defaultHeader and getSimpleClassDefault method.
-					particleEffect = getMapParsable(currentHeader, getSection(defaultHeader, "particles"), BrParticleEffect.class);
-				} 
-				
-				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
-				catch(Exception e) {
-					Messenger.warning("Failed to retrieve "+effectName+" particle effect:");
-					e.printStackTrace();
+				for(String rawParticleName : currentHeader.getKeys(false)) {
+					// Removes any (brackets) at end of particleName. This is used to identify multiple
+					String particleName = StringsUtil.firstGroup(rawParticleName, "(\\w+)(?=\\(\\d\\))");
+					
+					// This is within a try/catch because it is optional.
+					// If it failed, we dont want to halt the entire retrieval process.
+					try {
+						// Grabbing the header
+						currentHeader = getAvailable(getSection(baseHeader, "particle effects", rawParticleName), getSection(defaultHeader, "particle effects", rawParticleName));
+						
+						// Attempts to find the Special particle from particleHandler
+						Class<? extends SpecialParticle> particleClass = ParticleHandler.get(particleName);
+						
+						// If this particle does not return anything from the handler, then its not a valid particle
+						if(particleClass == null) {
+							throw new NullPointerException(String.format("Particle of type %s does not exist!", particleName));
+						}
+						
+						// If the particle class extends from OTHER, then we need to inject the ParticleType manually (outside constructor)
+						if(OTHER.class.isAssignableFrom(particleClass)) {
+							
+							// This won't give IllegalArgumentException as 'ParticleHandler.get' confirms the given name IS in the particle enum
+							Particle particleType = StringsUtil.constructEnum(particleName, Particle.class);
+							
+							// Creating the OTHER particle. If this extends from OTHER, such as DIRECTIONAL, then particleClass will be DIRECTIONAL
+							OTHER otherParticle = (OTHER) getMapParsable(currentHeader, getSection(defaultHeader, "particle effects", rawParticleName), particleClass);
+							
+							// Setting the particle of the OTHER manually.
+							otherParticle.setParticle(particleType);
+							
+							// Add to list
+							particles.add(otherParticle);
+						}
+						// Otherwise we are looking at a custom particle class and thus it will handle its own particletype injection.
+						else
+							particles.add(getMapParsable(currentHeader, getSection(defaultHeader, "particle effects", rawParticleName), particleClass));
+						
+					}
+					// Any exceptions will be caught here and printed.
+					catch(Exception e) {
+						Messenger.warning(String.format("Failed to retrieve %s particle effect for %s:", rawParticleName, effectName));
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -492,7 +536,7 @@ public class BrEffectYML extends BreweryYAML{
 				}
 			}
 			BrEffect effect = new BrEffect(effectName, modifier, trigger, radius, 
-					filter, particleEffect, soundEffect, potionEffects, tag, ignoreUser);
+					filter, particles, soundEffect, potionEffects, tag, ignoreUser);
 
 			
 			// If effect isnt already in the collection, it adds it.

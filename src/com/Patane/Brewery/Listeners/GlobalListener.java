@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -35,7 +36,8 @@ import com.Patane.runnables.PatRunnable;
 import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.ingame.ItemEncoder;
-import com.Patane.util.ingame.LocationsUtil;
+import com.Patane.util.location.LocationsUtil;
+import com.Patane.util.location.RadiusUtil;
 import com.Patane.util.main.PataneUtil;
 
 public class GlobalListener extends BaseListener{
@@ -55,19 +57,23 @@ public class GlobalListener extends BaseListener{
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		BrItem brItem = BrItem.get(item);
+		BrItem brItem = BrItem.getFromItemStack(item);
+		
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
 			return;
 		
-		
+	
 		Location blockLocation = LocationsUtil.getCentre(e.getClickedBlock());
-		Location location = new Location(blockLocation.getWorld(), blockLocation.getX() + e.getBlockFace().getModX(), blockLocation.getY() + e.getBlockFace().getModY(), blockLocation.getZ() + e.getBlockFace().getModZ());
+//		Location location = blockLocation.add(new Vector(e.getBlockFace().getModX(), e.getBlockFace().getModY(), e.getBlockFace().getModZ()));
+		
+		if(PataneUtil.getDebug())
+			blockLocation.getWorld().spawnParticle(Particle.FLAME, blockLocation, 0, 0,0,0);
 
 		// Starts the cooldown (if any)
 		if(brItem.hasCooldown() && !CooldownHandler.start(player, item, brItem))
 			return;
 		
-		hitGround(brItem, location, player);
+		hitGround(brItem, blockLocation, player);
 	}
 	/**
 	 * Called when an entity Damages another entity.
@@ -91,7 +97,7 @@ public class GlobalListener extends BaseListener{
 		}
 		LivingEntity damager = (LivingEntity) e.getDamager();
 		ItemStack item = damager.getEquipment().getItemInMainHand();
-		BrItem brItem = BrItem.get(item);
+		BrItem brItem = BrItem.getFromItemStack(item);
 		
 		// Only 'HITTABLE' items will trigger in this way.
 		if(brItem == null || brItem.getType() != CustomType.HITTABLE)
@@ -124,9 +130,11 @@ public class GlobalListener extends BaseListener{
 			return;
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
-		BrItem brItem = BrItem.get(item);
-		if(brItem == null)
+		BrItem brItem = BrItem.getFromItemStack(item);
+
+		if(brItem == null || (brItem.getType() != CustomType.THROWABLE && brItem.getType() != CustomType.CLICKABLE))
 			return;
+		
 		// Cancels if its something like SplashPotion
 		e.setCancelled(true);
 		
@@ -142,18 +150,19 @@ public class GlobalListener extends BaseListener{
 		}
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////// UUID ITEM CHECKS //////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ***************** IMPORTANT *********************
-	// When 'MaxStacks' is implemented, add a checker to ensure the dropped ItemStack adheres to MaxStacks. (
-	// ***************** IMPORTANT *********************
+
+	/** ==================================================================================================================
+	 *  UUID Item Checks
+	 *  ==================================================================================================================
+	 */
+	
+	// TODO: When 'MaxStacks' is implemented, add a checker to ensure the dropped ItemStack adheres to MaxStacks. (
 	@EventHandler
 	public void onCreativeItemDrop(PlayerDropItemEvent e) {
 		if(e.getPlayer().getGameMode() != GameMode.CREATIVE)
 			return;
 		ItemStack item = e.getItemDrop().getItemStack();
-		BrItem brItem = BrItem.get(item);
+		BrItem brItem = BrItem.getFromItemStack(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -177,7 +186,7 @@ public class GlobalListener extends BaseListener{
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
 		ItemStack item = e.getOldCursor();
-		BrItem brItem = BrItem.get(item);
+		BrItem brItem = BrItem.getFromItemStack(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -218,7 +227,7 @@ public class GlobalListener extends BaseListener{
 		if(!(e.getWhoClicked() instanceof Player) || e.getClickedInventory() == null || ((Player) e.getWhoClicked()).getGameMode() != GameMode.CREATIVE)
 			return;
 		ItemStack item = e.getCursor();
-		BrItem brItem = BrItem.get(item);
+		BrItem brItem = BrItem.getFromItemStack(item);
 		if(brItem == null)
 			return;
 		if(!ItemEncoder.hasTag(item, "UUID")) {
@@ -249,39 +258,16 @@ public class GlobalListener extends BaseListener{
 			return ArrayUtils.addAll(invView.getTopInventory().getContents(), invView.getBottomInventory().getContents());
 		return invView.getBottomInventory().getContents();
 	}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////// COOLDOWN CHECKERS /////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	/** ==================================================================================================================
+	 *  Cooldown Checks
+	 *  ==================================================================================================================
+	 */
 	/*
 	 * TODO: MaxStacks checks for each cooldown checker (when maxstacks is implemented)
 	 */
 	
-	// 4/8/18: Testing if this can be removed/replaced with method below it.
-//	@EventHandler
-//	public void onItemSwitch(PlayerItemHeldEvent e) {
-//		if(CooldownHandler.noCooldowns())
-//			return;
-//		Player player = e.getPlayer();
-//		ItemStack item = player.getInventory().getItem(e.getNewSlot());
-//		if(CooldownHandler.updateFromYAML(player, item, BrItem.get(item)))
-//			return;
-//		if(item == null || item.getType() == Material.AIR) {
-//			if(BrMetaDataHandler.hasValue(player, "showing_cooldown") && CooldownHandler.cooldowns().containsKey(BrMetaDataHandler.getValue(player, "showing_cooldown")))
-//				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
-//			return;
-//		}
-//		String uuidString = ItemEncoder.getString(item, "UUID");
-//		if(uuidString != null) {
-//			if(BrMetaDataHandler.hasValue(player, "showing_cooldown"))
-//				CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
-//			for(UUID uuid : CooldownHandler.cooldowns().keySet()) {
-//				if(uuidString.equals(uuid.toString())) {
-//					CooldownHandler.cooldowns().get(uuid).addPlayer(player);
-//					return;
-//				}
-//			}
-//		}
-//	}
 	@EventHandler
 	public void onItemSwitch(PlayerItemHeldEvent e) {
 		CooldownHandler.checkUpdateCooldowns(e.getPlayer());
@@ -307,48 +293,9 @@ public class GlobalListener extends BaseListener{
 		CooldownHandler.checkUpdateCooldowns(e.getPlayer());
 	}
 	
-	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////// Passive ItemType Tests ///////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	@EventHandler
-//	public void onItemSwitch(PlayerItemHeldEvent e) {
-//		Player player = e.getPlayer();
-//		BrItem brItem = BrItem.get(player.getInventory().getItem(e.getNewSlot()));
-//		int slot = e.getNewSlot();
-//		if(brItem == null || brItem.getType() != CustomType.MAIN_HAND)
-//			return;
-//		Brewery.getInstance().getServer().getPluginManager().registerEvents(new PassiveItem(brItem, player, slot), Brewery.getInstance());
-//	}
-//	private class PassiveItem extends PatRunnable implements Listener{
-//		private final BrItem brItem;
-//		private final Player player ;
-//		private final int slot;
-//		
-//		public PassiveItem(BrItem brItem, Player player, int slot) {
-//			super(0, 20);
-//			this.brItem = brItem;
-//			this.player = player;
-//			this.slot = slot;
-//		}
-//
-//		@Override
-//		public void run() {
-//			hitEntity(brItem, player, player);
-//		}
-//		@EventHandler
-//		public void onItemSwitch(PlayerItemHeldEvent e) {
-//			if(!e.getPlayer().equals(player))
-//				return;
-//			if(e.getPreviousSlot() == slot && e.getNewSlot() != slot)
-//				HandlerList.unregisterAll(this);
-//				this.cancel();
-//		}
-//	}
-	/*================================================================================================
-	 * 										Useful Methods
-	 * 
-	 *================================================================================================
+	/* ================================================================================================
+	 * Misc. Useful Methods
+	 * ================================================================================================
 	 */
 	private void hitGround(BrItem item, Location location, LivingEntity executor) {
 		item.execute(location, executor);
@@ -389,35 +336,50 @@ public class GlobalListener extends BaseListener{
 			this.brItem = brItem;
 			this.executor = executor;
 		}
+		// *** Optimise this a little. Many corners can be cut, especially with the entities detection system (eg. just search for closest living instead of ALL)
 		@Override
 		public void run() {
-			Location loc = item.getLocation();
 			List<Entity> entities = item.getNearbyEntities(item.getWidth(), item.getHeight(), item.getWidth());
 			// This allows us to ignore the executor whilst the object is being thrown away from them,
 			// but lets them be targetted on the way back (eg. throwing it directly upwards)
+			
+			// If executor is not part of the list, show theyve left
 			if(!entities.contains(executor))
 				hasLeftExecutor = true;
+			// If they havent left, remove them from found list
 			if(!hasLeftExecutor)
 				entities.remove(executor);
+			
+			// If entities arent empty
 			if(!entities.isEmpty()) {
 				List<LivingEntity> living = GeneralUtil.getLiving(entities);
+				// If there was a living entity found.
+				// *** Maybe optimize this with a simple "hasLiving"?
 				if(living.isEmpty()) {
+					// Stops anyone from picking item up
 					item.setPickupDelay(0);
+					// Removes the item
 					item.remove();
+					
+					// Hit ground execution
 					hitGround(brItem, item.getLocation(), executor);
+					
+					// Stop this task
 					this.cancel();
 					return;
 				}
 				item.setPickupDelay(0);
 				item.remove();
-				hitEntity(brItem, executor, LocationsUtil.getClosest(living, item.getLocation()));
+				hitEntity(brItem, executor, RadiusUtil.getClosestLivingEntity(living, item.getLocation()));
 				this.cancel();
 				return;
 			}
-			if(loc.add(0, -0.5, 0).getBlock().getType() != Material.AIR || loc.add(item.getVelocity().multiply(2)).getBlock().getType() != Material.AIR) {
+			Location loc = item.getLocation();
+			Block hitBlock;
+			if((hitBlock = loc.clone().add(item.getVelocity().multiply(2)).getBlock()).getType().isSolid()) {
 				item.setPickupDelay(0);
 				item.remove();
-				hitGround(brItem, item.getLocation(), executor);
+				hitGround(brItem, LocationsUtil.getCentre(hitBlock), executor);
 				this.cancel();
 				return;
 			}

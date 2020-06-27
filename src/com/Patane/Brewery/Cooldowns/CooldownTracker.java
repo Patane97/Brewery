@@ -75,11 +75,11 @@ public class CooldownTracker extends PatTimedRunnable {
 		// Colour of remaining time
 		String bar = "&f";
 		for(int i=0 ; i < blockCount ; i++)
-			bar = bar+"█";
+			bar = bar+"\u2588";
 		// Background colour
 		bar = bar+"&0";
 		for(int i=0 ; i < remainder ; i++)
-			bar = bar+"█";
+			bar = bar+"\u2588";
 		return bar;
 	}
 	private static Date completeTime(float duration) {

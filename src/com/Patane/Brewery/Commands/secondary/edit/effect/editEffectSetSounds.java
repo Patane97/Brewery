@@ -17,7 +17,7 @@ import com.Patane.util.general.StringsUtil;
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
 	name = "edit effect set sounds",
-	description = "Sets or changes the Sound Effects of an original Effect for a Brewery Item.",
+	description = "Sets or changes the Sound Effects of an original Effect.",
 	usage = "/brewery edit effect <effect name> set sounds [type] [formation] <intensity> <velocity>",
 	maxArgs = 4
 )
@@ -95,13 +95,13 @@ public class editEffectSetSounds extends editEffectSet {
 		
 		BrSoundEffect previousSoundEffect = effect.getSoundEffect();
 
-		// If the sound effect values are the same, do nothing and message appropriately
-		if(soundEffect.equals(previousSoundEffect)) {
-			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e already has a Sound Effect with those values. Hover to view it!", effect.getName())
-														, successHoverText + effect.getSoundEffect().toChatString(0, true)));
-			return true;
-		}
 		if(previousSoundEffect != null) {
+			// If the sound effect values are the same, do nothing and message appropriately
+			if(soundEffect.equals(previousSoundEffect)) {
+				Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e already has a Sound Effect with those values. Hover to view it!", effect.getName())
+															, successHoverText + effect.getSoundEffect().toChatString(0, true)));
+				return true;
+			}
 			// If its different, then it is changing
 			successMsg = String.format("&aChanged the Sound Effect for &7%s&a. Hover to view the details!", effect.getName());
 			successHoverText += "&2"+soundEffect.className()+":\n"

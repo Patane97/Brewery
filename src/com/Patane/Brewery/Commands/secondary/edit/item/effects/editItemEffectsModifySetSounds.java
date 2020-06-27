@@ -99,14 +99,14 @@ public class editItemEffectsModifySetSounds extends editItemEffectsModifySet {
 		
 		BrSoundEffect previousSoundEffect = effect.getSoundEffect();
 		
-		// If the sound effect values are the same, do nothing and message appropriately
-		if(soundEffect.equals(previousSoundEffect)) {
-			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Sound Effect with those values. Hover to view it!"
-														, successHoverText + effect.getSoundEffect().toChatString(0, true)));
-			return true;
-		}
 		
 		if(previousSoundEffect != null) {
+			// If the sound effect values are the same, do nothing and message appropriately
+			if(soundEffect.equals(previousSoundEffect)) {
+				Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e already has a Sound Effect with those values. Hover to view it!"
+															, successHoverText + effect.getSoundEffect().toChatString(0, true)));
+				return true;
+			}
 			// If its different, then it is changing
 			successMsg = "&aChanged the Sound Effect for &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 			successHoverText += "&2"+soundEffect.className()+":\n"

@@ -11,7 +11,7 @@ import com.Patane.Brewery.CustomEffects.Trigger;
 import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.annotations.ClassDescriber;
-import com.Patane.util.annotations.FieldDescriber;
+import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
 
@@ -19,9 +19,9 @@ import com.Patane.util.ingame.Focus;
 		name="lingering",
 		desc="Applies the Modifier at a fixed rate over a duration. Calculates which living entities are hit at each rate.")
 public class Lingering extends Trigger{
-	@FieldDescriber(desc="Rate at which to apply the Modifier. Measured in seconds.")
+	@ParseField(desc="Rate at which to apply the Modifier. Measured in seconds.")
 	public float rate;
-	@FieldDescriber(desc="Duration for the effect to linger. This must be greater than or equal to the rate and is measured in seconds.")
+	@ParseField(desc="Duration for the effect to linger. This must be greater than or equal to the rate and is measured in seconds.")
 	public float duration;
 	
 	public Lingering() {

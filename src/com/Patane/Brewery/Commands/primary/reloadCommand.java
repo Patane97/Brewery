@@ -1,5 +1,8 @@
 package com.Patane.Brewery.Commands.primary;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.Brewery;
@@ -31,5 +34,10 @@ public class reloadCommand extends PatCommand{
 //			return false;
 //		}
 //		CommandHandler.grabInstance().handleCommand(sender, child.command(), args);
+	}
+
+	@Override
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		return Arrays.asList();
 	}
 }
