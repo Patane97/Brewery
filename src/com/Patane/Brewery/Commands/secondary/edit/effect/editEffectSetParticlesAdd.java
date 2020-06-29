@@ -210,16 +210,7 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 
 		if(specialParticleClass == null)
 			return Arrays.asList();
-
-//		Messenger.debug("Checking fields ("+specialParticleClass.getSimpleName()+")");
-		Field[] fields = MapParsable.getFields(specialParticleClass);
-//		for(Field field : fields)
-//			Messenger.debug(field.getName());
-		int index = args.length - 2;
 		
-		if(index >= fields.length)
-			return Arrays.asList();
-		
-		return MapParsable.getSuggestion(specialParticleClass, index);
+		return MapParsable.getSuggestion(specialParticleClass, Commands.grabArgs(args, 1, args.length));
 	}
 }
