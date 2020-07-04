@@ -1,6 +1,5 @@
 package com.Patane.Brewery.Commands.secondary.edit.item.itemstack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -98,13 +97,8 @@ public class editItemItemstackLoreDelete extends editItemItemstackLore {
 				
 				if(lore == null || lore.isEmpty())
 					return Arrays.asList();
-				else {
-					// Create a list showing all available line numbers
-					List<String> lines = new ArrayList<String>();
-					for(int i=1 ; i<lore.size()+1 ; i++)
-						lines.add(Integer.toString(i));
-					return lines;
-				}
+				else
+					return StringsUtil.listCount(lore);
 		}
 		return Arrays.asList();
 	}

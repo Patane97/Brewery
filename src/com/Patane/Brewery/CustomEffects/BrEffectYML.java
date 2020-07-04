@@ -21,9 +21,9 @@ import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Brewery.YAML.BreweryYAML;
 import com.Patane.util.formables.ParticleHandler;
-import com.Patane.util.formables.Particles.OTHER;
 import com.Patane.util.formables.Radius;
 import com.Patane.util.formables.SpecialParticle;
+import com.Patane.util.formables.Particles.STANDARD;
 import com.Patane.util.general.Check;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
@@ -448,13 +448,13 @@ public class BrEffectYML extends BreweryYAML{
 						}
 						
 						// If the particle class extends from OTHER, then we need to inject the ParticleType manually (outside constructor)
-						if(OTHER.class.isAssignableFrom(particleClass)) {
+						if(STANDARD.class.isAssignableFrom(particleClass)) {
 							
 							// This won't give IllegalArgumentException as 'ParticleHandler.get' confirms the given name IS in the particle enum
 							Particle particleType = StringsUtil.constructEnum(particleName, Particle.class);
 							
 							// Creating the OTHER particle. If this extends from OTHER, such as DIRECTIONAL, then particleClass will be DIRECTIONAL
-							OTHER otherParticle = (OTHER) getMapParsable(currentHeader, getSection(defaultHeader, "particle effects", rawParticleName), particleClass);
+							STANDARD otherParticle = (STANDARD) getMapParsable(currentHeader, getSection(defaultHeader, "particle effects", rawParticleName), particleClass);
 							
 							// Setting the particle of the OTHER manually.
 							otherParticle.setParticle(particleType);

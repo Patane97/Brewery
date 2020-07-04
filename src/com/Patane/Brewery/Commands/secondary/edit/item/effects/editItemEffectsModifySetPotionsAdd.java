@@ -134,7 +134,8 @@ public class editItemEffectsModifySetPotionsAdd extends editItemEffectsModifySet
 		
 		String successMsg = "&aAdded new Potion Effect to &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 		
-		String successHoverText = generateEditingTitle(item, effect);
+		String successHoverText = generateEditingTitle(item, effect)
+								+ (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "");
 		
 		// If the type AND amplifier are equal, we do not want to duplicate with the same amp. Therefore, do nothing and message appropriately
 		for(PotionEffect currentPotionEffect : effect.getPotions()) {
@@ -147,8 +148,7 @@ public class editItemEffectsModifySetPotionsAdd extends editItemEffectsModifySet
 			}
 		}
 		// Add the new potion to end of potion effect list
-		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))+"\n" : "")
-						  + Chat.add(StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], potionEffect), ChatColor.BOLD);
+		successHoverText += String.format("\n%s", Chat.add(StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], potionEffect), ChatColor.BOLD));
 		
 		// Save potion effect to effect
 		effect.addPotion(potionEffect);

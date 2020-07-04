@@ -20,6 +20,5 @@ public class editItemEffectsModifySetPotions extends editItemEffectsModifySet {
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		return tabCompleteCore(sender, args, objects);
-		
 	}
 }

@@ -1,6 +1,5 @@
 package com.Patane.Brewery.Commands.secondary.edit.effect;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,6 @@ import com.Patane.Brewery.Handlers.ModifierHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.general.Chat;
-import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -59,7 +57,7 @@ public class editEffectSetModifier extends editEffectSet {
 		try {
 			// Attempting to create the modifier using the found Class
 			// and all the arguments after the first (as the first is the modifier type)
-			modifier = GeneralUtil.createMapParsable(modifierClass, Commands.grabArgs(args, 1, args.length));
+			modifier = MapParsable.create(modifierClass, Commands.grabArgs(args, 1, args.length));
 		}
 		// This will catch if either the value is missing OR an incorrect value was given for an argument
 		catch(IllegalArgumentException|NullPointerException e) {
@@ -69,6 +67,7 @@ public class editEffectSetModifier extends editEffectSet {
 		}
 		// This will catch if theres any other error with generating this mapParsable
 		catch(InvocationTargetException e) {
+			e.printStackTrace();
 			Messenger.send(sender, "&cModifier could not be set due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
@@ -135,11 +134,6 @@ public class editEffectSetModifier extends editEffectSet {
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
-		BrEffect effect = (BrEffect) objects[0];
-		
-		if(effect == null)
-			return Arrays.asList();
-		
 		// If its the first argument (args.length == 1), send all Modifiers
 		if(args.length < 2)
 			return ModifierHandler.getKeys();
@@ -151,24 +145,14 @@ public class editEffectSetModifier extends editEffectSet {
 		if(modifierClass == null)
 			return Arrays.asList();
 		
-		// Save all fields for found modifier class
-		Field[] fields = MapParsable.getFields(modifierClass);
-		
-		// index is this as we want the last argument (args.length-1) PAST the modifier arg (-2 instead of -1)
-		int index = args.length - 2;
-		
-		// If index is past fields length
-		if(index >= fields.length)
-			return Arrays.asList();
-		
 		// Very specific scenario for Effect modifier.
 		// *** Low priority: find a spot for this within effect modifier. 
 		//     Is difficult as modifier ISNT an actual object by this point, only a class.
 		//     Only thought is to have a "specialSuggestion" methos that runs onLoad.
-		if(args[0].equalsIgnoreCase("effect") && fields[index].getType().isAssignableFrom(BrEffect.class))
+		if(args[0].equalsIgnoreCase("effect"))
 			return StringsUtil.encase(Brewery.getEffectCollection().getAllIDs(), "'", "'");
 		
-		// Gets the suggestion. If its an enum, shows the enums available
-		return MapParsable.getSuggestion(fields[index]);
+		// Gets the suggestion.
+		return MapParsable.getSuggestion(modifierClass, Commands.grabArgs(args, 1, args.length));
 	}
 }

@@ -1,5 +1,6 @@
 package com.Patane.Brewery.Commands.secondary.edit;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -53,6 +54,9 @@ public class editEffect extends editCommand {
 		}
 		// Grabbing the effect
 		BrEffect effect = Brewery.getEffectCollection().getItem(args[0]);
+		
+		if(effect == null)
+			return Arrays.asList();
 		
 		return tabCompleteCore(sender, args, effect);
 	}

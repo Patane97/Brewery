@@ -88,10 +88,14 @@ public class BrEffect extends ChatCollectable{
 		// DEFAULTED VALUES.
 		// These values will always have a setting. If the given value is null, then the default is set.
 		this.filter = (filter == null ? new Filter() : filter);
-		this.particles = (particles == null ? new ArrayList<SpecialParticle>() : particles);
-		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
 		this.ignoreUser = (ignoreUser == null ? true : ignoreUser);
 //		this.stack = false;
+		
+		// SETTER METHODS
+		// These values will need to sort or run code for each element when being set, therefore we simply run their set methods.
+		setParticles(particles);
+		setPotions(potionEffects);
+		
 		if(!isComplete())
 			Messenger.info(name+" effect is incomplete. Missing: "+StringsUtil.stringJoiner(incomplete, ", "));
 	}
@@ -145,19 +149,42 @@ public class BrEffect extends ChatCollectable{
 	}
 	// Particle
 	public boolean hasParticles() {
-		return (particles == null ? false : true);
+		return !particles.isEmpty();
 	}
 	public List<SpecialParticle> getParticles() {
 		return particles;
 	}
 	public void setParticles(List<SpecialParticle> particles) {
+		if(particles == null) {
+			this.particles = new ArrayList<SpecialParticle>();
+			return;
+		}
 		this.particles = particles;
+		sortParticlesByType();
+		formatChatNames();
 	}
 	public void addParticle(SpecialParticle particle) {
 		particles.add(particle);
+		sortParticlesByType();
+		formatChatNames();
 	}
-	public void removePotion(SpecialParticle particle) {
+	public void removeParticle(SpecialParticle particle) {
 		particles.remove(particle);
+		// Dont need to sort here as its already in correct order
+		formatChatNames();
+	}
+	
+	protected void sortParticlesByType() {
+		particles.sort((p1, p2) -> p1.getParticle().toString().compareTo(p2.getParticle().toString()));
+	}
+	
+	protected void formatChatNames() {
+		Map<SpecialParticle, Integer> incParticles = StringsUtil.saveIncrements(particles, (p1, p2) -> (p1.getParticle() == p2.getParticle() ? 0 : -1));
+		for(SpecialParticle particle : particles) {
+			int i = incParticles.get(particle);
+			if(i!=0)
+				particle.formatChatName("&7%s&8("+i+")");
+		}
 	}
 	
 	// Sound
@@ -173,13 +200,17 @@ public class BrEffect extends ChatCollectable{
 
 	// Potion Effects
 	public boolean hasPotions() {
-		return (potionEffects.isEmpty() ? false : true);
+		return !potionEffects.isEmpty();
 	}
 	public List<PotionEffect> getPotions() {
 		return potionEffects;
 	}
 	public void setPotions(List<PotionEffect> potionEffects) {
-		this.potionEffects = (potionEffects == null ? new ArrayList<PotionEffect>() : potionEffects);
+		if(potionEffects == null) {
+			this.potionEffects = new ArrayList<PotionEffect>();
+			return;
+		}
+		this.potionEffects =potionEffects;
 		sortPotionsByAmplifier();
 	}
 	public void addPotion(PotionEffect potionEffect) {
@@ -330,7 +361,7 @@ public class BrEffect extends ChatCollectable{
 		if(hasParticles()) {
 			if(deep) {
 				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")
-							+ StringsUtil.manyToChatString(indentCount+1, 0, deep, s -> "\n"+s, null, particles.toArray(new SpecialParticle[0]));
+							+ StringsUtil.manyToChatString(indentCount+1, 0, false, null, s -> "&2> "+s[1], particles.toArray(new SpecialParticle[0]));
 			}
 			else
 				effectInfo += "\n" + Chat.indent(indentCount+1) + alternateLayout.build("Particle Effects", Integer.toString(particles.size()));
@@ -425,9 +456,9 @@ public class BrEffect extends ChatCollectable{
 			// Manually doing deep check as each SpecialParticle has its own toHoverString
 			if(deep) {
 				componentList.add(StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")));
-				for(SpecialParticle particleEffect : particles) {
-					current = StringsUtil.hoverText(String.format("\n%s&2> &7%s", Chat.indent(indentCount+1), particleEffect.className())
-					, particleEffect.toChatString(0, true, deepLayout));
+				for(SpecialParticle particle : particles) {
+					current = StringsUtil.hoverText(String.format("\n%s&2> %s", Chat.indent(indentCount+1), particle.getChatName())
+							, particle.toChatString(0, true, deepLayout));
 					componentList.add(current);
 				}
 			}

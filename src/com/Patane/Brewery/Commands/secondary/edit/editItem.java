@@ -1,5 +1,6 @@
 package com.Patane.Brewery.Commands.secondary.edit;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
@@ -54,6 +55,9 @@ public class editItem extends editCommand {
 		}
 		// Grabbing the item
 		BrItem item = Brewery.getItemCollection().getItem(args[0]);
+		
+		if(item == null)
+			return Arrays.asList();
 		
 		return tabCompleteCore(sender, args, item);
 	}

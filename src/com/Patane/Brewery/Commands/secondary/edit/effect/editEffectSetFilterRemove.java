@@ -118,8 +118,6 @@ public class editEffectSetFilterRemove extends editEffectSetFilter {
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		// Grabbing effect
 		BrEffect effect = (BrEffect) objects[0];
-		if(effect == null) 
-			return Arrays.asList();
 		
 		FilterTypes filterType;
 		

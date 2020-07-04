@@ -47,7 +47,7 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		}
 		
 		// Checking amplifier is given
-		if(args.length < 1) {
+		if(args.length < 2) {
 			Messenger.send(sender, "&ePlease provide an existing amplifier.");
 			return true;
 		}
@@ -85,11 +85,8 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		
 		// If the above loop found no matching potions, it means there are none with that type+amplifier. Do nothing and message appropriately
 		if(potionEffect == null) {
-			// Adding all potion effects
-			successHoverText += StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]));
-			
 			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e does not contain a potion effect with that type and amplifier. Hover to view all potion effects on this effect!", effect.getName())
-					, (!effect.hasPotions() ? successHoverText+"&8No Potion Effects!" : successHoverText)));
+					, successHoverText + (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "&8No Potion Effects!")));
 			return true;
 		}
 		
@@ -97,8 +94,8 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		effect.removePotion(potionEffect);
 		
 		// Adding the removed potion effect with removed layout
-		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))+"\n" : "")
-						  + StringsUtil.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect);
+		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "")
+						  + String.format("\n%s", StringsUtil.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect));
 
 		// Save the Effect to YML
 		BrEffect.YML().save(effect);
@@ -118,8 +115,6 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		// Grabbing effect
 		BrEffect effect = (BrEffect) objects[0];
-		if(effect == null) 
-			return Arrays.asList();
 		
 		switch(args.length) {
 			case 1:

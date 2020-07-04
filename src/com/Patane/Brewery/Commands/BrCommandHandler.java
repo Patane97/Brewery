@@ -35,6 +35,7 @@ import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetIgnoreuser
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetModifier;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetParticles;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetParticlesAdd;
+import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetParticlesRemove;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotions;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotionsAdd;
 import com.Patane.Brewery.Commands.secondary.edit.effect.editEffectSetPotionsRemove;
@@ -64,6 +65,8 @@ import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsMo
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetIgnoreuser;
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetModifier;
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetParticles;
+import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetParticlesAdd;
+import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetParticlesRemove;
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetPotions;
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetPotionsAdd;
 import com.Patane.Brewery.Commands.secondary.edit.item.effects.editItemEffectsModifySetPotionsRemove;
@@ -125,6 +128,7 @@ public class BrCommandHandler extends CommandHandler{
 		register(editEffectSetFilterRemove.class);
 		register(editEffectSetParticles.class);
 		register(editEffectSetParticlesAdd.class);
+		register(editEffectSetParticlesRemove.class);
 		register(editEffectSetSounds.class);
 		register(editEffectSetTag.class);
 		register(editEffectSetIgnoreuser.class);
@@ -170,6 +174,8 @@ public class BrCommandHandler extends CommandHandler{
 		register(editItemEffectsModifySetFilterAdd.class);
 		register(editItemEffectsModifySetFilterRemove.class);
 		register(editItemEffectsModifySetParticles.class);
+		register(editItemEffectsModifySetParticlesAdd.class);
+		register(editItemEffectsModifySetParticlesRemove.class);
 		register(editItemEffectsModifySetSounds.class);
 		register(editItemEffectsModifySetIgnoreuser.class);
 		register(editItemEffectsModifySetTag.class);

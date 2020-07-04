@@ -1,4 +1,4 @@
-package com.Patane.Brewery.Commands.secondary.edit.effect;
+package com.Patane.Brewery.Commands.secondary.edit.item.effects;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
+import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.formables.ParticleHandler;
@@ -21,11 +22,11 @@ import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
-	name = "edit effect set particles add",
-	description = "Adds a Particle Effect to an original Effect.",
-	usage = "/brewery edit effect <effect name> set particles add [particle] <values...>"
+	name = "edit item effects modify set particles add",
+	description = "Adds a Particle Effect to an Effect for a Brewery Item. These changes are seperate from the original Effect.",
+	usage = "/brewery edit item <item name> effects modify <effect name> set particles add [particle] <values...>"
 )
-public class editEffectSetParticlesAdd extends editEffectSetParticles {
+public class editItemEffectsModifySetParticlesAdd extends editItemEffectsModifySetParticles {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args, Object... objects) {
@@ -52,6 +53,7 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 		
 		try {
 			particleEffect = MapParsable.create(specialParticleClass, Commands.grabArgs(args, 1, args.length));
+			// STANDARD effects require the particle to be manually input.
 			if(particleEffect instanceof STANDARD)
 				((STANDARD) particleEffect).setParticle(particle);
 		}
@@ -66,18 +68,21 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 			Messenger.send(sender, "&cParticle effect could not be added due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
-
-		// Grabbing Effect
-		BrEffect effect = (BrEffect) objects[0];
 		
-		String successMsg = String.format("&aAdded new Particle Effect to &7%s&a. Hover to view the details!", effect.getName());
+		// Find Item
+		BrItem item = (BrItem) objects[0]; 
+		
+		// Find Effect
+		BrEffect effect = (BrEffect) objects[1];
+		
+		String successMsg = String.format("&aAdded new Particle Effect to &7%s&a's instance of &7%s&a. Hover to view the details!", item.getName(), effect.getName());
 		
 		String successHoverText = generateEditingTitle(effect)
 								+ (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "");
 		
 		for(SpecialParticle currentParticleEffect : effect.getParticles()) {
 			if(currentParticleEffect.getParticle() == particleEffect.getParticle() && currentParticleEffect.equalFieldMap(particleEffect)) {
-				Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e already contains a particle effect with those values. Hover to view all particle effects on this effect!", effect.getName())
+				Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e's instance of &7%s &ealready contains a particle effect with those values. Hover to view all particle effects on this effect!", item.getName(), effect.getName())
 						, successHoverText));
 				return true;
 			}
@@ -88,12 +93,9 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 		
 		// Save the new specialParticle to the effect
 		effect.addParticle(particleEffect);
-
-		// Save the Effect to YML
-		BrEffect.YML().save(effect);
 		
-		// Updates all items that contain references to this effect. Doing this updates any relevant changes to the items effect.
-		effect.updateReferences();
+		// Save the Item to the YML. This will also save the instance of the effect to the item
+		BrItem.YML().save(item);
 		
 		// Allows the user to view the details on hover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
@@ -103,7 +105,7 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 	}
 	
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {		
 		// If its the first argument (args.length == 1), send all Particles
 		if(args.length < 2)
 			return Arrays.asList(StringsUtil.enumValueStrings(Particle.class));

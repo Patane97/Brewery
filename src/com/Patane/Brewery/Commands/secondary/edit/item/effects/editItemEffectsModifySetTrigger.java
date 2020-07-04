@@ -1,6 +1,5 @@
 package com.Patane.Brewery.Commands.secondary.edit.item.effects;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,6 @@ import com.Patane.Brewery.Handlers.TriggerHandler;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.general.Chat;
-import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
@@ -63,7 +61,7 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 		try {
 			// Attempting to create the trigger using the found Class
 			// and all the arguments after the first (as the first is the trigger type)
-			trigger = GeneralUtil.createMapParsable(triggerClass, Commands.grabArgs(args, 1, args.length));
+			trigger = MapParsable.create(triggerClass, Commands.grabArgs(args, 1, args.length));
 		}
 		// This will catch if either the value is missing OR an incorrect value was given for an argument
 		catch(IllegalArgumentException|NullPointerException e) {
@@ -73,6 +71,7 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 		}
 		// This will catch if theres any other error with generating this mapParsable
 		catch(InvocationTargetException e) {
+			e.printStackTrace();
 			Messenger.send(sender, "&cTrigger could not be set due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
@@ -133,13 +132,7 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 	}
 	
 	@Override
-	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
-		BrItem item = (BrItem) objects[0];
-		BrEffect effect = (BrEffect) objects[1];
-		
-		if(item == null || effect == null)
-			return Arrays.asList();
-		
+	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {		
 		// If its the first argument (args.length == 1), send all Triggers
 		if(args.length < 2)
 			return TriggerHandler.getKeys();
@@ -151,17 +144,7 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 		if(triggerClass == null)
 			return Arrays.asList();
 		
-		// Save all fields for found trigger class
-		Field[] fields = MapParsable.getFields(triggerClass);
-		
-		// index is this as we want the last argument (args.length-1) PAST the trigger arg (-2 instead of -1)
-		int index = args.length - 2;
-		
-		// If index is past fields length
-		if(index >= fields.length)
-			return Arrays.asList();
-			
-		// Gets the suggestion. If its an enum, shows the enums available
-		return MapParsable.getSuggestion(fields[index]);
+		// Gets the suggestion.
+		return MapParsable.getSuggestion(triggerClass, Commands.grabArgs(args, 1, args.length));
 	}
 }

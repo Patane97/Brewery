@@ -83,9 +83,9 @@ public class editItemEffectsRemove extends editItemEffects {
 		
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
+		// Grabbing the Item
 		BrItem item = (BrItem) objects[0];
-		if(item == null)
-			return Arrays.asList();
+		
 		switch(args.length) {
 			case 1: return StringsUtil.encase(StringsUtil.getCollectableNames(item.getEffects()), "'", "'");
 		}
