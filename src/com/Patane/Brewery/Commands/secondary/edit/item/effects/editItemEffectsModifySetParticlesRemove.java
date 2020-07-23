@@ -71,7 +71,8 @@ public class editItemEffectsModifySetParticlesRemove extends editItemEffectsModi
 		
 		String successMsg = String.format("&aRemoved a Particle Effect from &7%s&a's instance of &7%s&a. Hover to view the details!", item.getName(), effect.getName());
 		
-		String successHoverText = generateEditingTitle(effect);
+		String successHoverText = generateEditingTitle(effect)
+								+ "&2Particle Effects:\n";
 		
 		SpecialParticle particleEffect = null;
 		
@@ -86,19 +87,19 @@ public class editItemEffectsModifySetParticlesRemove extends editItemEffectsModi
 		// If the particle effect type could not be found
 		catch(NullPointerException e) {
 			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e's instance of &7%s&e does not contain a particle effect of that type. Hover to view all particle effects on this effect!", item.getName(), effect.getName())
-					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
+					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(1, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
 			return true;
 		} 
 		// If the increment value SHOULD be provided but isnt
 		catch(IllegalStateException e) {
 			Messenger.send(sender, StringsUtil.hoverText(String.format("&ePlease provide an increment value as &7%s&e's instance of &7%s&e has multiple particle effects of the given type. Hover to view all particle effects on this effect!", item.getName(), effect.getName())
-					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
+					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(1, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
 			return true;
 		} 
 		// If the increment value is higher than the amount of particles of the found type
 		catch(ArrayIndexOutOfBoundsException e) {
 			Messenger.send(sender, StringsUtil.hoverText(String.format("&eIncrement is too high to identify which particle of this type you would like to remove for &7%s&e's instance of &7%s&e. Hover to view all particle effects on this effect!", item.getName(), effect.getName())
-					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
+					, successHoverText + (effect.hasParticles() ? StringsUtil.manyToChatString(1, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "&8No Particle Effects!")));
 			return true;
 		}
 		
@@ -106,8 +107,8 @@ public class editItemEffectsModifySetParticlesRemove extends editItemEffectsModi
 		effect.removeParticle(particleEffect);
 		
 		// Add the removed particle effect to the end of the new particle effect list
-		successHoverText += (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "")
-				  		  + String.format("\n%s", particleEffect.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r"));
+		successHoverText += (effect.hasParticles() ? StringsUtil.manyToChatString(1, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0]))+"\n" : "")
+				  		  + String.format("%s", particleEffect.toChatString(1, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r"));
 		
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);

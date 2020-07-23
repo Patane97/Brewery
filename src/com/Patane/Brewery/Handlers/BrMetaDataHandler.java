@@ -5,27 +5,30 @@ import java.util.List;
 
 import org.bukkit.entity.LivingEntity;
 
-import com.Patane.handlers.MetaDataHandler;
+import com.Patane.handlers.TrackedMetaData;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.general.StringsUtil;
 
-public class BrMetaDataHandler extends MetaDataHandler{
+@Deprecated
+public class BrMetaDataHandler extends TrackedMetaData {
 
+	
 	public static boolean add(PatRunnable task, LivingEntity entity, String metaName, Object value) {
-		return MetaDataHandler.add(entity, packMetaName(task, metaName), value);
+		return add(entity, packMetaName(task, metaName), value);
 	}
+
 	public static boolean add(PatRunnable task, List<LivingEntity> entities, String metaName, Object value) {
-		return MetaDataHandler.add(entities, packMetaName(task, metaName), value);
-	}
-	public static boolean remove(PatRunnable task, LivingEntity entity, String metaName) {
-		return MetaDataHandler.remove(entity, packMetaName(task, metaName));
-	}
-	public static boolean remove(PatRunnable task, String metaName) {
-		return MetaDataHandler.remove(packMetaName(task, metaName));
+		return add(entities, packMetaName(task, metaName), value);
 	}
 	public static boolean check(LivingEntity entity, String regex) {
-		return MetaDataHandler.check(entity, "\\[\\d+\\]"+regex);
+		return TrackedMetaData.check(entity, "(?:\\[\\d+\\])"+regex);
+	}
+	public static boolean remove(PatRunnable task, LivingEntity entity, String metaName) {
+		return remove(entity, packMetaName(task, metaName));
+	}
+	public static boolean remove(PatRunnable task, String metaName) {
+		return remove(packMetaName(task, metaName));
 	}
 	
 	private static String packMetaName(PatRunnable task, String metaName) {
@@ -55,7 +58,7 @@ public class BrMetaDataHandler extends MetaDataHandler{
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Checks if the entity already has another instance of the same task (eg. StickyTask from a Lingering effect).
 	 * If this is the case, instead of adding the entity to yet another instance this simply resets the timer on
@@ -71,10 +74,10 @@ public class BrMetaDataHandler extends MetaDataHandler{
 		for(LivingEntity entity : new ArrayList<LivingEntity>(entities)) {
 			
 			// If the entity is in within metadata collection found from using the given regex.
-			if(BrMetaDataHandler.check(entity, metaName)) {
+			if(TrackedMetaData.check(entity, metaName)) {
 				try{
 					// Grab the first metadata value (in this case, a PatTimedRunnable) stored within the entity from using the given regex.
-					PatTimedRunnable storedTask = (PatTimedRunnable) BrMetaDataHandler.grabFirst(entity, "\\[\\d+\\]"+metaName);
+					PatTimedRunnable storedTask = (PatTimedRunnable) TrackedMetaData.grabFirst(entity, "\\[\\d+\\]"+metaName);
 					
 					// Reset the tasks timer.
 					storedTask.reset();
@@ -84,12 +87,12 @@ public class BrMetaDataHandler extends MetaDataHandler{
 				} 
 				// In the rare case that the grabbed Object from 'grabFirst' isnt a PatTimedRunnable.
 				catch (ClassCastException e) {
-					BrMetaDataHandler.add(task, entity, metaName, task);
+					add(task, entity, metaName, task);
 				}
 			}
 			// If they do not have any metadata yet, then add them to the collection and give them the relevant metadata.
 			else
-				BrMetaDataHandler.add(task, entity, metaName, task);
+				add(task, entity, metaName, task);
 		}
 	}
 }

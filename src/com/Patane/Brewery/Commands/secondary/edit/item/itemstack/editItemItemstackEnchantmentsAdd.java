@@ -109,6 +109,9 @@ public class editItemItemstackEnchantmentsAdd extends editItemItemstackEnchantme
 		
 		// Save the YML
 		BrItem.YML().save(item);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
 		
 		// Send the success message
 		Messenger.send(sender, successMsgComponent);

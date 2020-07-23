@@ -75,7 +75,8 @@ public class editItemEffectsModifySetPotionsRemove extends editItemEffectsModify
 		
 		String successMsg = "&aRemoved a Potion Effect from &7"+item.getName()+"&a's instance of &7"+effect.getName()+"&a. Hover to view the details!";
 		
-		String successHoverText = generateEditingTitle(item, effect);
+		String successHoverText = generateEditingTitle(item, effect)
+								+ "&2Potion Effects:\n";
 		
 		PotionEffect potionEffect = null;
 		
@@ -90,7 +91,7 @@ public class editItemEffectsModifySetPotionsRemove extends editItemEffectsModify
 		// If the above loop found no matching potions, it means there are none with that type+amplifier. Do nothing and message appropriately
 		if(potionEffect == null) {			
 			Messenger.send(sender, StringsUtil.hoverText("&7"+item.getName()+"&e's instance of &7"+effect.getName()+"&e does not contain a potion effect with that type and amplifier. Hover to view all potion effects on this effect!"
-					, successHoverText + (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "&8No Potion Effects!")));
+					, successHoverText + (effect.hasPotions() ? StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "&8No Potion Effects!")));
 			return true;
 		}
 		
@@ -99,8 +100,8 @@ public class editItemEffectsModifySetPotionsRemove extends editItemEffectsModify
 		
 		// Adding the removed potion effect with removed layout
 		// This is done after the effect is removed to get the new list + removed item in its own format
-		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "")
-						  + String.format("\n%s", StringsUtil.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect));
+		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))+"\n" : "")
+						  + String.format("%s", StringsUtil.toChatString(1, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect));
 		
 		// Save the Item to the YML. This will also save the instance of the effect to the item
 		BrItem.YML().save(item);

@@ -67,7 +67,7 @@ public class editEffectSetModifier extends editEffectSet {
 		}
 		// This will catch if theres any other error with generating this mapParsable
 		catch(InvocationTargetException e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			Messenger.send(sender, "&cModifier could not be set due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
@@ -146,7 +146,7 @@ public class editEffectSetModifier extends editEffectSet {
 			return Arrays.asList();
 		
 		// Very specific scenario for Effect modifier.
-		// *** Low priority: find a spot for this within effect modifier. 
+		// TODO: Low priority: find a spot for this within effect modifier. 
 		//     Is difficult as modifier ISNT an actual object by this point, only a class.
 		//     Only thought is to have a "specialSuggestion" methos that runs onLoad.
 		if(args[0].equalsIgnoreCase("effect"))

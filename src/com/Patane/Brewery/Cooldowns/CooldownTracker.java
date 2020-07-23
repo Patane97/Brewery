@@ -1,73 +1,55 @@
 package com.Patane.Brewery.Cooldowns;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
+import java.util.HashSet;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
-import com.Patane.util.ingame.ItemEncoder;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class CooldownTracker extends PatTimedRunnable {
-	final private Date date;
-	final private UUID uuid;
-	private ArrayList<Player> showing = new ArrayList<Player>();
-	public CooldownTracker(LivingEntity entity, UUID uuid, BrItem item) {
+public abstract class CooldownTracker extends PatTimedRunnable {
+
+	final protected BrItem item;
+	final protected Date completeTime;
+		
+	protected HashSet<Player> showing = new HashSet<Player>();
+	
+	public CooldownTracker(LivingEntity entity, BrItem item) {
 		super(0, 0.05f, item.getCooldown());
-		this.uuid = uuid;
-		this.date = completeTime(item.getCooldown());
-		if(entity instanceof Player)
-			addPlayer((Player) entity);
+		this.item = item;
+		this.completeTime = completeTime(item.getCooldown());
+		
 	}
-	public Date getDate() {
-		return date;
+
+	public BrItem getItem() {
+		return item;
 	}
-	public void addPlayer(Player player) {
-		if(showing.contains(player))
-			return;
-//		Messenger.debug("Adding "+player.getDisplayName()+" to cooldown (UUID="+uuid.toString()+")");
-		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(Chat.translate(constructBar(ticksLeft(), duration(), 20))));
-		showing.add(player);
-		BrMetaDataHandler.add(player, "showing_cooldown", uuid);
+	public Date getCompleteTime() {
+		return completeTime;
 	}
+	
+	public abstract boolean addPlayer(Player player);
+	
+	public abstract boolean removePlayer(Player player);
+	
 	public boolean hasPlayer(Player player) {
 		return showing.contains(player);
 	}
-	public void removePlayer(Player player) {
-		if(!showing.contains(player))
-			return;
-//		Messenger.debug("Removing "+player.getDisplayName()+" from cooldown (UUID="+uuid.toString()+")");
-		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(""));
-		showing.remove(player);
-		BrMetaDataHandler.remove("showing_cooldown");
-	}
-	@Override
-	public void task() {
-		for(Player player : new ArrayList<Player>(showing)) {
-			String uuidString = ItemEncoder.getString(player.getInventory().getItemInMainHand(), "UUID");
-			if(uuidString == null || !uuidString.equals(uuid.toString())) {
-				removePlayer(player);
-				return;
-			}
-			Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(Chat.translate(constructBar(ticksLeft(), duration(), 20))));
+	
+	public void clearPlayers() {
+		for(Player player : showing) {
+			removePlayer(player);
 		}
 	}
-	@Override
-	public void complete() {
-		CooldownHandler.end(uuid);
-		for(Player player : new ArrayList<Player>(showing))
-			removePlayer(player);
-	}
-	private static String constructBar(float current, float max, int width) {
+	
+	protected static String constructBar(float current, float max, int width) {
 		current = (width/max)*current;
 		max = width;
 		int blockCount = (Math.round(current));
@@ -82,7 +64,14 @@ public class CooldownTracker extends PatTimedRunnable {
 			bar = bar+"\u2588";
 		return bar;
 	}
-	private static Date completeTime(float duration) {
+	protected static Date completeTime(float duration) {
 		return new Date(System.currentTimeMillis() + ((long)(duration * 1000)));
+	}
+	protected void updateActionBar(Player player) {
+		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(Chat.translate(constructBar(ticksLeft(), duration(), 20))));
+	}
+	protected void clearActionBar(Player player) {
+		Messenger.sendRaw(player, ChatMessageType.ACTION_BAR, new TextComponent(""));
+
 	}
 }

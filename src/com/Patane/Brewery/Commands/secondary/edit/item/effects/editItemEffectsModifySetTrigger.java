@@ -71,7 +71,7 @@ public class editItemEffectsModifySetTrigger extends editItemEffectsModifySet {
 		}
 		// This will catch if theres any other error with generating this mapParsable
 		catch(InvocationTargetException e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			Messenger.send(sender, "&cTrigger could not be set due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}

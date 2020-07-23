@@ -1,28 +1,31 @@
 package com.Patane.Brewery.CustomEffects.triggers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.Metadatable;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
+import com.Patane.util.metadata.RunnableMetaDataUtil;
+import com.Patane.util.metadata.TrackedMetaDataUtil;
 
 @ClassDescriber(
 		name="lingering",
 		desc="Applies the Modifier at a fixed rate over a duration. Calculates which living entities are hit at each rate.")
 public class Lingering extends Trigger{
 	@ParseField(desc="Rate at which to apply the Modifier. Measured in seconds.")
-	public float rate;
+	private float rate;
 	@ParseField(desc="Duration for the effect to linger. This must be greater than or equal to the rate and is measured in seconds.")
-	public float duration;
+	private float duration;
 	
 	public Lingering() {
 		super();
@@ -77,6 +80,8 @@ public class Lingering extends Trigger{
 		private final LivingEntity executor;
 		private final LivingEntity target;
 		
+		public static final String FORMAT = "lingering:%s";
+		
 		public LingeringTask(BrEffect effect, Location impact, LivingEntity executor) {
 			super(0, rate, duration);
 			this.effect = effect;
@@ -102,14 +107,16 @@ public class Lingering extends Trigger{
 
 			// Executes tasks on hit LivingEntities and adds the appropriate metadata to each.
 			List<LivingEntity> hit = (impact == null ? executeMany(effect, executor, target) : executeMany(effect, impact, executor));
-			BrMetaDataHandler.addClean(this, hit, effect.getName(), "lingering");
+			RunnableMetaDataUtil.refresh(new ArrayList<Metadatable>(hit), String.format(FORMAT, effect.getName()), this);
+//			BrMetaDataHandler.addClean(this, hit, effect.getName(), "lingering");
 			effect.applyTag(this, hit);
 		}
 
 		@Override
 		public void complete() {
-			// Removes any effect metadatas leftover from the final task() tick.
-			BrMetaDataHandler.remove(this, effect.getName());
+			TrackedMetaDataUtil.remove(String.format(FORMAT, effect.getName()));
+//			 Removes any effect metadatas leftover from the final task() tick.
+//			BrMetaDataHandler.remove(this, effect.getName());
 			effect.clearTag(this);
 		}
 	}

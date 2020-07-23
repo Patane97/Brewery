@@ -55,6 +55,9 @@ public class editItemItemstackName extends editItemItemstack {
 		
 		// Save YML
 		BrItem.YML().save(brItem);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
 		
 		// Send successmsg
 		Messenger.send(sender, successMsgComponent);

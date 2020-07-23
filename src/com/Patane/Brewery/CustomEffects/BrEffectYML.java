@@ -169,7 +169,7 @@ public class BrEffectYML extends BreweryYAML{
 					currentHeader = baseHeader.createSection("particle effects");
 				Map<Particle, Integer> counts = new HashMap<Particle, Integer>();
 				
-				// *** Maybe a cleaner way of writing all this (1) duplicates for mapparsable and potionffects (below)?
+				// TODO: Maybe a cleaner way of writing all this (1) duplicates for mapparsable and potionffects (below)?
 				for(SpecialParticle particle : effect.getParticles()) {
 					int pCount = 0;
 					if(!counts.containsKey(particle.getParticle()))
@@ -247,7 +247,7 @@ public class BrEffectYML extends BreweryYAML{
 			if(effect == null)
 				Messenger.warning("An Unknown Effect failed to save:");
 			Messenger.warning("'"+effect.getName()+"' Effect failed to save:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		return false;
 	}
@@ -358,7 +358,7 @@ public class BrEffectYML extends BreweryYAML{
 					ignoreUser = getBoolean("ignore user", currentHeader, defaultHeader);
 				} catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" ignore user:");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			
@@ -386,7 +386,7 @@ public class BrEffectYML extends BreweryYAML{
 					// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 					catch(Exception e) {
 						Messenger.warning("Failed to retrieve "+effectName+" filter:");
-						e.printStackTrace();
+						Messenger.printStackTrace(e);
 					}
 				}
 			/*
@@ -412,7 +412,7 @@ public class BrEffectYML extends BreweryYAML{
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 				catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" tag:");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			
@@ -470,7 +470,7 @@ public class BrEffectYML extends BreweryYAML{
 					// Any exceptions will be caught here and printed.
 					catch(Exception e) {
 						Messenger.warning(String.format("Failed to retrieve %s particle effect for %s:", rawParticleName, effectName));
-						e.printStackTrace();
+						Messenger.printStackTrace(e);
 					}
 				}
 			}
@@ -498,7 +498,7 @@ public class BrEffectYML extends BreweryYAML{
 				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 				catch(Exception e) {
 					Messenger.warning("Failed to retrieve "+effectName+" sound effect:");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			
@@ -531,7 +531,7 @@ public class BrEffectYML extends BreweryYAML{
 					// Throws a NullPointerException if the potionEffect is null and debugging is on.
 					} catch(NullPointerException e) {
 						Messenger.warning("Failed to retrieve "+effectName+" potion effect '"+potionName+"':");
-						e.printStackTrace();
+						Messenger.printStackTrace(e);
 					}
 				}
 			}
@@ -546,13 +546,13 @@ public class BrEffectYML extends BreweryYAML{
 			return effect;
 		} catch(YAMLException e) {
 			Messenger.warning("An effect failed to be found and loaded:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		} catch(Exception e) {
 //			if(essentialTask != null)
 //				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load due to an error with the "+essentialTask+":");
 //			else
 				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		} finally {
 			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
 			BrEffectCollection.delProcessing(extractLast(baseHeader));
@@ -652,7 +652,7 @@ public class BrEffectYML extends BreweryYAML{
 //					radius = getFloat("radius", currentHeader, defaultHeader);
 //				} catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" radius:");
-//					e.printStackTrace();
+//					Messenger.printStackTrace(e);
 //				}
 //			}
 //
@@ -672,7 +672,7 @@ public class BrEffectYML extends BreweryYAML{
 //					ignoreUser = getBoolean("ignore user", currentHeader, defaultHeader);
 //				} catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" ignore user:");
-//					e.printStackTrace();
+//					Messenger.printStackTrace(e);
 //				}
 //			}
 //			
@@ -700,7 +700,7 @@ public class BrEffectYML extends BreweryYAML{
 //					// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 //					catch(Exception e) {
 //						Messenger.warning("Failed to retrieve "+effectName+" filter:");
-//						e.printStackTrace();
+//						Messenger.printStackTrace(e);
 //					}
 //				}
 //			/*
@@ -726,7 +726,7 @@ public class BrEffectYML extends BreweryYAML{
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 //				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" tag:");
-//					e.printStackTrace();
+//					Messenger.printStackTrace(e);
 //				}
 //			}
 //			
@@ -754,7 +754,7 @@ public class BrEffectYML extends BreweryYAML{
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 //				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" particle effect:");
-//					e.printStackTrace();
+//					Messenger.printStackTrace(e);
 //				}
 //			}
 //			
@@ -781,7 +781,7 @@ public class BrEffectYML extends BreweryYAML{
 //				// Generally ClassNotFoundException (class is null) or YAMLException (currentHeader is null).
 //				catch(Exception e) {
 //					Messenger.warning("Failed to retrieve "+effectName+" sound effect:");
-//					e.printStackTrace();
+//					Messenger.printStackTrace(e);
 //				}
 //			}
 //			
@@ -814,7 +814,7 @@ public class BrEffectYML extends BreweryYAML{
 //					// Throws a NullPointerException if the potionEffect is null and debugging is on.
 //					} catch(NullPointerException e) {
 //						Messenger.warning("Failed to retrieve "+effectName+" potion effect '"+potionName+"':");
-//						e.printStackTrace();
+//						Messenger.printStackTrace(e);
 //					}
 //				}
 //			}
@@ -829,13 +829,13 @@ public class BrEffectYML extends BreweryYAML{
 //			return effect;
 //		} catch(YAMLException e) {
 //			Messenger.warning("An effect failed to be found and loaded:");
-//			e.printStackTrace();
+//			Messenger.printStackTrace(e);
 //		} catch(Exception e) {
 //			if(essentialTask != null)
 //				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load due to an error with the "+essentialTask+":");
 //			else
 //				Messenger.warning("'"+extractLast(baseHeader)+"' Effect failed to load:");
-//			e.printStackTrace();
+//			Messenger.printStackTrace(e);
 //		} finally {
 //			// Removing effect to the processing list. This avoids any infinite loops of processing effects.
 //			BrEffectCollection.delProcessing(extractLast(baseHeader));

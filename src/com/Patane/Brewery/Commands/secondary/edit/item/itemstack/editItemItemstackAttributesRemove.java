@@ -94,6 +94,10 @@ public class editItemItemstackAttributesRemove extends editItemItemstackAttribut
 		
 		// Save YML
 		BrItem.YML().save(item);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
+		
 		
 		// Send success message
 		Messenger.send(sender, successMsgComponent);

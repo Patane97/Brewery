@@ -19,7 +19,7 @@ import com.Patane.util.general.Check;
 		desc="Activates a different, pre-existing effect when the attached effect is activated.")
 public class Effect extends Modifier{
 	@ParseField(desc="Brewery effect to activate. This effect must be complete.")
-	public BrEffect effect;
+	private BrEffect effect;
 	
 	public Effect() {
 		super();

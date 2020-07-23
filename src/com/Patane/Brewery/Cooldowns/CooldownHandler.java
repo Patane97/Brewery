@@ -5,17 +5,21 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.util.YAML.types.YAMLData;
 import com.Patane.util.general.Messenger;
+import com.Patane.util.ingame.InventoriesUtil;
 import com.Patane.util.ingame.ItemEncoder;
 import com.Patane.util.main.PataneUtil;
+import com.Patane.util.metadata.MetaDataUtil;
+import com.Patane.util.metadata.persistent.PersistentDataType;
 
 public class CooldownHandler {
 	/** =========================================================
@@ -44,28 +48,63 @@ public class CooldownHandler {
 			return true;
 		return false;
 	}
-	public static boolean start(LivingEntity entity, ItemStack item, BrItem brItem) {
-		UUID uuid = getUUID(item);
-		if(!ready(uuid))
+	public static boolean start(@Nonnull LivingEntity entity, @Nonnull ItemStack item, @Nonnull BrItem brItem) {
+		UUID uuid = getUUID(entity, item, brItem);
+		Messenger.debug(uuid.toString());
+		// If it is currently on cooldown, return false.
+		if(cooldowns.containsKey(uuid))
 			return false;
-		cooldowns.put(uuid, new CooldownTracker(entity, uuid, brItem));
-		YML().addData(cooldowns.get(uuid).getDate(), uuid.toString());
-		Messenger.debug("Cooldown starting: UUID="+uuid.toString()+", brItem="+brItem.getName());
+		
+		CooldownTracker tracker;
+		// Getting the appropriate cooldown tracker
+		if(brItem.getType().isUnique())
+			tracker = new UniqueCooldown(entity, brItem, uuid);
+		else
+			tracker = new CommonCooldown(entity, brItem);
+		
+		// Add cooldown to the masterlist
+		cooldowns.put(uuid, tracker);
+		
+		// Add cooldown to cooldowns.yml
+		YML().addData(cooldowns.get(uuid).getCompleteTime(), uuid.toString());
+		
+		Messenger.debug(String.format("+ Cooldown(%s, %s)", brItem.getName(), uuid.toString()));
 		return true;
 	}
-	public static boolean ready(UUID uuid) {
-		return !cooldowns.containsKey(uuid);
-	}
+	
 	public static void end(UUID uuid) {
+		String itemName = null;
+		if(cooldowns.containsKey(uuid))
+			itemName = cooldowns.get(uuid).getItem().getName();
+		
+		cooldowns.get(uuid).clearPlayers();
+		
+		// Remove cooldown from masterList
 		cooldowns.remove(uuid);
+		
+		// Remove cooldown from cooldowns.yml
 		YML().removeData(uuid.toString());
-		Messenger.debug("Cooldown ending: UUID="+uuid.toString());
+		
+		Messenger.debug(String.format("- Cooldown(%s, %s)", itemName, uuid.toString()));
 	}
-	public static UUID getUUID(ItemStack item) throws IllegalArgumentException{
-		String uuidString = ItemEncoder.getString(item, "UUID");
-		if(uuidString == null)
-			throw new IllegalArgumentException("UUID required for Cooldown is missing!");
-		return UUID.fromString(uuidString);
+	private static UUID getUUID(@Nonnull LivingEntity entity, @Nonnull ItemStack item, @Nonnull BrItem brItem) throws IllegalArgumentException {
+		if(brItem.getType().isUnique()) {
+			String itemUUID = ItemEncoder.getString(item, "UUID");
+			if(itemUUID == null)
+				throw new IllegalArgumentException(String.format("%s is missing is a Unique Item and is missing its ItemStacks UUID tag.", brItem.getName()));
+			
+			return UUID.fromString(itemUUID);
+		}
+		else {
+			if(entity instanceof Player)
+				return ((Player) entity).getUniqueId();
+			else {
+				UUID entityTempUUID = entity.getPersistentDataContainer().get(CommonCooldown.TEMP_UUID_KEY, PersistentDataType.UUID);
+				if(entityTempUUID == null)
+					throw new IllegalArgumentException(String.format("%s entity is missing its temporary UUID tag.", entity.getName()));
+				return entityTempUUID;
+			}
+		}
 	}
 	
 	/**
@@ -75,13 +114,11 @@ public class CooldownHandler {
 	 * @param brItem
 	 * @return
 	 */
-	public static boolean updateFromYAML(LivingEntity entity, ItemStack item, BrItem brItem) {
-		// Nullchecks
+	public static boolean updateFromYAML(@Nonnull LivingEntity entity, @Nonnull ItemStack item, @Nonnull BrItem brItem) {
 		if(item == null || brItem == null)
 			return false;
 		
-		// Constructs UUID taken from item (will throw IllegalArgumentException if item doesnt have UUID).
-		UUID uuid = getUUID(item);
+		UUID uuid = getUUID(entity, item, brItem);
 		
 		// Checks if the uuid is currently on cooldown.
 		if(cooldowns.containsKey(uuid)) {
@@ -132,19 +169,49 @@ public class CooldownHandler {
 		PataneUtil.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
 			@Override
 			public void run() {
-				// Gravving ItemStack and uuidString information
+				// Grabbing ItemStack and uuidString information
 				ItemStack item = player.getInventory().getItemInMainHand();
-				String uuidString = ItemEncoder.getString(item, "UUID");
-				if(uuidString == null)
+				
+				// If its a bow, actually show the cooldown of the arrow.
+				// *** Should maybe check if the BOW ITSELF has a cooldown first?
+				if(InventoriesUtil.isBowMaterial(item.getType())) {
+					ItemStack arrow = InventoriesUtil.getTargettedArrowStack(player);
+					item = (arrow == null ? item : arrow);
+				}
+				
+				BrItem brItem = BrItem.getFromItemStack(item);
+				
+				if(brItem == null)
 					return;
 				
+				UUID uuid;
+				try{
+					uuid = getUUID(player, item, brItem);
+				} catch (IllegalArgumentException e) {
+					return;
+				}
+				
+				
+				
+				if(MetaDataUtil.has(player, UniqueCooldown.META_KEY)) {
+					UUID previousUUID = (UUID) MetaDataUtil.get(player, UniqueCooldown.META_KEY).value();
+					if(!uuid.equals(previousUUID))
+						CooldownHandler.cooldowns().get(previousUUID).removePlayer(player);
+				}
+				else if(MetaDataUtil.has(player, CommonCooldown.META_KEY)) {
+					String previousItem = MetaDataUtil.get(player, CommonCooldown.META_KEY).asString();
+					if(!brItem.getName().equals(previousItem))
+						CooldownHandler.cooldowns().get(player.getUniqueId()).removePlayer(player);
+				}
 				// If the player currently has a cooldown being shown,
 				// and the UUID of cooldown ISNT the same as the UUID of the item in their hand (The UUID's are the same in the case of a /reload or server restart)
 				// Then remove the player from the previous cooldown.
 				// TLDR: When player swaps from one CD item to another CD item, it removes the previous CD from their display.
-				if(BrMetaDataHandler.hasValue(player, "showing_cooldown") && !BrMetaDataHandler.getValue(player, "showing_cooldown").equals(UUID.fromString(uuidString)))
-					CooldownHandler.cooldowns().get(BrMetaDataHandler.getValue(player, "showing_cooldown")).removePlayer(player);
-
+//				if(MetaDataUtil.has(player, "showing_cooldown") && !MetaDataUtil.get(player, "showing_cooldown").value().equals(UUID.fromString(uuidString))) {
+//					UUID uuid = (UUID) MetaDataUtil.get(player, "showing_cooldown").value();
+//					CooldownHandler.cooldowns().get(uuid).removePlayer(player);
+//				}
+					
 				// Either adds the user to a currently runnning Cooldown with the same UUID as their item
 				// or it extracts the saved cooldown from YAML and subtracts the remaining time appropriately, then adds the player.
 				// Both of these cases return true, otherwise we continue.
@@ -153,8 +220,8 @@ public class CooldownHandler {
 				
 				// Loops through each UUID on cooldown and compares it to their held item UUID.
 				// If they match, player is added to the cooldown display list.
-				for(UUID uuid : CooldownHandler.cooldowns().keySet()) {
-					if(uuidString.equals(uuid.toString()))
+				for(UUID cooldownUUID : CooldownHandler.cooldowns().keySet()) {
+					if(cooldownUUID.equals(uuid))
 						CooldownHandler.cooldowns().get(uuid).addPlayer(player);
 				}
 			}

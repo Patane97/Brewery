@@ -12,12 +12,12 @@ import com.Patane.util.general.Check;
 @ClassDescriber(
 		name="damage",
 		desc="Damages a living entity for a certain amount.")
-// *** Need to actually implement DamageCause!!!
+// TODO: Need to actually implement DamageCause!!!
 public class Damage extends Modifier {
 	@ParseField(desc="Defines in which way the damage is being caused, such as through fire or poison.")
-	public DamageCause cause;
+	private DamageCause cause;
 	@ParseField(desc="Amount of damage applied to the living entity.")
-	public double amount;
+	private double amount;
 	
 	public Damage() {
 		super();

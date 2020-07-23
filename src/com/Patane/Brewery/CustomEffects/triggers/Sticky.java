@@ -1,28 +1,31 @@
 package com.Patane.Brewery.CustomEffects.triggers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.Metadatable;
 
 import com.Patane.Brewery.CustomEffects.BrEffect;
 import com.Patane.Brewery.CustomEffects.Trigger;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatTimedRunnable;
 import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.annotations.ParseField;
 import com.Patane.util.general.Check;
 import com.Patane.util.ingame.Focus;
+import com.Patane.util.metadata.RunnableMetaDataUtil;
+import com.Patane.util.metadata.TrackedMetaDataUtil;
 
 @ClassDescriber(
 		name="sticky",
 		desc="Sticks to the initial living entities hit and applies the Modifier to them at a fixed rate over a duration.")
 public class Sticky extends Trigger{
 	@ParseField(desc="Rate at which to apply the Modifier. Measured in seconds.")
-	public float rate;
+	private float rate;
 	@ParseField(desc="Duration for the effect to stick. This must be greater than or equal to the rate and is measured in seconds.")
-	public float duration;
+	private float duration;
 	
 	public Sticky() {
 		super();
@@ -78,12 +81,14 @@ public class Sticky extends Trigger{
 	 * ================================================================================
 	 */
 	
-	protected class StickyTask extends PatTimedRunnable{
+	protected class StickyTask extends PatTimedRunnable {
 		private final BrEffect effect;
 		private final Location impact;
 		private final LivingEntity executor;
 		private final LivingEntity target;
 		private final List<LivingEntity> entities;
+		
+		public static final String FORMAT = "sticky:%s";
 		
 		public StickyTask(BrEffect effect, Location impact, LivingEntity executor, List<LivingEntity> entities) {
 			super(0, rate, duration);
@@ -94,7 +99,9 @@ public class Sticky extends Trigger{
 			this.target = null;
 			
 			// Adds effect metadata to entities hit.
-			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
+			
+			RunnableMetaDataUtil.setOrReset(new ArrayList<Metadatable>(entities), String.format(FORMAT, effect.getName()), this);
+//			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
 			effect.applyTag(this, entities);
 		}
 		public StickyTask(BrEffect effect, LivingEntity executor, LivingEntity target, List<LivingEntity> entities) {
@@ -106,7 +113,8 @@ public class Sticky extends Trigger{
 			this.entities = entities;
 			
 			// Adds effect metadata to entities hit.
-			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
+			RunnableMetaDataUtil.setOrReset(new ArrayList<Metadatable>(entities), String.format(FORMAT, effect.getName()), this);
+//			BrMetaDataHandler.addOrReset(this, entities, "STICKY, "+effect.getName());
 			effect.applyTag(this, entities);
 		}
 		@Override
@@ -118,8 +126,9 @@ public class Sticky extends Trigger{
 
 		@Override
 		public void complete() {
+			TrackedMetaDataUtil.remove(String.format(FORMAT, effect.getName()));
 			// Removes any effect metadatas leftover from the final task() tick.
-			BrMetaDataHandler.remove(this, "STICKY, "+effect.getName());
+//			BrMetaDataHandler.remove(this, "STICKY, "+effect.getName());
 			effect.clearTag(this);
 		}
 	}

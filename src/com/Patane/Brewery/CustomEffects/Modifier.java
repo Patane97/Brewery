@@ -4,12 +4,11 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.metadata.FixedMetadataValue;
 
-import com.Patane.Brewery.Brewery;
 import com.Patane.util.YAML.TypeParsable;
 import com.Patane.util.annotations.TypeDescriber;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
+import com.Patane.util.metadata.MetaDataUtil;
 
 @TypeDescriber(
 		name="Modifier",
@@ -26,7 +25,7 @@ public abstract class Modifier extends TypeParsable {
 	public abstract void modify(ModifierInfo info);
 	
 	public void damage(LivingEntity damagee, LivingEntity damager, double amount) {
-		damagee.setMetadata("Brewery_DAMAGE", new FixedMetadataValue(Brewery.getInstance(), null));
+		MetaDataUtil.setFixed(damagee, "effect_damage", amount);
 		damagee.damage(amount, damager);
 	}
 	

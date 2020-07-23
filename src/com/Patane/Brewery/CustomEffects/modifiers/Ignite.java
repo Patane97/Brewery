@@ -12,7 +12,7 @@ import com.Patane.util.general.Check;
 		desc="Ignites a living entity for a certain duration.")
 public class Ignite extends Modifier{
 	@ParseField(desc="Duration the living entity is ignited for. Measured in server ticks (1s = 20ticks).")
-	public int duration;
+	private int duration;
 	
 	public Ignite() {
 		super();

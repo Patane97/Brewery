@@ -66,7 +66,7 @@ public class createEffect extends createCommand {
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
 			successMsg = "&cEffect could not be created due to an error. Please check server console for error trace.";
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		// Allows the user to view the details on hover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);

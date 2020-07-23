@@ -71,7 +71,8 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		
 		String successMsg = String.format("&aRemoved a Potion Effect from &7%s&a. Hover to view the details!", effect.getName());
 		
-		String successHoverText = generateEditingTitle(effect);
+		String successHoverText = generateEditingTitle(effect)
+								+ "&2Potion Effects:\n";
 		
 		PotionEffect potionEffect = null;
 		
@@ -86,7 +87,7 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		// If the above loop found no matching potions, it means there are none with that type+amplifier. Do nothing and message appropriately
 		if(potionEffect == null) {
 			Messenger.send(sender, StringsUtil.hoverText(String.format("&7%s&e does not contain a potion effect with that type and amplifier. Hover to view all potion effects on this effect!", effect.getName())
-					, successHoverText + (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "&8No Potion Effects!")));
+					, successHoverText + (effect.hasPotions() ? StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "&8No Potion Effects!")));
 			return true;
 		}
 		
@@ -94,8 +95,8 @@ public class editEffectSetPotionsRemove extends editEffectSetPotions {
 		effect.removePotion(potionEffect);
 		
 		// Adding the removed potion effect with removed layout
-		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "")
-						  + String.format("\n%s", StringsUtil.toChatString(0, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect));
+		successHoverText += (effect.hasPotions() ? StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))+"\n" : "")
+						  + String.format("%s", StringsUtil.toChatString(1, true, s -> "&c"+Chat.replace(s[0], "&7", "&8&m")+"&c: &8&m"+Chat.replace(s[1], "&8&m")+"&r", potionEffect));
 
 		// Save the Effect to YML
 		BrEffect.YML().save(effect);

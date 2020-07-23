@@ -152,6 +152,9 @@ public class editItemItemstackAttributesAdd extends editItemItemstackAttributes 
 		
 		// Save YML
 		BrItem.YML().save(item);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
 		
 		// Send user success message
 		Messenger.send(sender, successMsgComponent);

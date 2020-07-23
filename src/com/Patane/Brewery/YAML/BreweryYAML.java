@@ -92,7 +92,7 @@ public abstract class BreweryYAML extends YAMLEditable{
 			return new PotionEffect(type, duration, amplifier, ambient, particles, icon);
 		} catch (Exception e) {
 			Messenger.warning("Potion Effect '"+effectName+"' retrieval has failed. Check all YML values are set correctly.");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			return null;
 		}
 	}

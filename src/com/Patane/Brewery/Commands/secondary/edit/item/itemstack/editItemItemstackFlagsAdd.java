@@ -94,6 +94,9 @@ public class editItemItemstackFlagsAdd extends editItemItemstackFlags {
 		
 		// Save YML
 		BrItem.YML().save(item);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
 		
 		// Send successmsg
 		Messenger.send(sender, successMsgComponent);

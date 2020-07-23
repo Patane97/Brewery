@@ -5,6 +5,7 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.util.annotations.ClassDescriber;
 import com.Patane.util.annotations.ParseField;
@@ -15,9 +16,9 @@ import com.Patane.util.general.Check;
 		desc="Force or push a living entity into a direction.")
 public class Force extends Modifier{
 	@ParseField(desc="Direction to push the living entity from the impact location.")
-	public Direction direction;
+	private Direction direction;
 	@ParseField(desc="Intensity of the push.")
-	public double intensity;
+	private double intensity;
 	
 	public Force() {
 		super();
@@ -45,12 +46,16 @@ public class Force extends Modifier{
 	
 	@Override
 	public void modify(ModifierInfo info) {
-		// If the target IS the location, do nothing.
-		if(info.getTarget().getLocation().equals(info.getImpact()))
-			return;
-		double speed = direction.getIntensity(info.getTarget().getLocation(), info.getImpact())*(1+intensity/10);
-        Vector velocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
-        info.getTarget().setVelocity(velocity);
+		// We must do the velocity addition 1 tick after this, as the knockback of a weapon can OVERRIDE the current velocity.
+		// Therefore, this will add ON TOP of the knockback velocity (plus any other velocities on the entity)
+        Brewery.getInstance().getServer().getScheduler().scheduleSyncDelayedTask(Brewery.getInstance(), new Runnable() {
+			@Override
+			public void run() {
+				double speed = direction.getIntensity(info.getTarget().getLocation(), info.getImpact())*(1+intensity/10);
+				Vector addingVelocity = direction.getVector(info.getTarget().getLocation(), info.getImpact()).normalize().multiply(speed);
+		        info.getTarget().setVelocity(info.getTarget().getVelocity().add(addingVelocity));
+			}
+        }, 1);
 	}
 
 	/* 

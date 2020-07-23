@@ -30,13 +30,13 @@ import com.Patane.util.general.Messenger;
 @ClassDescriber(
 		name="polymorph",
 		desc="Transforms a living entity into a specified mob for a certain duration.")
-public class Polymorph extends Modifier{
-	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
-	
+public class Polymorph extends Modifier{	
 	@ParseField(desc="Mob to transform the living entity into.")
-	public EntityType entity;
+	private EntityType entity;
 	@ParseField(desc="Duration the living entity is transformed for. Measured in server ticks (1s = 20ticks).")
-	public int duration;
+	private int duration;
+	
+	private HashMap<LivingEntity, Entity> currentlyMorphed = new HashMap<LivingEntity, Entity>();
 	
 	public Polymorph() {
 		super();

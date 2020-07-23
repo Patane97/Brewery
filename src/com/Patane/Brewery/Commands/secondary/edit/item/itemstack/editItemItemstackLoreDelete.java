@@ -78,6 +78,9 @@ public class editItemItemstackLoreDelete extends editItemItemstackLore {
 		
 		// Save YML
 		BrItem.YML().save(brItem);
+
+		// Refreshes all inventory brItems.
+		BrItem.refreshAllInventories();
 		
 		// Send successmsg
 		Messenger.send(sender, successMsgComponent);

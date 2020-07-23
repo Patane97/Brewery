@@ -80,6 +80,8 @@ public abstract class Trigger extends TypeParsable{
 	 * @return A List of the LivingEntities in which the effects were executed on.
 	 */
 	protected List<LivingEntity> executeMany(BrEffect effect, Location impact, LivingEntity executor) {
+		if(!effect.hasRadius())
+			return new ArrayList<LivingEntity>();
 		// Grabs all entites within the radius and filters them appropriately.
 		List<LivingEntity> hitEntities = effect.getFilter().filter(impact, effect.getRadius());
 		return executeMany(effect, impact, executor, hitEntities);
@@ -171,12 +173,13 @@ public abstract class Trigger extends TypeParsable{
 		
 		if(effect.hasParticles()) {
 			for(SpecialParticle particle : effect.getParticles()) {
+				
 				if(particle.getFormation().getFocus() == focus) {
 					long startTime = System.currentTimeMillis();
 					
 					// Form the particle using the location & intensity. If it also has its own radius, use that. Otherwise, use the effects radius
 					particle.getFormation().form(particle, location, particle.getIntensity(), (particle.hasRadius() ? particle.getRadius() : effect.getRadius()));
-
+					
 					long endTime = System.currentTimeMillis();
 					Messenger.debug(String.format("Particle %s for %s took %dms.", particle.className(), effect.getName(), endTime-startTime));
 				}

@@ -1,27 +1,29 @@
 package com.Patane.Brewery.Commands.primary;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
+import com.Patane.Brewery.Cooldowns.CooldownHandler;
 import com.Patane.Brewery.CustomItems.BrItem;
 import com.Patane.Commands.CommandInfo;
 import com.Patane.Commands.PatCommand;
 import com.Patane.util.general.GeneralUtil;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
-import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.TextComponent;
 
 @CommandInfo(
 	name = "give",
 	description = "Gives a player a Brewery Item. Player must currently be on the server to receive the item.",
-	usage = "/brewery give <player> <item name>",
+	usage = "/brewery give <player> <item name> (amount)",
 	permission = "brewery.give",
-	maxArgs = 2
+	maxArgs = 3
 )
 public class giveCommand extends PatCommand {
 	
@@ -45,7 +47,9 @@ public class giveCommand extends PatCommand {
 				player = onlinePlayer;
 				break;
 			}
-			Messenger.send(sender, "&7"+args[0]+" &e is currently not online or does not exist.");
+		}
+		if(player == null) {
+			Messenger.send(sender, String.format("&7%s&e is currently not online or does not exist.", args[0]));
 			return true;
 		}
 		// Checks if item name is given
@@ -55,13 +59,27 @@ public class giveCommand extends PatCommand {
 		}
 		
 		// Grab the item name from remaining arguments
-		String itemName = Commands.combineArgs(args, 1, args.length);
+		String itemName = args[1];
 		
 		// If no effect with that name exists, do nothing and message appropriately
 		if(!Brewery.getItemCollection().hasItem(itemName)) {
 			Messenger.send(sender, StringsUtil.hoverText("&eThere is no Brewery Item named &7"+itemName+"&e. Hover to view all Items!"
 														, StringsUtil.stringJoiner(Brewery.getItemCollection().getAllIDs(), "\n&2> &f&l", "&2> &f&l", "")));
 			return true;
+		}
+		
+		Integer amount;
+		
+		// If an amount is provided, get it. Otherwise, default to 1
+		if(args.length < 3) {
+			amount = 1;
+		} else {
+			try {
+				amount = Integer.parseInt(args[2]);
+			} catch (IllegalArgumentException e) {
+				Messenger.send(sender, String.format("&7%s &cis not a valid amount. It must be a positive number greater than 0.", args[2]));
+				return true;
+			}
 		}
 		
 		// Grabbing the item
@@ -71,8 +89,16 @@ public class giveCommand extends PatCommand {
 
 		String successHoverText = item.toChatString(0, true);
 		
+		// Generate the stack
+		ItemStack itemStack = item.generateItem();
+		
+		// Set the amount (Defaulted to 1)
+		itemStack.setAmount(amount);
+		
 		// Give the player the itemStack
-		player.getInventory().addItem(item.generateItem());
+		player.getInventory().addItem(itemStack);
+		
+		CooldownHandler.checkUpdateCooldowns(player);
 		
 		// Allows the user to view the details on hover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
@@ -88,7 +114,9 @@ public class giveCommand extends PatCommand {
 			case 1: return (sender instanceof Player 
 					? StringsUtil.getVisibleOnlinePlayerNames((Player) sender)
 					: StringsUtil.getOnlinePlayerNames()) ;
-			default: return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
+			case 2: return StringsUtil.encase(Brewery.getItemCollection().getAllIDs(), "'", "'");
+			case 3: return Arrays.asList("(amount)");
 		}
+		return Arrays.asList();
 	}
 }

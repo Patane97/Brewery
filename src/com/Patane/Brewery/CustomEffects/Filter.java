@@ -9,13 +9,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
+import com.Patane.Brewery.CustomEffects.BrEffect.BrTag;
 import com.Patane.util.formables.Radius;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.ChatHoverable;
 import com.Patane.util.general.ChatStringable;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
+import com.Patane.util.metadata.RunnableMetaDataUtil;
+import com.Patane.util.metadata.TrackedMetaDataUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -579,9 +581,11 @@ public class Filter implements ChatStringable, ChatHoverable{
 			}
 			// Looping through each Tag.
 			for(String tag : tags) {
-				// Checks if the regex with the tag matches the entity.
-				if(BrMetaDataHandler.check(entity, "<TAG-"+tag+">"))
+				if(TrackedMetaDataUtil.has(entity, RunnableMetaDataUtil.prepRegex(String.format(BrTag.FORMAT, tag))))
 					return true;
+				// Checks if the regex with the tag matches the entity.
+//				if(BrMetaDataHandler.check(entity, "<TAG-"+tag+">"))
+//					return true;
 			}
 			// If the entity is a player
 			if(entity instanceof Player) {

@@ -2,22 +2,17 @@ package com.Patane.Brewery.CustomItems;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.BrEffect;
-import com.Patane.GUI.GUIAction;
-import com.Patane.GUI.GUIClick;
-import com.Patane.GUI.GUIIcon;
-import com.Patane.GUI.GUIPage;
 import com.Patane.util.collections.ChatCollectable;
 import com.Patane.util.general.Chat;
 import com.Patane.util.general.Check;
@@ -71,7 +66,7 @@ public class BrItem extends ChatCollectable{
 		setItemStack(item);
 		this.effects = (effects == null ? new ArrayList<BrEffect>() : effects);
 		this.cooldown = cooldown;
-		constructGUI();
+//		constructGUI();
 	}
 	
 	/* ================================================================================
@@ -144,10 +139,37 @@ public class BrItem extends ChatCollectable{
 	 * ================================================================================
 	 */
 	/**
-	 * Generates an ItemStack appropriate to give to a player for use.
+	 * Generates an item appropriate for Player use by saving a UUID to the item before returning it. Without this UUID, the item cannot be tracked for cooldown purposes.
 	 */
 	public ItemStack generateItem() {
-		return ItemEncoder.addTag(item.clone(), "UUID", UUID.randomUUID().toString());
+		return generateWithUUID(UUID.randomUUID());
+	}
+	
+	/**
+	 * Refreshes the given item to become the latest iteration of this BrItem. The given item will retain any specific properties it previously had, such as UUID & amount.
+	 * 
+	 * @param item Item to refresh.
+	 * @return A new ItemStack representing the latest iteration of this BrItems Itemstack.
+	 */
+	public ItemStack generateFrom(ItemStack oldStack) {
+		String brItemUUID = ItemEncoder.getString(oldStack, "UUID");
+		UUID uuid = (brItemUUID == null ? null : UUID.fromString(brItemUUID));		
+		
+		ItemStack newStack = generateWithUUID(uuid);
+		
+		// Copy any properties that need to be the same.
+		newStack.setAmount(oldStack.getAmount());
+		
+		return newStack;
+	}
+	
+	public ItemStack generateWithUUID(UUID uuid) {
+		// Projectiles should not be unique. This way, they can be stacked!
+		if(type == CustomType.PROJECTILE)
+			return item.clone();
+		if(uuid == null)
+			return generateItem();
+		return ItemEncoder.addTag(this.item.clone(), "UUID", uuid.toString());
 	}
 	
 	/**
@@ -160,7 +182,35 @@ public class BrItem extends ChatCollectable{
 			return null;
 		return Brewery.getItemCollection().getItem(itemName);
 	}
-
+	
+	public static boolean isBrItem(ItemStack item) {
+		return ItemEncoder.hasTag(item, "name");
+	}
+	
+	/**
+	 * Refreshes all BrItems ItemStacks within all online inventories. This ensures each item within each inventory has the latest ItemStack for its BrItem.
+	 */
+	public static void refreshAllInventories() {
+		Brewery.getInstance().getServer().getOnlinePlayers().forEach(p -> refreshInventory(p.getInventory()));		
+	}
+	
+	/**
+	 * Refreshes any BrItem ItemStacks within the given inventory. This ensures each item within this inventory has the latest ItemStack for its BrItem.
+	 * @param inventory Inventory to refresh
+	 */
+	public static void refreshInventory(Inventory inventory) {
+		ItemStack[] contents = inventory.getContents();
+		for(int i=0 ; i<contents.length ; i++) {
+			if(contents[i] == null)
+				continue;
+			BrItem item = BrItem.getFromItemStack(contents[i]);
+			if(item != null) {
+				Messenger.debug(String.format("Refreshing %s(%d) ItemStack within a %s inventory.", item.getName(), contents[i].getAmount(), inventory.getType().toString()));
+				inventory.setItem(i, item.generateFrom(contents[i]));
+			}
+		}
+	}
+	
 	/* ================================================================================
 	 * ChatStringable & ChatHoverable Methods
 	 * ================================================================================
@@ -312,8 +362,7 @@ public class BrItem extends ChatCollectable{
 				// If the effect has a radius, then it can be executed.
 				// If the effect does not have a radius, then it cannot be executed on a specific location.
 				if(effect.isComplete())
-					if(effect.hasRadius())
-						effect.execute(location, executor);
+					effect.execute(location, executor);
 			}
 
 			// Collecting information and displaying it in one line in console
@@ -327,7 +376,7 @@ public class BrItem extends ChatCollectable{
 			return true;
 		} catch (Exception e) {
 			Messenger.severe(String.format("Failed to execute Brewery Item %s at Location:", this.getName()));
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			return false;
 		}
 	}
@@ -356,7 +405,7 @@ public class BrItem extends ChatCollectable{
 			return true;
 		} catch (Exception e) {
 			Messenger.severe(String.format("Failed to execute Brewery Item %s on Living Entity:", this.getName()));
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			return false;
 		}
 	}
@@ -366,49 +415,49 @@ public class BrItem extends ChatCollectable{
 	 * ================================================================================
 	 */
 	
-	protected GUIPage guiPage;
-	
-	public GUIPage guiPage() {
-		return guiPage;
-	}
-	public void constructGUI() {
-		GUIPage mainPage = new GUIPage(this.getName(), 1, false);
-		guiPage = mainPage;
-		
-		//
-		GUIIcon typeIcon = new GUIIcon(type.getGuiIcon());
-		typeIcon.addAction(GUIClick.LEFT, new GUIAction() {
-
-			@Override
-			public boolean execute() {
-				Iterator<CustomType> iter = Arrays.stream(CustomType.values()).iterator();
-				while(iter.next() != type) {}
-				type = (iter.hasNext() ? iter.next() : CustomType.values()[0]);
-				typeIcon.icon = type.getGuiIcon();
-				mainPage.updateIcon(typeIcon);
-				return true;
-			}
-		});
-		mainPage.addIcon(1, typeIcon);
-		//
-		GUIPage effectsPage = new GUIPage(this.getName() + " Effects", 1, false);
-		effectsPage.addBackIcon(effectsPage.getInventory().getSize()-1, mainPage);
-		
-		// implement 'icon dragging'
-//		GUIIcon item = new GUIIcon();
-		GUIIcon effectIcon = new GUIIcon(ItemsUtil.addFlavourText(ItemsUtil.createItem(Material.BOOK, Math.max(effects.size(), 1), "&6Effects: &2"+effects.size()), "Click to edit"));
-		effectIcon.addAction(GUIClick.LEFT, new GUIAction() {
-
-			@Override
-			public boolean execute() {
-				mainPage.open(effectsPage);
-				return true;
-			}
-			
-		});
-		mainPage.addIcon(2, effectIcon);
-		//
-	}
+//	protected GUIPage guiPage;
+//	
+//	public GUIPage guiPage() {
+//		return guiPage;
+//	}
+//	public void constructGUI() {
+//		GUIPage mainPage = new GUIPage(this.getName(), 1, false);
+//		guiPage = mainPage;
+//		
+//		//
+//		GUIIcon typeIcon = new GUIIcon(type.getGuiIcon());
+//		typeIcon.addAction(GUIClick.LEFT, new GUIAction() {
+//
+//			@Override
+//			public boolean execute() {
+//				Iterator<CustomType> iter = Arrays.stream(CustomType.values()).iterator();
+//				while(iter.next() != type) {}
+//				type = (iter.hasNext() ? iter.next() : CustomType.values()[0]);
+//				typeIcon.icon = type.getGuiIcon();
+//				mainPage.updateIcon(typeIcon);
+//				return true;
+//			}
+//		});
+//		mainPage.addIcon(1, typeIcon);
+//		//
+//		GUIPage effectsPage = new GUIPage(this.getName() + " Effects", 1, false);
+//		effectsPage.addBackIcon(effectsPage.getInventory().getSize()-1, mainPage);
+//		
+//		// implement 'icon dragging'
+////		GUIIcon item = new GUIIcon();
+//		GUIIcon effectIcon = new GUIIcon(ItemsUtil.addFlavourText(ItemsUtil.createItem(Material.BOOK, Math.max(effects.size(), 1), "&6Effects: &2"+effects.size()), "Click to edit"));
+//		effectIcon.addAction(GUIClick.LEFT, new GUIAction() {
+//
+//			@Override
+//			public boolean execute() {
+//				mainPage.open(effectsPage);
+//				return true;
+//			}
+//			
+//		});
+//		mainPage.addIcon(2, effectIcon);
+//		//
+//	}
 
 /* ================================================================================
  * Item Specific Classes
@@ -419,28 +468,51 @@ public class BrItem extends ChatCollectable{
 	 * ================================================================================
 	 */
 	public static enum CustomType {
-		THROWABLE(Material.SPLASH_POTION, "Right click whilst holding to throw this item. Effects apply on impacted location or target."),
-		HITTABLE(Material.IRON_SWORD, "Hit a block or target to apply the effects at that location."),
-		CLICKABLE(Material.STONE_BUTTON, "Right click whilst holding to activate this item. Effects apply from the users location.");
+		THROWABLE("Throwable", "Right click whilst holding to throw this item and apply its effects on the impacted location or target. If there is no radius set, only the target that is hit will be affected.",
+				true),
+		HITTABLE("Hittable", "Swing and hit to apply this items effects at the desired location or target. If there is no radius set, only the target that is hit by you will be affected.",
+				true),
+		CLICKABLE("Clickable", "Right click whilst holding this item to trigger its effects at your location. If there is no radius set, only you will be affected.",
+				true),
+		CONSUMABLE("Consumable", "Right click to consume this item to trigger its effects at your location. If there is no radius set, only you will be affected.",
+				true),
+		PROJECTILE("Projectile", "If this item is a projectile, it will trigger its effects on the impact location or target. If there is no radius, only the target you hit with the projectile will be affected.",
+				false);
 		
-		private ItemStack icon;
-		private ItemStack guiItem;
-		private String description;
+		final private String name;
+		final private String description;
+		final private boolean unique;
 		
-		CustomType(Material material, String description) {
-			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.stringSplitter(description, 5, "&7")));
-			this.guiItem = ItemsUtil.addFlavourText(ItemsUtil.setItemNameLore(icon,"&6Item Type: &2"+ItemsUtil.getDisplayName(icon)), "Click to change");
+		CustomType(String name, String description, boolean unique) {
+//			this.icon = ItemsUtil.addFlags(ItemsUtil.createItem(material, 1, StringsUtil.formaliseString(this.name()), StringsUtil.stringSplitter(description, 5, "&7")));
+//			this.guiItem = ItemsUtil.addFlavourText(ItemsUtil.setItemNameLore(icon,"&6Item Type: &2"+ItemsUtil.getDisplayName(icon)), "Click to change");
+			this.name = name;
 			this.description = description;
+			this.unique = unique;
+		}
+		public String toString() {
+			return getName();
+		}
+		
+		public String getName() {
+			return name;
 		}
 		public String getDescription() {
 			return description;
 		}
-		public ItemStack getIcon() {
-			return icon;
+		
+		public boolean isUnique() {
+			return unique;
 		}
-		public ItemStack getGuiIcon() {
-			return guiItem;
-		}
+		
+//		public ItemStack getIcon() {
+//			return icon;
+//		}
+//		public ItemStack getGuiIcon() {
+//			return guiItem;
+//		}
+		
+		
 	}
 
 }

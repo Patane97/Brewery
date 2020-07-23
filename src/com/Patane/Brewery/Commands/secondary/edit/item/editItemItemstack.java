@@ -23,5 +23,5 @@ public class editItemItemstack extends editItem {
 	@Override
 	public List<String> tabComplete(CommandSender sender, String[] args, Object... objects) {
 		return this.tabCompleteCore(sender, args, objects);
-	}
+	}	
 }

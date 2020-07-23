@@ -12,7 +12,7 @@ import com.Patane.util.general.Check;
 		desc="Smites a living entity with thunder.")
 public class Smite extends Modifier{
 	@ParseField(desc="Amount to damage the living entity for.")
-	public double amount;
+	private double amount;
 	
 	public Smite() {
 		super();

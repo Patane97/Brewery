@@ -62,7 +62,7 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 		}
 		// This will catch if theres any other error with generating this mapParsable
 		catch(InvocationTargetException e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			Messenger.send(sender, "&cParticle effect could not be added due to an uncommon error. Please check server console for error trace.");
 			return true;
 		}
@@ -73,7 +73,8 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 		String successMsg = String.format("&aAdded new Particle Effect to &7%s&a. Hover to view the details!", effect.getName());
 		
 		String successHoverText = generateEditingTitle(effect)
-								+ (effect.hasParticles() ? StringsUtil.manyToChatString(0, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0])) : "");
+								+ "&2Particle Effects:\n"
+								+ (effect.hasParticles() ? StringsUtil.manyToChatString(1, 0, true, null, null, effect.getParticles().toArray(new SpecialParticle[0]))+"\n" : "");
 		
 		for(SpecialParticle currentParticleEffect : effect.getParticles()) {
 			if(currentParticleEffect.getParticle() == particleEffect.getParticle() && currentParticleEffect.equalFieldMap(particleEffect)) {
@@ -84,7 +85,7 @@ public class editEffectSetParticlesAdd extends editEffectSetParticles {
 		}
 		
 		// Add the particle effect to the end of the particle effect list
-		successHoverText += String.format("\n%s", Chat.add(particleEffect.toChatString(0, true), ChatColor.BOLD));
+		successHoverText += String.format("%s", Chat.add(particleEffect.toChatString(1, true), ChatColor.BOLD));
 		
 		// Save the new specialParticle to the effect
 		effect.addParticle(particleEffect);

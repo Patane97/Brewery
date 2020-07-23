@@ -14,7 +14,7 @@ import com.Patane.util.general.Check;
 		desc="Feeds a living player for a certain amount.")
 public class Feed extends Modifier{
 	@ParseField(desc="Amount of food given to the living player.")
-	public double amount;
+	private double amount;
 	
 	public Feed() {
 		super();

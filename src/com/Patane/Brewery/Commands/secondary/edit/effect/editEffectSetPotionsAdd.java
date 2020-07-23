@@ -64,7 +64,7 @@ public class editEffectSetPotionsAdd extends editEffectSetPotions {
 		}
 		
 		// Checking amplifier is given
-		if(args.length < 2) {
+		if(args.length < 3) {
 			Messenger.send(sender, "&ePlease provide an amplifier. This must be a rounded, positive number or 0.");
 			return true;
 		}
@@ -131,7 +131,8 @@ public class editEffectSetPotionsAdd extends editEffectSetPotions {
 		String successMsg = String.format("&aAdded new Potion Effect to &7%s&a. Hover to view the details!", effect.getName());
 		
 		String successHoverText = generateEditingTitle(effect)
-								+ (effect.hasPotions() ? StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0])) : "");
+								+ "&2Potion Effects:\n"
+								+ (effect.hasPotions() ? StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], effect.getPotions().toArray(new PotionEffect[0]))+"\n" : "");
 		
 		// If the type AND amplifier are equal, we do not want to duplicate with the same amp. Therefore, do nothing and message appropriately
 		for(PotionEffect currentPotionEffect : effect.getPotions()) {
@@ -144,7 +145,7 @@ public class editEffectSetPotionsAdd extends editEffectSetPotions {
 			}
 		}
 		// Add the new potion to end of potion effect list
-		successHoverText += String.format("\n%s", Chat.add(StringsUtil.toChatString(0, true, s -> "&2"+s[0]+"&2: &7"+s[1], potionEffect), ChatColor.BOLD));
+		successHoverText += String.format("%s", Chat.add(StringsUtil.toChatString(1, true, s -> "&2"+s[0]+"&2: &7"+s[1], potionEffect), ChatColor.BOLD));
 		
 		// Save potion effect to effect
 		effect.addPotion(potionEffect);

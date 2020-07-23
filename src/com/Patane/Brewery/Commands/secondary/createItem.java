@@ -48,6 +48,12 @@ public class createItem extends createCommand {
 			Messenger.send(player, "&ePlease hold an item you wish to create with.");
 			return true;
 		}
+		BrItem item = BrItem.getFromItemStack(itemStack);
+		// Making sure the item they are holding isnt ALREADY a brewery item.
+		if(item != null) {
+			Messenger.send(player, String.format("&eThis held item is already a Brewery Item named &7%s&e. Please hold a non-brewery Item.", item.getName()));
+			return true;
+		}
 		
 		// Checking item name is given
 		if(args.length < 1) {
@@ -58,7 +64,6 @@ public class createItem extends createCommand {
 		// Setting name
 		String itemName = Commands.combineArgs(args);
 		
-		BrItem item = null;
 		
 		// If an item with that name already exists, do nothing and message appropriately
 		if(Brewery.getItemCollection().hasItem(itemName)) {
@@ -67,7 +72,7 @@ public class createItem extends createCommand {
 														, item.toChatString(0, false)));
 			return true;
 		}
-		String successMsg = "&aCreated a new Brewery Item. Hover to view its details!";
+		String successMsg = "&aCreated a new Brewery Item which you are now holding. Hover to view its details!";
 		String successHoverText = null;
 		
 		try {
@@ -86,10 +91,13 @@ public class createItem extends createCommand {
 		} catch (Exception e) {
 			// Save the error message onto successMsg (oh the irony)
 			successMsg = "&cItem could not be created due to an error. Please check server console for error trace.";
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		// Allows the user to view the details on hover
 		TextComponent successMsgComponent = StringsUtil.hoverText(successMsg, successHoverText);
+		
+		// Sets the item they just used to be the brewery item!
+		player.getInventory().setItemInMainHand(item.generateItem());
 		
 		// Send the hover message to sender
 		Messenger.send(sender, successMsgComponent);

@@ -8,11 +8,11 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.metadata.Metadatable;
 import org.bukkit.potion.PotionEffect;
 
 import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomItems.BrItem;
-import com.Patane.Brewery.Handlers.BrMetaDataHandler;
 import com.Patane.runnables.PatRunnable;
 import com.Patane.util.YAML.MapParsable;
 import com.Patane.util.annotations.ClassDescriber;
@@ -24,6 +24,8 @@ import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.general.StringsUtil.LambdaStrings;
+import com.Patane.util.metadata.RunnableMetaDataUtil;
+import com.Patane.util.metadata.TrackedMetaDataUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -129,7 +131,7 @@ public class BrEffect extends ChatCollectable{
 	
 	// Radius
 	public boolean hasRadius() {
-		return(radius == null ? false : true);
+		return radius != null;
 	}
 	public Radius getRadius() {
 		return radius;
@@ -184,12 +186,14 @@ public class BrEffect extends ChatCollectable{
 			int i = incParticles.get(particle);
 			if(i!=0)
 				particle.formatChatName("&7%s&8("+i+")");
+			else
+				particle.formatChatName("&7%s");
 		}
 	}
 	
 	// Sound
 	public boolean hasSound() {
-		return (sounds == null ? false : true);
+		return sounds != null;
 	}
 	public BrSoundEffect getSoundEffect() {
 		return sounds;
@@ -238,7 +242,7 @@ public class BrEffect extends ChatCollectable{
 	
 	// Tags
 	public boolean hasTag() {
-		return (tag == null ? false : true);
+		return tag != null;
 	}
 	public BrTag getTag() {
 		return tag;
@@ -361,7 +365,7 @@ public class BrEffect extends ChatCollectable{
 		if(hasParticles()) {
 			if(deep) {
 				effectInfo += "\n" + Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")
-							+ StringsUtil.manyToChatString(indentCount+1, 0, false, null, s -> "&2> "+s[1], particles.toArray(new SpecialParticle[0]));
+							+ "\n" + StringsUtil.manyToChatString(indentCount+1, 0, false, null, s -> "&2> "+s[0], particles.toArray(new SpecialParticle[0]));
 			}
 			else
 				effectInfo += "\n" + Chat.indent(indentCount+1) + alternateLayout.build("Particle Effects", Integer.toString(particles.size()));
@@ -419,10 +423,10 @@ public class BrEffect extends ChatCollectable{
 		}
 		
 		// Radius
-		if(hasRadius())
+		if(hasRadius()) {
 			componentList.add(StringsUtil.createTextComponent("\n"));
 			componentList.addAll(Arrays.asList(radius.toChatHover(indentCount, deep, deepLayout)));
-
+		}
 		// Tag
 		if(hasTag()) {
 			componentList.add(StringsUtil.createTextComponent("\n"));
@@ -439,7 +443,9 @@ public class BrEffect extends ChatCollectable{
 		if(hasPotions()) {
 			// Need to manually do deep check here as the potion effect toChatString method prints each potion individually, whilst we want to look at the list as a whole
 			if(deep) {
-				componentList.add(StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Potion Effects", "")));
+				componentList.add(StringsUtil.hoverText("\n"+Chat.indent(indentCount)+alternateLayout.build("Potion Effects", "")
+				, "&f&lPotion Effects"
+				+ "\n&7These minecraft potion effects will be applied to all entities hit by the attached effect."));
 				for(PotionEffect potionEffect : potionEffects) {
 					current = StringsUtil.hoverText("\n"+StringsUtil.toChatString(indentCount+1, false, s -> "&2> "+s[0], potionEffect)
 							, StringsUtil.toChatString(0, true, alternateLayout, potionEffect));
@@ -455,7 +461,9 @@ public class BrEffect extends ChatCollectable{
 		if(hasParticles()) {
 			// Manually doing deep check as each SpecialParticle has its own toHoverString
 			if(deep) {
-				componentList.add(StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Particle Effects", "")));
+				componentList.add(StringsUtil.hoverText("\n"+Chat.indent(indentCount)+alternateLayout.build("Particle Effects", "")
+				, "&f&lParticle Effects"
+				+ "\n&7These unique particle effects will spawn when the attached effect is activated."));
 				for(SpecialParticle particle : particles) {
 					current = StringsUtil.hoverText(String.format("\n%s&2> %s", Chat.indent(indentCount+1), particle.getChatName())
 							, particle.toChatString(0, true, deepLayout));
@@ -499,7 +507,7 @@ public class BrEffect extends ChatCollectable{
 			return true;
 		} catch(Exception e) {
 			Messenger.severe(String.format("Failed to execute Brewery Effect %s at Location:", this.getName()));
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			return false;
 		}
 	}
@@ -517,7 +525,7 @@ public class BrEffect extends ChatCollectable{
 			return true;
 		} catch(Exception e) {
 			Messenger.severe(String.format("Failed to execute Brewery Effect %s on Living Entity:", this.getName()));
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 			return false;
 		}
 	}
@@ -677,12 +685,12 @@ public class BrEffect extends ChatCollectable{
 			desc="Applies a custom sound effect when the attached effect is activated.")
 	public static class BrSoundEffect extends MapParsable{
 		@ParseField(desc="Custom sound effect to be heard.")
-		public Sound type;
+		private Sound type;
 //		public Formation formation;
 		@ParseField(desc="Volume of the sound effect.")
-		public float volume;
+		private float volume;
 		@ParseField(desc="Altered pitch of the sound effect.")
-		public float pitch;
+		private float pitch;
 		
 		public BrSoundEffect() {
 			super();
@@ -773,8 +781,12 @@ public class BrEffect extends ChatCollectable{
 			name="Tag",
 			desc="Adds a tag to each living entity being affected by the attached effect. This tag can be used in other effects filters to target or ignore entities hit by this effect.")
 	public static class BrTag extends MapParsable{
+		public static final String FORMAT = "tag:%s";
+		
 		@ParseField(desc="The word or phrase to recognise this tag with.")
-		public String name;
+		private String name;
+		
+		private String metadataName;
 		
 		public BrTag() {
 			super();
@@ -782,6 +794,7 @@ public class BrEffect extends ChatCollectable{
 		
 		public BrTag(Map<String, String> fields) {
 			super(fields);
+			metadataName = String.format(FORMAT, name);
 		}
 
 		@Override
@@ -817,11 +830,20 @@ public class BrEffect extends ChatCollectable{
 		 */
 
 		public void apply(PatRunnable task, List<LivingEntity> entities) {
-			BrMetaDataHandler.addClean(task, entities, "TAG", name);
+			RunnableMetaDataUtil.refresh(new ArrayList<Metadatable>(entities), metadataName, task);
+			
+//			TrackedMetaDataUtil.refresh(new ArrayList<Metadatable>(entities), RunnableMetaDataUtil.prepName("tag", task), new FixedMetadataValue(Brewery.getInstance(), name));
+//			TrackedMetaDataUtil.remove(taskName);
+//			TrackedMetaDataUtil.set(new ArrayList<Metadatable>(entities), taskName, new FixedMetadataValue(Brewery.getInstance(), name));
+//			RunnableMetaDataUtil.setFresh(new ArrayList<Metadatable>(entities), "tag", , task);
+//			BrMetaDataHandler.addClean(task, entities, "TAG", name);
 		}
 		
 		public void clear(PatRunnable task) {
-			BrMetaDataHandler.remove(task, "TAG");
+			TrackedMetaDataUtil.remove(RunnableMetaDataUtil.prepName(metadataName, task));
+			
+//			BrMetaDataHandler.remove(task, "TAG");
 		}
+		
 	}
 }

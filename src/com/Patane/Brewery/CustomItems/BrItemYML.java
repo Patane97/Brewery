@@ -250,7 +250,7 @@ public class BrItemYML extends BreweryYAML{
 			throw e;
 		} catch (Exception e) {
 			Messenger.warning("'"+item.getName()+"' Item failed to save:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		return false;
 	}
@@ -325,7 +325,7 @@ public class BrItemYML extends BreweryYAML{
 					ItemsUtil.setUnbreakable(itemStack, unbreakable);
 			} catch (IllegalArgumentException e) {
 				Messenger.warning("'unbreakable' value is invalid for '"+itemName+"' Item. Unbreakable will be set to 'false'");
-				e.printStackTrace();
+				Messenger.printStackTrace(e);
 			}
 			
 			// >>> Flags
@@ -353,14 +353,14 @@ public class BrItemYML extends BreweryYAML{
 							itemStack = ItemsUtil.addFlags(itemStack, getEnumFromString(flagString, ItemFlag.class));
 						} catch (NullPointerException e) {
 							Messenger.warning("'"+flagString+"' is not a valid ItemFlag");
-							e.printStackTrace();
+							Messenger.printStackTrace(e);
 						}
 						
 					}
 				}
 			} catch (Exception e ) {
 				Messenger.warning("Failed to load Flags for '"+itemName+"' Item.  No flags will be set for this item:");
-				e.printStackTrace();
+				Messenger.printStackTrace(e);
 			}
 			
 			// >>> Enchantments
@@ -387,14 +387,14 @@ public class BrItemYML extends BreweryYAML{
 							// Occurs if level is not a number.
 							catch (NumberFormatException e) {
 								Messenger.warning("'"+enchantmentName+"' does not have a valid level. Please ensure it is a number");
-								e.printStackTrace();
+								Messenger.printStackTrace(e);
 							}
 						}
 						
 					}
 				} catch (Exception e) {
 					Messenger.warning("Failed to load Enchantments for '"+itemName+"' Item");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			setSelect(itemName, "item");
@@ -432,17 +432,17 @@ public class BrItemYML extends BreweryYAML{
 									itemStack = ItemsUtil.addAttributeModifier(itemStack, attribute, attributeModifier);
 								} catch (Exception e) {
 									Messenger.warning("Failed to load '"+modifierName+"' for '"+attributeName+"' attribute for '"+itemName+"' Item");
-									e.printStackTrace();
+									Messenger.printStackTrace(e);
 								}
 							}
 						} catch (Exception e) {
 							Messenger.warning("Failed to load '"+attributeName+"' attribute for '"+itemName+"' Item");
-							e.printStackTrace();
+							Messenger.printStackTrace(e);
 						}
 					}
 				} catch (Exception e) {
 					Messenger.warning("Failed to load Attributes for '"+itemName+"' Item");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			
@@ -485,7 +485,7 @@ public class BrItemYML extends BreweryYAML{
 				// Generally NullPointerExceptions, however some other can come from retieve if handled incorrectly.
 				catch(Exception e) {
 					Messenger.warning("'"+effectName+"' Effect for '"+itemName+" Item failed to be retireved:");
-					e.printStackTrace();
+					Messenger.printStackTrace(e);
 				}
 			}
 			// Creates the item with all given values.
@@ -497,12 +497,12 @@ public class BrItemYML extends BreweryYAML{
 			return item;
 		} catch(YAMLException e) {
 			Messenger.warning("An item failed to be found and loaded:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		} catch (IllegalStateException e) {
 			throw e;
 		} catch (Exception e) {
 			Messenger.warning("'"+itemName+"' Item failed to load:");
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		return null;
 	}

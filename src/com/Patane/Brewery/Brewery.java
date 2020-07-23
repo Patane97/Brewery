@@ -56,6 +56,8 @@ public class Brewery extends JavaPlugin{
 		
 		CooldownHandler.onLoadChecks();
 		
+		BrItem.refreshAllInventories();
+		
 		Messenger.info("Brewery version " + this.getDescription().getVersion() + " successfully loaded!");
 	}
 	public void onDisable() {
@@ -76,18 +78,18 @@ public class Brewery extends JavaPlugin{
 			BrEffect.setYML(new BrEffectYML());
 			BrEffect.YML().load();
 		} catch(Exception e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		try {
 			BrItem.setYML(new BrItemYML());
 			BrItem.YML().load();
 		} catch(Exception e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 		try {
 			CooldownHandler.setYML(new YAMLData("cooldowns", "data"));
 		} catch(Exception e) {
-			e.printStackTrace();
+			Messenger.printStackTrace(e);
 		}
 	}
 	public static Brewery getInstance() {
