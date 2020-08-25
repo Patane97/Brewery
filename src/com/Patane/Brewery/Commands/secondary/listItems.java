@@ -15,9 +15,9 @@ import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 @CommandInfo(
 	name = "list items",
 	aliases = {"item"},
@@ -38,7 +38,7 @@ public class listItems extends listCommand {
 		for(BrItem item : Brewery.getItemCollection().getAllItems()) {
 			TextComponent text = StringsUtil.createTextComponent("\n"+Chat.indent(1)+"&2> &7"+item.getName());
 			
-			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(item.toChatString(0, true))).create()));
+			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate(item.toChatString(0, true)))));
 			
 			text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandHandler.getPackage(infoItem.class).buildString(item.getName())));
 			

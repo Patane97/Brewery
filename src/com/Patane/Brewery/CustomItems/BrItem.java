@@ -26,6 +26,7 @@ import com.Patane.util.main.PataneUtil;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 
 public class BrItem extends ChatCollectable{
@@ -258,6 +259,7 @@ public class BrItem extends ChatCollectable{
 		return itemInfo;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public TextComponent[] toChatHover(int indentCount, boolean deep, LambdaStrings alternateLayout) {
 		// If the alternateLayout is null, we want to use the default layout for itself
@@ -275,12 +277,17 @@ public class BrItem extends ChatCollectable{
 		// Saving Type with layout
 		current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Type", type.toString()));
 		// Saving Hover as Type name and description
-		current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+		current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate(
 				"&f&l"+type.toString() 
-			  + "\n&7"+type.getDescription())).create()));
+			  + "\n&7"+type.getDescription()))));
 		componentList.add(current);
 		
 		// ItemStack
+		
+		/**
+		 * TODO: When more detailed documentation about 'net.md_5.bungee.api.chat.hover.content.Item' is released, change the below two
+		 * ComponentBuilders to that. It is hard to update at this time as there is no information on HOW to actually use it. ~ 12/8/20
+		 */
 		if(deep) {
 			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Item", "\n"));
 			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(ItemsUtil.ItemStackToJSON(item)).create()));
@@ -301,17 +308,17 @@ public class BrItem extends ChatCollectable{
 			// If not empty, set Cooldown with layout
 			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Cooldown", Float.toString(cooldown)+" second"+(cooldown > 1 ? "s" : "")));
 			// Show how cooldown works
-			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate(
 					"&f&lCooldown"
-				  + "\n&7Once used, this item will take "+cooldown+" second"+(cooldown > 1 ? "s" : "")+" to recover its use again.")).create()));
+				  + "\n&7Once used, this item will take "+cooldown+" second"+(cooldown > 1 ? "s" : "")+" to recover its use again."))));
 		}
 		else {
 			// If empty, set cooldown with none
 			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Cooldown", "None"));
 			// Show how 'none' cooldown works
-			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(
+			current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate(
 					"&f&lCooldown"
-				  + "\n&7This item does not take any time to recover its use.")).create()));
+				  + "\n&7This item does not take any time to recover its use."))));
 		}
 		componentList.add(current);
 		
@@ -324,7 +331,7 @@ public class BrItem extends ChatCollectable{
 			for(BrEffect effect : effects) {
 				// Prints the effect with &7 if its complete or &8&o if its not
 				current = StringsUtil.createTextComponent(String.format("\n%s&2> %s%s", Chat.indent(indentCount+1), (effect.isComplete() ? "&7" : "&8&o"), effect.getName()));
-				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r "+effect.toChatString(0, true))).create()));
+				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate("&f&l"+getName()+" &7&l\u2192&r "+effect.toChatString(0, true)))));
 				componentList.add(current);
 			}
 		}
@@ -333,7 +340,7 @@ public class BrItem extends ChatCollectable{
 			current = StringsUtil.createTextComponent("\n"+Chat.indent(indentCount) + alternateLayout.build("Effects", Integer.toString(effects.size())));
 			// If there are effects, show them on hover.
 			if(effects.size() > 0)
-				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&f&l"+getName()+" &7&l\u2192&r\n"+StringsUtil.manyToChatString(1, 2, true, null, null, effects.toArray(new BrEffect[0])))).create()));
+				current.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate("&f&l"+getName()+" &7&l\u2192&r\n"+StringsUtil.manyToChatString(1, 2, true, null, null, effects.toArray(new BrEffect[0]))))));
 			componentList.add(current);
 		}
 		
@@ -512,6 +519,23 @@ public class BrItem extends ChatCollectable{
 //			return guiItem;
 //		}
 		
+		/**
+		 * Determines the appropriate CustomType for the given itemstack.
+		 * @param itemStack
+		 * @return
+		 */
+		public static CustomType determineType(ItemStack itemStack) {
+			switch(itemStack.getType()) {
+				case ARROW:
+				case SPECTRAL_ARROW:
+				case TIPPED_ARROW:
+					return CustomType.PROJECTILE;
+				default:
+					if(itemStack.getType().isEdible())
+						return CustomType.CONSUMABLE;
+					return CustomType.HITTABLE;
+			}
+		}
 		
 	}
 

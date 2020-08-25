@@ -15,9 +15,9 @@ import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 @CommandInfo(
 	name = "list effects",
 	aliases = {"effect"},
@@ -38,7 +38,7 @@ public class listEffects extends listCommand {
 		for(BrEffect effect : Brewery.getEffectCollection().getAllItems()) {
 			TextComponent text = StringsUtil.createTextComponent("\n"+Chat.indent(1)+"&2> &7"+effect.getName());
 			
-			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate(effect.toChatString(0, false))).create()));
+			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate(effect.toChatString(0, false)))));
 			
 			text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandHandler.getPackage(infoEffect.class).buildString(effect.getName())));
 			

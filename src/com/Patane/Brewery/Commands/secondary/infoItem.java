@@ -18,9 +18,9 @@ import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 @CommandInfo(
 	name = "info item",
 	description = "Provides detailed information for a Brewery Item.",
@@ -59,7 +59,7 @@ public class infoItem extends infoCommand{
 		
 		// textComponents[1] should be the Item Title!
 		
-		textComponents[1].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Chat.translate("&7Click here to give yourself this item!")).create()));
+		textComponents[1].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Chat.translate("&7Click here to give yourself this item!"))));
 		textComponents[1].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, CommandHandler.getPackage(giveCommand.class).buildString(sender.getName(), item.getName())));
 		
 		Messenger.send(sender, textComponents);

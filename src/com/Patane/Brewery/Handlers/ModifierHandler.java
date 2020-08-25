@@ -1,10 +1,19 @@
 package com.Patane.Brewery.Handlers;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.core.util.Loader;
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.FilenameUtils;
+
+import com.Patane.Brewery.Brewery;
 import com.Patane.Brewery.CustomEffects.Modifier;
 import com.Patane.Brewery.CustomEffects.modifiers.Damage;
 import com.Patane.Brewery.CustomEffects.modifiers.Effect;
@@ -44,6 +53,33 @@ public class ModifierHandler implements PatHandler{
 		register(Kill.class);
 		register(Effect.class);
 		Messenger.debug("Registered Modifiers: "+StringsUtil.stringJoiner(modifiers.keySet(), ", "));
+		
+		// Saves all files in array which have the ".jar" extension
+		File[] modifierFiles = new File(Brewery.getInstance().getDataFolder(), "modifiers").listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return (FilenameUtils.getExtension(file.getName()) == "jar" ? true : false);
+			}
+		});
+		
+		// Lists through each file
+		for(File modifierJar : modifierFiles) {
+			String fileName = FilenameUtils.getName(modifierJar.getName());
+			try {
+				URLClassLoader loader = new URLClassLoader(new URL[] {
+						new URL(modifierJar.toURI().toURL().toString())
+				});
+				
+				Class<?> cls = loader.loadClass(fileName);
+				
+				
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	private static void register(Class< ? extends Modifier> modifierClass) {
 		ClassDescriber info = modifierClass.getAnnotation(ClassDescriber.class);

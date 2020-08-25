@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +17,7 @@ import com.Patane.util.general.Chat;
 import com.Patane.util.general.Messenger;
 import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
+import com.Patane.util.ingame.InventoriesUtil;
 
 import net.md_5.bungee.api.chat.TextComponent;
 @CommandInfo(
@@ -41,10 +41,10 @@ public class createItem extends createCommand {
 		Player player = (Player) sender;
 		
 		// Saving the itemstack
-		ItemStack itemStack = player.getInventory().getItemInMainHand();
+		ItemStack itemStack = InventoriesUtil.getHand(player.getInventory(), true);
 		
 		// Making sure they are holding an item
-		if(itemStack == null || itemStack.getType() == Material.AIR) {
+		if(itemStack == null) {
 			Messenger.send(player, "&ePlease hold an item you wish to create with.");
 			return true;
 		}
@@ -76,7 +76,7 @@ public class createItem extends createCommand {
 		String successHoverText = null;
 		
 		try {
-			item = new BrItem(itemName, CustomType.HITTABLE, itemStack, null, null);
+			item = new BrItem(itemName, CustomType.determineType(itemStack), itemStack, null, null);
 			
 
 			// Save new effect onto hover text

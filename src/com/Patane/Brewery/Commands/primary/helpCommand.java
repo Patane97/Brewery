@@ -15,9 +15,9 @@ import com.Patane.util.general.StringsUtil;
 import com.Patane.util.ingame.Commands;
 
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 @CommandInfo(
 	name = "help",
@@ -39,7 +39,7 @@ public class helpCommand extends PatCommand {
 			
 			TextComponent commandText = new TextComponent(Chat.translate(" &a> &7"+parentPackage.info().usage()));
 			
-			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Commands.hoverFormat(parentPackage.info())).create()));
+			commandText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Commands.hoverFormat(parentPackage.info()))));
 			
 			commandText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, parentPackage.info().usage()));
 			
